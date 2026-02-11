@@ -3,6 +3,7 @@ import { Node, Edge, Connection, addEdge, OnSelectionChangeParams, useReactFlow 
 import { NodeData } from '../types';
 import { DEFAULT_EDGE_OPTIONS, NODE_WIDTH, NODE_HEIGHT } from '../constants';
 import { useFlowStore } from '../store';
+import { alignNodes, distributeNodes } from '../services/AlignDistribute';
 
 export const useFlowOperations = (
   recordHistory: () => void,
@@ -49,6 +50,26 @@ export const useFlowOperations = (
     setEdges((eds) => eds.map((edge) => edge.id === id ? { ...edge, ...updates } : edge));
   }, [setEdges, recordHistory]);
 
+  const onEdgeUpdate = useCallback((oldEdge: Edge, newConnection: Connection) => {
+    recordHistory();
+    setEdges((eds) => {
+      // updateEdge from reactflow handles logic merging oldEdge and newConnection cleanly
+      // But since we are managing state in Zustand, we can manually merge.
+      return eds.map((edge) => {
+        if (edge.id === oldEdge.id) {
+          return {
+            ...edge,
+            source: newConnection.source || edge.source,
+            target: newConnection.target || edge.target,
+            sourceHandle: newConnection.sourceHandle, // Can be null
+            targetHandle: newConnection.targetHandle, // Can be null
+          };
+        }
+        return edge;
+      });
+    });
+  }, [setEdges, recordHistory]);
+
   // --- Delete Operations ---
   const deleteNode = useCallback((id: string) => {
     recordHistory();
@@ -81,6 +102,17 @@ export const useFlowOperations = (
   // --- Connection ---
   const onConnect = useCallback((params: Connection) => {
     isConnectionValid.current = true;
+
+    // Prevent duplicates
+    const isDuplicate = edges.some(e =>
+      e.source === params.source &&
+      e.target === params.target && // Check if exact same connection
+      e.sourceHandle === params.sourceHandle &&
+      e.targetHandle === params.targetHandle
+    );
+
+    if (isDuplicate) return;
+
     recordHistory();
     setEdges((eds) =>
       addEdge({
@@ -88,7 +120,7 @@ export const useFlowOperations = (
         ...DEFAULT_EDGE_OPTIONS,
       }, eds)
     );
-  }, [setEdges, recordHistory]);
+  }, [edges, setEdges, recordHistory]);
 
   const onConnectStart = useCallback((_, { nodeId, handleId }: { nodeId: string | null; handleId: string | null }) => {
     connectingNodeId.current = nodeId;
@@ -111,6 +143,8 @@ export const useFlowOperations = (
       let closestHandle: { nodeId: string, handleId: string, dist: number } | null = null;
 
       nodes.forEach(node => {
+        // Fix: Use correct handle IDs matching CustomNode.tsx definition
+        // We are connecting TO this node, so we look for TARGET handles
         const hPoints = [
           { id: 'top', x: node.position.x + NODE_WIDTH / 2, y: node.position.y },
           { id: 'bottom', x: node.position.x + NODE_WIDTH / 2, y: node.position.y + NODE_HEIGHT },
@@ -120,19 +154,32 @@ export const useFlowOperations = (
 
         hPoints.forEach(hp => {
           const dist = Math.sqrt((hp.x - position.x) ** 2 + (hp.y - position.y) ** 2);
-          if (dist < 40 && (!closestHandle || dist < closestHandle.dist)) {
+          if (dist < 50 && (!closestHandle || dist < closestHandle.dist)) { // Increased snap radius slightly
             closestHandle = { nodeId: node.id, handleId: hp.id, dist };
           }
         });
       });
 
       if (closestHandle) {
-        onConnect({
+        // Validate connection before making it
+        const connection = {
           source: connectingNodeId.current,
           sourceHandle: connectingHandleId.current,
           target: (closestHandle as any).nodeId,
           targetHandle: (closestHandle as any).handleId,
-        } as Connection);
+        } as Connection;
+
+        // Prevent duplicates
+        const isDuplicate = edges.some(e =>
+          e.source === connection.source &&
+          e.target === connection.target &&
+          e.sourceHandle === connection.sourceHandle &&
+          e.targetHandle === connection.targetHandle
+        );
+
+        if (isDuplicate) return;
+
+        onConnect(connection);
         return;
       }
 
@@ -366,17 +413,18 @@ export const useFlowOperations = (
     }
   }, [setNodes, setEdges, recordHistory, setSelectedNodeId]);
 
-  const handleAddAndConnect = useCallback((type: string, position: { x: number; y: number }, sourceId: string, sourceHandle: string | null) => {
+  const handleAddAndConnect = useCallback((type: string, position: { x: number; y: number }, sourceId: string, sourceHandle: string | null, shape?: string) => {
     recordHistory();
     const id = `${Date.now()}`;
     const newNode: Node = {
       id,
       position,
       data: {
-        label: type === 'annotation' ? 'Note' : 'New Node',
+        label: type === 'annotation' ? 'Note' : (shape === 'cylinder' ? 'Database' : shape === 'parallelogram' ? 'Input / Output' : 'New Node'),
         subLabel: type === 'decision' ? 'Branch' : 'Process Step',
-        icon: type === 'decision' ? 'Sparkles' : (type === 'annotation' ? 'StickyNote' : 'Settings'),
-        color: type === 'annotation' ? 'yellow' : (type === 'decision' ? 'amber' : 'slate')
+        icon: type === 'decision' ? 'GitBranch' : (type === 'annotation' ? 'StickyNote' : (shape === 'cylinder' ? 'Database' : 'Settings')),
+        color: type === 'annotation' ? 'yellow' : (type === 'decision' ? 'amber' : (shape === 'cylinder' ? 'emerald' : 'slate')),
+        ...(shape ? { shape } : {}),
       },
       type,
     };
@@ -393,6 +441,70 @@ export const useFlowOperations = (
     );
     setSelectedNodeId(id);
   }, [setNodes, setEdges, recordHistory, setSelectedNodeId]);
+
+  // --- Align / Distribute / Group ---
+  const handleAlignNodes = useCallback((direction: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+    const { nodes, setNodes } = useFlowStore.getState();
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (selectedNodes.length < 2) return;
+
+    recordHistory();
+    const updates = alignNodes(selectedNodes, direction);
+    setNodes((nds) => nds.map((n) => {
+      const update = updates.find(u => u.id === n.id);
+      return update ? { ...n, position: update.position } : n;
+    }));
+  }, [recordHistory]);
+
+  const handleDistributeNodes = useCallback((direction: 'horizontal' | 'vertical') => {
+    const { nodes, setNodes } = useFlowStore.getState();
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (selectedNodes.length < 3) return;
+
+    recordHistory();
+    const updates = distributeNodes(selectedNodes, direction);
+    setNodes((nds) => nds.map((n) => {
+      const update = updates.find(u => u.id === n.id);
+      return update ? { ...n, position: update.position } : n;
+    }));
+  }, [recordHistory]);
+
+  const handleGroupNodes = useCallback(() => {
+    const { nodes, setNodes } = useFlowStore.getState();
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (selectedNodes.length < 2) return;
+
+    recordHistory();
+    // Calculate bounding box
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    selectedNodes.forEach(n => {
+      minX = Math.min(minX, n.position.x);
+      minY = Math.min(minY, n.position.y);
+      maxX = Math.max(maxX, n.position.x + (n.width || 150));
+      maxY = Math.max(maxY, n.position.y + (n.height || 40));
+    });
+
+    const padding = 40;
+    const groupNode: Node = {
+      id: `group-${Date.now()}`,
+      type: 'group',
+      position: { x: minX - padding, y: minY - padding },
+      style: { width: maxX - minX + padding * 2, height: maxY - minY + padding * 2 },
+      data: { label: 'Group', subLabel: `${selectedNodes.length} items` },
+      selected: true,
+      zIndex: -1
+    };
+
+    // For now, we just add the group node behind them. 
+    // True parenting (moving into group) requires coordinate conversion which is complex for this sanity check.
+    // Visual grouping is often sufficient for "grouping".
+    // Or we can set parentNode if we convert coords.
+    // Let's stick to adding the group node for now to ensure stability.
+
+    setNodes((nds) => [groupNode, ...nds]);
+    // Add group first so it's behind (if zIndex matches, but we set zIndex -1)
+  }, [recordHistory]);
+
 
   return {
     updateNodeData,
@@ -417,5 +529,10 @@ export const useFlowOperations = (
     pasteSelection,
     handleAddTextNode,
     handleAddAndConnect,
+    // Batch
+    handleAlignNodes,
+    handleDistributeNodes,
+    handleGroupNodes,
+    onEdgeUpdate
   };
 };

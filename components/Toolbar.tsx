@@ -1,73 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Trash2,
-  Wand2,
-  Maximize,
-  Plus,
-  MousePointer2,
-  Undo2,
-  Redo2,
-  Workflow,
-  StickyNote,
-  Group,
-  Layout,
-  Hand,
-  Square,
-  Type,
+  Undo2, Redo2, MousePointer2, Hand, Wand2, Plus,
+  Square, StickyNote, Group, Type, Layout, Workflow,
+  Maximize, Trash2
 } from 'lucide-react';
-import { useReactFlow } from 'reactflow';
+import { Button } from './ui/Button';
 import { Tooltip } from './Tooltip';
+import { Node, Edge } from 'reactflow';
 
 interface ToolbarProps {
-  onClear: () => void;
-  onCommandBar: () => void;
-  onFitView: () => void;
-  onAddNode: (pos?: { x: number; y: number }) => void;
-  onAddAnnotation: (pos?: { x: number; y: number }) => void;
-  onAddSection: (pos?: { x: number; y: number }) => void;
-  onAddText: (pos?: { x: number; y: number }) => void;
   onUndo: () => void;
-  onRedo: () => void;
-  onLayout: () => void;
-  onTemplates: () => void;
   canUndo: boolean;
+  onRedo: () => void;
   canRedo: boolean;
-  isSelectMode: boolean;
-  isCommandBarOpen: boolean;
   onToggleSelectMode: () => void;
+  isSelectMode: boolean;
   onTogglePanMode: () => void;
+  onCommandBar: () => void;
+  isCommandBarOpen: boolean;
+  onAddNode: (position: { x: number, y: number }) => void;
+  onAddAnnotation: (position: { x: number, y: number }) => void;
+  onAddSection: (position: { x: number, y: number }) => void;
+  onAddText: (position: { x: number, y: number }) => void;
+  onTemplates: () => void;
+  onLayout: () => void;
+  onFitView: () => void;
+  onClear: () => void;
+  getCenter: () => { x: number, y: number };
 }
 
-const ToolbarDivider = () => <div className="w-px h-5 bg-slate-200 mx-1.5 self-center" />;
+const ToolbarDivider = () => (
+  <div className="w-px h-6 bg-slate-200 mx-1" />
+);
 
 export const Toolbar: React.FC<ToolbarProps> = ({
-  onClear,
+  onUndo,
+  canUndo,
+  onRedo,
+  canRedo,
+  onToggleSelectMode,
+  isSelectMode,
+  onTogglePanMode,
   onCommandBar,
-  onFitView,
+  isCommandBarOpen,
   onAddNode,
   onAddAnnotation,
   onAddSection,
   onAddText,
-  onUndo,
-  onRedo,
-  onLayout,
   onTemplates,
-  canUndo,
-  canRedo,
-  isSelectMode,
-  isCommandBarOpen,
-  onToggleSelectMode,
-  onTogglePanMode
+  onLayout,
+  onFitView,
+  onClear,
+  getCenter
 }) => {
-  const [showAddMenu, setShowAddMenu] = React.useState(false);
-  const { screenToFlowPosition } = useReactFlow();
-
-  const getCenter = () => {
-    return screenToFlowPosition({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    });
-  };
+  const [showAddMenu, setShowAddMenu] = useState(false);
 
   return (
     <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 transform-gpu">
@@ -76,24 +62,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Group 1: Undo/Redo */}
         <div className="flex items-center gap-0.5 px-1">
           <Tooltip text="Undo (Ctrl+Z)">
-            <button
+            <Button
               onClick={onUndo}
               disabled={!canUndo}
-              aria-label="Undo"
-              className={`p-2 rounded-xl transition-all active:scale-95 ${!canUndo ? 'text-slate-300' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
-            >
-              <Undo2 className="w-4 h-4" />
-            </button>
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              icon={<Undo2 className="w-4 h-4" />}
+            />
           </Tooltip>
           <Tooltip text="Redo (Ctrl+Y)">
-            <button
+            <Button
               onClick={onRedo}
               disabled={!canRedo}
-              aria-label="Redo"
-              className={`p-2 rounded-xl transition-all active:scale-95 ${!canRedo ? 'text-slate-300' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
-            >
-              <Redo2 className="w-4 h-4" />
-            </button>
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              icon={<Redo2 className="w-4 h-4" />}
+            />
           </Tooltip>
         </div>
 
@@ -102,22 +88,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Group 2: Mode Selection */}
         <div className="flex bg-slate-100/80 p-1 rounded-xl gap-0.5 mx-1">
           <Tooltip text="Select Mode">
-            <button
+            <Button
               onClick={onToggleSelectMode}
-              aria-label="Select Mode"
-              className={`p-1.5 rounded-lg transition-all ${isSelectMode ? 'bg-white shadow-sm text-indigo-600 ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-            >
-              <MousePointer2 className="w-4 h-4" />
-            </button>
+              variant="ghost"
+              size="icon"
+              className={`rounded-lg h-8 w-8 ${isSelectMode ? 'bg-white shadow-sm text-indigo-600 ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+              icon={<MousePointer2 className="w-4 h-4" />}
+            />
           </Tooltip>
           <Tooltip text="Pan Mode">
-            <button
+            <Button
               onClick={onTogglePanMode}
-              aria-label="Pan Mode"
-              className={`p-1.5 rounded-lg transition-all ${!isSelectMode ? 'bg-white shadow-sm text-indigo-600 ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
-            >
-              <Hand className="w-4 h-4" />
-            </button>
+              variant="ghost"
+              size="icon"
+              className={`rounded-lg h-8 w-8 ${!isSelectMode ? 'bg-white shadow-sm text-indigo-600 ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
+              icon={<Hand className="w-4 h-4" />}
+            />
           </Tooltip>
         </div>
 
@@ -126,49 +112,54 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Group 3: Core Actions */}
         <div className="flex items-center gap-0.5 px-1">
           <Tooltip text="Command Bar">
-            <button
+            <Button
               onClick={onCommandBar}
-              aria-label="Open Command Bar"
-              className={`p-2 rounded-xl transition-all active:scale-95 relative overflow-hidden group ${isCommandBarOpen ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
+              variant="ghost"
+              size="icon"
+              className={`rounded-xl relative overflow-hidden group ${isCommandBarOpen ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
             >
               <Wand2 className="w-4 h-4" />
               <div className="absolute inset-0 bg-indigo-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
+            </Button>
           </Tooltip>
 
           <div className="relative">
             <Tooltip text="Add Item">
-              <button
+              <Button
                 onClick={() => setShowAddMenu(!showAddMenu)}
-                aria-label="Add Node Menu"
-                className={`p-2 rounded-xl transition-all active:scale-95 ${showAddMenu ? 'bg-slate-100 text-slate-900' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+                variant="ghost"
+                size="icon"
+                className={`rounded-xl ${showAddMenu ? 'bg-slate-100 text-slate-900' : 'hover:bg-slate-100 text-slate-500 hover:text-slate-900'}`}
+                icon={<Plus className="w-4 h-4" />}
+              />
             </Tooltip>
 
             {showAddMenu && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-40 bg-white rounded-xl shadow-xl border border-slate-100 p-1 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2 zoom-in-95 duration-200">
-                <button onClick={() => { onAddNode(getCenter()); setShowAddMenu(false); }} className="px-2 py-1.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors flex items-center gap-2">
-                  <Square className="w-4 h-4 text-slate-400" /> Node
-                </button>
-                <button onClick={() => { onAddAnnotation(getCenter()); setShowAddMenu(false); }} className="px-2 py-1.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors flex items-center gap-2">
-                  <StickyNote className="w-4 h-4 text-yellow-500" /> Note
-                </button>
-                <button onClick={() => { onAddSection(getCenter()); setShowAddMenu(false); }} className="px-2 py-1.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors flex items-center gap-2">
-                  <Group className="w-4 h-4 text-blue-500" /> Section
-                </button>
-                <button onClick={() => { onAddText(getCenter()); setShowAddMenu(false); }} className="px-2 py-1.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-lg transition-colors flex items-center gap-2">
-                  <Type className="w-4 h-4 text-slate-500" /> Text
-                </button>
+                <Button onClick={() => { onAddNode(getCenter()); setShowAddMenu(false); }} variant="ghost" className="w-full justify-start h-8 px-2 text-xs" icon={<Square className="w-4 h-4 text-slate-400" />}>
+                  Node
+                </Button>
+                <Button onClick={() => { onAddAnnotation(getCenter()); setShowAddMenu(false); }} variant="ghost" className="w-full justify-start h-8 px-2 text-xs" icon={<StickyNote className="w-4 h-4 text-yellow-500" />}>
+                  Note
+                </Button>
+                <Button onClick={() => { onAddSection(getCenter()); setShowAddMenu(false); }} variant="ghost" className="w-full justify-start h-8 px-2 text-xs" icon={<Group className="w-4 h-4 text-blue-500" />}>
+                  Section
+                </Button>
+                <Button onClick={() => { onAddText(getCenter()); setShowAddMenu(false); }} variant="ghost" className="w-full justify-start h-8 px-2 text-xs" icon={<Type className="w-4 h-4 text-slate-500" />}>
+                  Text
+                </Button>
               </div>
             )}
           </div>
 
           <Tooltip text="Templates">
-            <button onClick={onTemplates} aria-label="Templates" className="p-2 hover:bg-slate-100 rounded-xl transition-all active:scale-95 text-slate-500 hover:text-slate-900">
-              <Layout className="w-4 h-4" />
-            </button>
+            <Button
+              onClick={onTemplates}
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              icon={<Layout className="w-4 h-4" />}
+            />
           </Tooltip>
         </div>
 
@@ -176,16 +167,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         {/* Group 4: Layout & View */}
         <div className="flex items-center gap-0.5 px-1">
-          <Tooltip text="Auto Layout">
-            <button onClick={onLayout} aria-label="Auto Layout" className="p-2 hover:bg-slate-100 rounded-xl transition-all active:scale-95 text-slate-500 hover:text-slate-900">
-              <Workflow className="w-4 h-4" />
-            </button>
+          <Tooltip text="Layout Studio">
+            <Button
+              onClick={() => onLayout()}
+              variant="ghost"
+              size="icon"
+              className="rounded-xl text-amber-500 hover:text-amber-600"
+              icon={<Workflow className="w-4 h-4" />}
+            />
           </Tooltip>
 
           <Tooltip text="Fit View">
-            <button onClick={onFitView} aria-label="Fit View" className="p-2 hover:bg-slate-100 rounded-xl transition-all active:scale-95 text-slate-500 hover:text-slate-900">
-              <Maximize className="w-4 h-4" />
-            </button>
+            <Button
+              onClick={onFitView}
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
+              icon={<Maximize className="w-4 h-4" />}
+            />
           </Tooltip>
         </div>
 
@@ -194,9 +193,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         {/* Clear */}
         <div className="flex items-center px-1">
           <Tooltip text="Clear Canvas">
-            <button onClick={onClear} aria-label="Clear Canvas" className="p-2 hover:bg-red-50 rounded-xl transition-all active:scale-95 text-slate-400 hover:text-red-600 group">
-              <Trash2 className="w-4 h-4 group-hover:stroke-red-600 transition-colors" />
-            </button>
+            <Button
+              onClick={onClear}
+              variant="ghost"
+              size="icon"
+              className="rounded-xl hover:bg-red-50 hover:text-red-600 group"
+              icon={<Trash2 className="w-4 h-4 group-hover:stroke-red-600 transition-colors" />}
+            />
           </Tooltip>
         </div>
 

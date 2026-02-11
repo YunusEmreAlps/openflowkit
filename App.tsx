@@ -1,11 +1,12 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import 'reactflow/dist/style.css';
 import {
   ReactFlowProvider,
   useReactFlow,
   getRectOfNodes,
 } from 'reactflow';
 import { useFlowStore } from './store';
-import dagre from 'dagre';
+import { getElkLayout, LayoutAlgorithm } from './services/elkLayout';
 
 // import CustomConnectionLine from './components/CustomConnectionLine'; // Moved
 import { CommandBar } from './components/CommandBar';
@@ -63,15 +64,21 @@ const FlowEditor = () => {
 
   // Command Bar State
   const [isCommandBarOpen, setIsCommandBarOpen] = useState(false);
-  const [commandBarView, setCommandBarView] = useState<'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search'>('root');
+  const [commandBarView, setCommandBarView] = useState<'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search' | 'layout'>('root');
 
-  const openCommandBar = (view: 'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search' = 'root') => {
+  const openCommandBar = (view: 'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search' | 'layout' = 'root') => {
     setCommandBarView(view);
     setIsCommandBarOpen(true);
   };
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { fitView, screenToFlowPosition } = useReactFlow();
+
+  const getCenter = useCallback(() => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    return screenToFlowPosition({ x: centerX, y: centerY });
+  }, [screenToFlowPosition]);
 
   // View Settings (Migrated to Store)
 
@@ -151,28 +158,30 @@ const FlowEditor = () => {
     recordHistory, reactFlowWrapper
   );
 
-  // --- Auto Layout (dagre) ---
-  const onLayout = useCallback(() => {
+  // --- Auto Layout (ELK) ---
+  const [isLayouting, setIsLayouting] = useState(false);
+  const onLayout = useCallback(async (
+    direction: 'TB' | 'LR' | 'RL' | 'BT' = 'TB',
+    algorithm: LayoutAlgorithm = 'layered',
+    spacing: 'compact' | 'normal' | 'loose' = 'normal'
+  ) => {
+    if (nodes.length === 0) return;
+    setIsLayouting(true);
     recordHistory();
-    const dagreGraph = new dagre.graphlib.Graph();
-    dagreGraph.setDefaultEdgeLabel(() => ({}));
-    dagreGraph.setGraph({ rankdir: 'TB' });
 
-    nodes.forEach((node) => {
-      dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
-    });
-    edges.forEach((edge) => {
-      dagreGraph.setEdge(edge.source, edge.target);
-    });
-    dagre.layout(dagreGraph);
-
-    const layoutedNodes = nodes.map((node) => {
-      const pos = dagreGraph.node(node.id);
-      return { ...node, position: { x: pos.x - NODE_WIDTH / 2, y: pos.y - NODE_HEIGHT / 2 } };
-    });
-
-    setNodes(layoutedNodes);
-    setTimeout(() => fitView({ duration: 800 }), 10);
+    try {
+      const layoutedNodes = await getElkLayout(nodes, edges, {
+        direction,
+        algorithm,
+        spacing,
+      });
+      setNodes(layoutedNodes);
+      setTimeout(() => fitView({ duration: 800 }), 50);
+    } catch (err) {
+      console.error('ELK layout failed:', err);
+    } finally {
+      setIsLayouting(false);
+    }
   }, [nodes, edges, recordHistory, setNodes, fitView]);
 
   const handleInsertTemplate = useCallback((template: FlowTemplate) => {
@@ -298,6 +307,19 @@ const FlowEditor = () => {
         />
       </ErrorBoundary>
 
+      {/* Layout loading overlay */}
+      {isLayouting && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-white/60 backdrop-blur-sm pointer-events-none" aria-live="polite">
+          <div className="flex items-center gap-3 px-6 py-3 bg-white rounded-2xl shadow-xl border border-slate-200">
+            <svg className="w-5 h-5 animate-spin text-indigo-600" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-sm font-medium text-slate-600">Applying layout…</span>
+          </div>
+        </div>
+      )}
+
       <Toolbar
         onCommandBar={() => openCommandBar('root')}
         onClear={handleClear}
@@ -308,14 +330,15 @@ const FlowEditor = () => {
         onAddText={handleAddTextNode}
         onUndo={undo}
         onRedo={redo}
-        onLayout={onLayout}
+        onLayout={() => openCommandBar('layout')}
         onTemplates={() => openCommandBar('templates')}
         canUndo={canUndo}
         canRedo={canRedo}
         isSelectMode={isSelectMode}
-        isCommandBarOpen={isCommandBarOpen}
         onToggleSelectMode={() => setIsSelectMode(true)}
+        isCommandBarOpen={isCommandBarOpen}
         onTogglePanMode={() => setIsSelectMode(false)}
+        getCenter={getCenter}
       />
 
       <ErrorBoundary fallbackMessage="The command bar encountered an error.">

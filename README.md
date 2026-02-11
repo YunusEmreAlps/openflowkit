@@ -44,14 +44,28 @@ First-class support for **Mermaid.js** and our own **FlowMind DSL**.
 
 ### 💎 Premium UX & Smart Editor
 - **Intelligent Text Nodes**: Multi-line labels with auto-expanding text areas and Markdown support.
-- **Auto-Sizing**: Nodes automatically grow vertically to fit your content.
-- **Movable Edge Labels**: Drag labels anywhere along the connector wire; they stick like beads on a string.
-- **Node Search**: Instantly find and jump to any node using `⌘ F`.
-- **Keyboard Shortcuts**: Power-user friendly with a built-in help modal (press `?`).
-- **Zoom Indicator**: Real-time zoom level display with quick-fit navigation.
-- **Glassmorphism UI**: Modern, translucent controls that stay out of your way.
+- **Design System 2.0**: A completely refreshed UI with glassmorphic controls, consistent iconography, and a refined color palette.
+- **Universal Handles**: Omni-directional connection points that just work.
+- **Interactive Minimap**: Navigate massive diagrams with ease.
 
-### 🛡 Reliability & Testing (New!)
+### 📐 Advanced Auto-Layout (New!)
+Powered by the **ELK Layout Engine** for professional-grade graph organization.
+- **4 Algorithms**: Layered (standard flow), Tree (org charts), Force (organic networks), and Radial.
+- **Layout Studio**: Interactive control over direction (TB/LR), spacing density, and node separation.
+- **Animated Transitions**: Watch your graph smoothly reorganize itself.
+
+### 🧩 Organization & Structure (New!)
+Tame complex systems with powerful grouping tools.
+- **Collapsible Groups**: Nest nodes inside containers that can be expanded or collapsed to hide detail.
+- **Swimlanes**: Visually segregate processes into functional areas or responsibilities.
+- **Smart Routing**: Edges automatically route around obstacles, utilizing orthogonal paths and minimizing crossings. Support for parallel edges and self-loops.
+
+### ⚡️ Productivity Tools
+- **Multi-Select & Batch Ops**: Align, distribute, and style multiple nodes simultaneously.
+- **Quick Actions**: Double-click canvas to add nodes. Context menus for rapid editing.
+- **Command Bar (`Cmd+K`)**: Keyboard-driven navigation for every action in the app.
+
+### 🛡 Reliability & Testing
 FlowMind is built for production-grade stability.
 - **Unit Testing**: 100% logic coverage for Mermaid and FlowMind DSL parsers.
 - **State Integrity**: History (undo/redo) and auto-save logic are strictly validated via Vitest.

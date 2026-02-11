@@ -84,3 +84,12 @@ export const INITIAL_NODES: Node[] = [
 export const INITIAL_EDGES: Edge[] = [
   createDefaultEdge('1', '2', 'Start', 'e1-2'),
 ];
+
+// Dash pattern definitions for edge styling
+export const EDGE_DASH_PATTERNS: Record<string, { label: string; strokeDasharray: string }> = {
+  solid: { label: 'Solid', strokeDasharray: '' },
+  dashed: { label: 'Dashed', strokeDasharray: '8 4' },
+  dotted: { label: 'Dotted', strokeDasharray: '2 4' },
+  dashdot: { label: 'Dash-Dot', strokeDasharray: '8 4 2 4' },
+};
+

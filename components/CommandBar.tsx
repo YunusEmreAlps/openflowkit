@@ -19,7 +19,13 @@ import {
     Copy,
     AlertCircle,
     Plus,
-    BookOpen
+    BookOpen,
+    Network,
+    GitGraph,
+    Move,
+    Maximize2,
+    AlignJustify,
+    Grid
 } from 'lucide-react';
 import { Node, Edge } from 'reactflow';
 import { FLOW_TEMPLATES, FlowTemplate } from '../services/templates';
@@ -27,11 +33,40 @@ import { parseMermaid } from '../services/mermaidParser';
 import { parseFlowMindDSL } from '../services/flowmindDSLParser';
 import { toMermaid } from '../services/exportService';
 import { toFlowMindDSL } from '../services/flowmindDSLExporter';
+import { LayoutAlgorithm, LayoutDirection } from '../services/elkLayout';
 
 import { useReactFlow } from 'reactflow';
 import { useFlowStore } from '../store';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
-type CommandView = 'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search';
+const ViewHeader = ({ title, icon, onBack }: { title: string, icon: React.ReactNode, onBack: () => void }) => (
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200/50 bg-slate-50/50">
+        <Button
+            onClick={onBack}
+            variant="ghost"
+            size="icon"
+            className="rounded-md h-6 w-6"
+            icon={<ArrowLeft className="w-4 h-4" />}
+        />
+        <div className="flex items-center gap-2 font-medium text-slate-700">
+            {icon}
+            <span>{title}</span>
+        </div>
+        <div className="ml-auto">
+            <Button
+                onClick={onBack}
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-6 w-6"
+                icon={<X className="w-4 h-4" />}
+            />
+        </div>
+    </div>
+);
+
+
+type CommandView = 'root' | 'ai' | 'mermaid' | 'flowmind' | 'templates' | 'search' | 'layout';
 
 interface CommandBarProps {
     isOpen: boolean;
@@ -44,7 +79,7 @@ interface CommandBarProps {
     onUndo?: () => void;
     onRedo?: () => void;
     onFitView?: () => void;
-    onLayout?: () => void;
+    onLayout?: (direction?: 'TB' | 'LR' | 'RL' | 'BT', algorithm?: LayoutAlgorithm, spacing?: 'compact' | 'normal' | 'loose') => void;
     onSelectTemplate?: (template: FlowTemplate) => void;
     initialView?: CommandView;
     settings?: {
@@ -68,29 +103,6 @@ interface CommandItem {
     value?: boolean;
     view?: CommandView;
 }
-
-// --- SUB COMPONENTS (Defined outside to prevent re-mounting) ---
-
-const ViewHeader = ({ title, icon, onBack }: { title: string, icon: React.ReactNode, onBack: () => void }) => (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200/50 bg-slate-50/50">
-        <button
-            onClick={onBack}
-            aria-label="Back"
-            className="p-1 rounded-md hover:bg-slate-200 text-slate-500 transition-colors"
-        >
-            <ArrowLeft className="w-4 h-4" />
-        </button>
-        <div className="flex items-center gap-2 font-medium text-slate-700">
-            {icon}
-            <span>{title}</span>
-        </div>
-        <div className="ml-auto">
-            <button onClick={onBack} aria-label="Close" className="p-1 hover:bg-slate-200 rounded-full text-slate-400">
-                <X className="w-4 h-4" />
-            </button>
-        </div>
-    </div>
-);
 
 const CommandItemRow = ({ item, isSelected, onClick }: { item: CommandItem, isSelected: boolean, onClick: () => void }) => (
     <div
@@ -200,7 +212,6 @@ const RootView = ({
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [filteredCommands, selectedIndex, onClose, setView, searchQuery, setSelectedIndex]);
-
     return (
         <>
             <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200/50">
@@ -214,13 +225,17 @@ const RootView = ({
                         e.stopPropagation();
                     }}
                     placeholder="Type a command or ask AI..."
-                    className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 text-base"
+                    className="flex-1 bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 text-base focus:ring-0"
                     autoFocus
                 />
                 <div className="flex items-center gap-2">
-                    <button onClick={onClose} aria-label="Close" className="p-1 hover:bg-slate-100 rounded-md text-slate-400 hover:text-slate-600 transition-colors">
-                        <X className="w-4 h-4" />
-                    </button>
+                    <Button
+                        onClick={onClose}
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-md h-6 w-6"
+                        icon={<X className="w-4 h-4" />}
+                    />
                 </div>
             </div>
 
@@ -299,16 +314,17 @@ const AIView = ({
                     autoFocus
                 />
                 <div className="flex justify-end mt-4">
-                    <button
+                    <Button
                         onClick={handleGenerate}
                         disabled={!prompt.trim() || isGenerating}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm text-white transition-all
-                            ${!prompt.trim() || isGenerating ? 'bg-indigo-300' : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20'}
+                        variant="primary"
+                        className={`flex items-center gap-2 px-4 py-2 h-auto text-sm transition-all
+                            ${!prompt.trim() || isGenerating ? 'opacity-50 cursor-not-allowed' : 'shadow-lg shadow-indigo-500/20'}
                         `}
                     >
-                        {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                         Generate Flow
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
@@ -455,12 +471,12 @@ const TemplatesView = ({
             <ViewHeader title="Templates" icon={<Layout className="w-4 h-4 text-blue-500" />} onBack={handleBack} />
 
             <div className="px-4 py-2 border-b border-slate-100">
-                <input
+                <Input
                     value={tSearch}
                     onChange={e => setTSearch(e.target.value)}
                     onKeyDown={(e) => e.stopPropagation()}
                     placeholder="Search templates..."
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-400 transition-colors"
+                    className="w-full focus:border-blue-400"
                     autoFocus
                 />
             </div>
@@ -527,12 +543,12 @@ const SearchView = ({
             <ViewHeader title="Search Nodes" icon={<Search className="w-4 h-4 text-violet-500" />} onBack={handleBack} />
 
             <div className="px-4 py-2 border-b border-slate-100">
-                <input
+                <Input
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={(e) => e.stopPropagation()}
                     placeholder="Search by label or ID..."
-                    className="w-full px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:border-violet-400 transition-colors"
+                    className="w-full focus:border-violet-400"
                     autoFocus
                 />
             </div>
@@ -576,6 +592,161 @@ const SearchView = ({
 function getInitials(str: string) {
     return str.slice(0, 2).toUpperCase();
 }
+
+// 6. Layout Studio View
+const LayoutView = ({
+    onLayout,
+    onClose,
+    handleBack
+}: {
+    onLayout?: (direction?: 'TB' | 'LR' | 'RL' | 'BT', algorithm?: LayoutAlgorithm, spacing?: 'compact' | 'normal' | 'loose') => void,
+    onClose: () => void,
+    handleBack: () => void
+}) => {
+    const [algorithm, setAlgorithm] = useState<LayoutAlgorithm>('layered');
+    const [direction, setDirection] = useState<'TB' | 'LR' | 'RL' | 'BT'>('TB');
+    const [spacing, setSpacing] = useState<'compact' | 'normal' | 'loose'>('normal');
+
+    const handleApply = () => {
+        onLayout?.(direction, algorithm, spacing);
+        onClose();
+    };
+
+    return (
+        <div className="flex flex-col h-full">
+            <ViewHeader title="Layout Studio" icon={<Zap className="w-4 h-4 text-amber-500" />} onBack={handleBack} />
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+
+                {/* Algorithms */}
+                <div className="space-y-3">
+                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Algorithm</label>
+                    <div className="grid grid-cols-2 gap-3">
+                        <AlgorithmCard
+                            id="layered"
+                            label="Layered"
+                            desc="Hierarchical, good for flows"
+                            icon={<GitGraph className="w-4 h-4" />}
+                            selected={algorithm === 'layered'}
+                            onClick={() => setAlgorithm('layered')}
+                        />
+                        <AlgorithmCard
+                            id="mrtree"
+                            label="Tree"
+                            desc="Strict parent-child structure"
+                            icon={<Network className="w-4 h-4" />}
+                            selected={algorithm === 'mrtree'}
+                            onClick={() => setAlgorithm('mrtree')}
+                        />
+                        <AlgorithmCard
+                            id="force"
+                            label="Force"
+                            desc="Organic, physics-based"
+                            icon={<Move className="w-4 h-4" />}
+                            selected={algorithm === 'force'}
+                            onClick={() => setAlgorithm('force')}
+                        />
+                        <AlgorithmCard
+                            id="radial"
+                            label="Radial"
+                            desc="Circular arrangement"
+                            icon={<Maximize2 className="w-4 h-4" />}
+                            selected={algorithm === 'radial'}
+                            onClick={() => setAlgorithm('radial')}
+                        />
+                    </div>
+                </div>
+
+                {/* Direction (Conditional) */}
+                {(algorithm === 'layered' || algorithm === 'mrtree') && (
+                    <div className="space-y-3 animate-in slide-in-from-top-2 duration-200">
+                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Direction</label>
+                        <div className="flex bg-slate-100 p-1 rounded-lg">
+                            <DirectionButton dir="TB" label="Down" selected={direction === 'TB'} onClick={() => setDirection('TB')} />
+                            <DirectionButton dir="BT" label="Up" selected={direction === 'BT'} onClick={() => setDirection('BT')} />
+                            <DirectionButton dir="LR" label="Right" selected={direction === 'LR'} onClick={() => setDirection('LR')} />
+                            <DirectionButton dir="RL" label="Left" selected={direction === 'RL'} onClick={() => setDirection('RL')} />
+                        </div>
+                    </div>
+                )}
+
+                {/* Spacing */}
+                <div className="space-y-3">
+                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Spacing</label>
+                    <div className="grid grid-cols-3 gap-2">
+                        <SpacingButton id="compact" label="Tight" selected={spacing === 'compact'} onClick={() => setSpacing('compact')} />
+                        <SpacingButton id="normal" label="Normal" selected={spacing === 'normal'} onClick={() => setSpacing('normal')} />
+                        <SpacingButton id="loose" label="Loose" selected={spacing === 'loose'} onClick={() => setSpacing('loose')} />
+                    </div>
+                </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+                <Button
+                    onClick={handleApply}
+                    variant="primary"
+                    className="w-full py-2.5 h-auto rounded-xl shadow-sm shadow-indigo-200 justify-center"
+                >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Apply Layout
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+const AlgorithmCard = ({ id, label, desc, icon, selected, onClick }: any) => (
+    <div
+        onClick={onClick}
+        className={`
+            relative p-3 rounded-xl border-2 cursor-pointer transition-all duration-200
+            ${selected
+                ? 'border-indigo-500 bg-indigo-50/50 ring-1 ring-indigo-500/20'
+                : 'border-slate-100 bg-white hover:border-indigo-200 hover:bg-slate-50'}
+        `}
+    >
+        <div className={`
+            w-8 h-8 rounded-lg flex items-center justify-center mb-2 transition-colors
+            ${selected ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-500'}
+        `}>
+            {icon}
+        </div>
+        <div className="font-medium text-sm text-slate-700">{label}</div>
+        <div className="text-[10px] text-slate-400 leading-tight mt-0.5">{desc}</div>
+        {selected && (
+            <div className="absolute top-3 right-3 text-indigo-500">
+                <Check className="w-4 h-4" />
+            </div>
+        )}
+    </div>
+);
+
+const DirectionButton = ({ dir, label, selected, onClick }: any) => (
+    <button
+        onClick={onClick}
+        className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all
+            ${selected ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}
+        `}
+    >
+        {label}
+    </button>
+);
+
+const SpacingButton = ({ id, label, selected, onClick }: any) => (
+    <button
+        onClick={onClick}
+        className={`py-2 px-3 rounded-lg border text-sm font-medium transition-all
+            ${selected
+                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}
+        `}
+    >
+        {label}
+    </button>
+);
+
 
 // --- MAIN COMPONENT ---
 
@@ -719,11 +890,23 @@ export const CommandBar: React.FC<CommandBarProps> = ({
         },
         {
             id: 'auto-layout',
-            label: 'Auto Layout',
+            label: 'Layout Studio...',
             icon: <Zap className="w-4 h-4 text-amber-500" />,
+            type: 'navigation',
+            view: 'layout',
+            description: 'Advanced algorithms & settings'
+        },
+        {
+            id: 'select-all-edges',
+            label: 'Select All Edges',
+            icon: <ArrowRight className="w-4 h-4 text-cyan-500" />,
             type: 'action',
-            action: onLayout
-        }
+            description: 'Highlight all connections',
+            action: () => {
+                const { edges, setEdges } = useFlowStore.getState();
+                setEdges(edges.map(e => ({ ...e, selected: true })));
+            }
+        },
     ], [settings, onFitView, onUndo, onRedo, onLayout]);
 
     if (!isOpen) return null;
@@ -781,6 +964,13 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                 {view === 'templates' && (
                     <TemplatesView
                         onSelectTemplate={onSelectTemplate}
+                        onClose={onClose}
+                        handleBack={handleBack}
+                    />
+                )}
+                {view === 'layout' && (
+                    <LayoutView
+                        onLayout={onLayout}
                         onClose={onClose}
                         handleBack={handleBack}
                     />

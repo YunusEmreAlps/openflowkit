@@ -1,6 +1,9 @@
+
 export interface ThemeColors {
     bg: string;
+    fill: string; // for SVG
     border: string;
+    stroke: string; // for SVG
     iconBg: string;
     iconColor: string;
     handle: string;
@@ -16,7 +19,9 @@ export interface ThemeColors {
 export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
     slate: {
         bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-slate-300',
+        stroke: 'stroke-slate-300',
         iconBg: 'bg-slate-100',
         iconColor: 'text-slate-600',
         handle: 'bg-slate-400',
@@ -27,9 +32,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(0,0,0,0.08)',
     },
     blue: {
-        bg: 'bg-blue-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-blue-300',
-        iconBg: 'bg-blue-100',
+        stroke: 'stroke-blue-300',
+        iconBg: 'bg-blue-50',
         iconColor: 'text-blue-600',
         handle: 'bg-blue-500',
         ring: 'ring-blue-400',
@@ -38,9 +45,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(37,99,235,0.08)',
     },
     emerald: {
-        bg: 'bg-emerald-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-emerald-300',
-        iconBg: 'bg-emerald-100',
+        stroke: 'stroke-emerald-300',
+        iconBg: 'bg-emerald-50',
         iconColor: 'text-emerald-600',
         handle: 'bg-emerald-500',
         ring: 'ring-emerald-400',
@@ -49,9 +58,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(5,150,105,0.08)',
     },
     red: {
-        bg: 'bg-red-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-red-300',
-        iconBg: 'bg-red-100',
+        stroke: 'stroke-red-300',
+        iconBg: 'bg-red-50',
         iconColor: 'text-red-600',
         handle: 'bg-red-500',
         ring: 'ring-red-400',
@@ -60,9 +71,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(220,38,38,0.08)',
     },
     amber: {
-        bg: 'bg-amber-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-amber-300',
-        iconBg: 'bg-amber-100',
+        stroke: 'stroke-amber-300',
+        iconBg: 'bg-amber-50',
         iconColor: 'text-amber-600',
         handle: 'bg-amber-500',
         ring: 'ring-amber-400',
@@ -71,9 +84,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(217,119,6,0.08)',
     },
     violet: {
-        bg: 'bg-violet-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-violet-300',
-        iconBg: 'bg-violet-100',
+        stroke: 'stroke-violet-300',
+        iconBg: 'bg-violet-50',
         iconColor: 'text-violet-600',
         handle: 'bg-violet-500',
         ring: 'ring-violet-400',
@@ -82,9 +97,11 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(124,58,237,0.08)',
     },
     pink: {
-        bg: 'bg-pink-50/50',
+        bg: 'bg-white',
+        fill: 'fill-white',
         border: 'border-pink-300',
-        iconBg: 'bg-pink-100',
+        stroke: 'stroke-pink-300',
+        iconBg: 'bg-pink-50',
         iconColor: 'text-pink-600',
         handle: 'bg-pink-500',
         ring: 'ring-pink-400',
@@ -93,15 +110,30 @@ export const NODE_COLOR_PALETTE: Record<string, ThemeColors> = {
         shadow: 'rgba(219,39,119,0.08)',
     },
     yellow: {
-        bg: 'bg-yellow-100',
+        bg: 'bg-yellow-100', // Keep yellow background for sticky notes
+        fill: 'fill-yellow-100',
         border: 'border-yellow-300',
+        stroke: 'stroke-yellow-300',
         iconBg: 'bg-yellow-200',
         iconColor: 'text-yellow-700',
         handle: 'bg-yellow-500',
         ring: 'ring-yellow-400',
-        text: '#713f12',
-        subText: '#854d0e',
-        shadow: 'rgba(161,98,7,0.08)',
+        text: '#a16207',
+        subText: '#b45309',
+        shadow: 'rgba(250,204,21,0.08)',
+    },
+    cyan: {
+        bg: 'bg-white',
+        fill: 'fill-white',
+        border: 'border-cyan-300',
+        stroke: 'stroke-cyan-300',
+        iconBg: 'bg-cyan-50',
+        iconColor: 'text-cyan-600',
+        handle: 'bg-cyan-500',
+        ring: 'ring-cyan-400',
+        text: '#0e7490',
+        subText: '#155e75',
+        shadow: 'rgba(6,182,212,0.08)',
     },
 };
 
@@ -187,9 +219,9 @@ export const SECTION_COLOR_PALETTE: Record<string, SectionColors> = {
 };
 
 export const NODE_DEFAULTS: Record<string, { color: string; icon: string; shape: string }> = {
-    start: { color: 'emerald', icon: 'Play', shape: 'rounded' },
-    end: { color: 'red', icon: 'Square', shape: 'rounded' },
-    decision: { color: 'amber', icon: 'Diamond', shape: 'rounded' },
+    start: { color: 'emerald', icon: 'Play', shape: 'capsule' },
+    end: { color: 'red', icon: 'Square', shape: 'capsule' },
+    decision: { color: 'amber', icon: 'GitBranch', shape: 'diamond' },
     custom: { color: 'violet', icon: 'Cpu', shape: 'rounded' },
     process: { color: 'slate', icon: 'Settings', shape: 'rounded' },
 };

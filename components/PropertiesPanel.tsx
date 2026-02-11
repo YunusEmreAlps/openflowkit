@@ -1,14 +1,20 @@
 import React, { useRef, useState, useMemo } from 'react';
 import {
-    X, Upload, Type, Image as ImageIcon, Palette, Layout, Trash2, ArrowRight, Ban,
+    X, Upload, Type, Image as ImageIcon, Palette, Layout, Trash2, ArrowRight, ArrowRightLeft, Ban,
     AlignLeft, AlignCenter, AlignRight, Copy,
     Bold, Italic, List, ListOrdered, Code, Quote, Heading1, CheckSquare,
     Square, Circle, Search, GitBranch
 } from 'lucide-react';
-import { Node, Edge } from 'reactflow';
+import { Node, Edge, MarkerType } from 'reactflow';
 import { NodeData, EdgeCondition } from '../types';
 import { ICON_MAP } from './IconMap';
 import { EDGE_CONDITION_STYLES, EDGE_CONDITION_LABELS } from '../constants';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Slider } from './ui/Slider';
+import { Switch } from './ui/Switch';
+import { Label } from './ui/Label';
+
 
 interface PropertiesPanelProps {
     selectedNode: Node<NodeData> | null;
@@ -204,31 +210,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                             {/* Shapes */}
                             {!isAnnotation && !isText && (
-                                <div className="flex bg-slate-100 p-1 rounded-lg mb-3">
-                                    <button
-                                        onClick={() => onChangeNode(selectedNode.id, { shape: 'rectangle' })}
-                                        className={`flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all gap-2
-                                ${selectedNode.data.shape === 'rectangle' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}
-                            `}
-                                    >
-                                        <Square className="w-3.5 h-3.5" /> Rect
-                                    </button>
-                                    <button
-                                        onClick={() => onChangeNode(selectedNode.id, { shape: 'rounded' })}
-                                        className={`flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all gap-2
-                                ${(selectedNode.data.shape === 'rounded' || !selectedNode.data.shape) ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}
-                            `}
-                                    >
-                                        <Square className="w-3.5 h-3.5 rounded-sm" /> Round
-                                    </button>
-                                    <button
-                                        onClick={() => onChangeNode(selectedNode.id, { shape: 'capsule' })}
-                                        className={`flex-1 flex items-center justify-center py-1.5 rounded-md text-xs font-medium transition-all gap-2
-                                ${selectedNode.data.shape === 'capsule' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}
-                            `}
-                                    >
-                                        <Circle className="w-3.5 h-3.5" /> Capsule
-                                    </button>
+                                <div className="grid grid-cols-4 gap-2 mb-3">
+                                    {[
+                                        { value: 'rectangle', label: 'Rect', svg: <rect x="2" y="4" width="16" height="12" rx="1" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'rounded', label: 'Rounded', svg: <rect x="2" y="4" width="16" height="12" rx="4" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'capsule', label: 'Capsule', svg: <rect x="2" y="5" width="16" height="10" rx="5" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'diamond', label: 'Diamond', svg: <polygon points="10,2 18,10 10,18 2,10" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'hexagon', label: 'Hexagon', svg: <polygon points="5,2 15,2 19,10 15,18 5,18 1,10" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'cylinder', label: 'Db', svg: <><ellipse cx="10" cy="5" rx="7" ry="3" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="M3 5 L3 15 C3 17 10 19 17 15 L17 5" fill="none" stroke="currentColor" strokeWidth="1.5" /></> },
+                                        { value: 'ellipse', label: 'Ellipse', svg: <ellipse cx="10" cy="10" rx="8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'parallelogram', label: 'I/O', svg: <polygon points="5,3 19,3 15,17 1,17" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                        { value: 'circle', label: 'Circle', svg: <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+                                    ].map(({ value, label, svg }) => (
+                                        <button
+                                            key={value}
+                                            onClick={() => onChangeNode(selectedNode.id, { shape: value as any })}
+                                            className={`flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg text-[10px] font-semibold transition-all
+                                                ${(selectedNode.data.shape || 'rounded') === value
+                                                    ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200'
+                                                    : 'bg-slate-50 text-slate-500 hover:bg-white hover:text-slate-700 hover:shadow-sm'
+                                                }`}
+                                            title={label}
+                                        >
+                                            <svg viewBox="0 0 20 20" className="w-5 h-5 opacity-80">{svg}</svg>
+                                        </button>
+                                    ))}
                                 </div>
                             )}
 
@@ -238,27 +244,6 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Content</label>
-
-                                {!isAnnotation && !isText && (
-                                    <div className="flex bg-slate-100 rounded-lg p-1 gap-1">
-                                        {[
-                                            { val: 'left', Icon: AlignLeft },
-                                            { val: 'center', Icon: AlignCenter },
-                                            { val: 'right', Icon: AlignRight }
-                                        ].map(({ val, Icon }) => (
-                                            <button
-                                                key={val}
-                                                onClick={() => onChangeNode(selectedNode.id, { align: val as any })}
-                                                className={`p-1 rounded-md transition-all ${(selectedNode.data.align || 'left') === val
-                                                    ? 'bg-white text-indigo-600 shadow-sm'
-                                                    : 'text-slate-400 hover:text-slate-600'
-                                                    }`}
-                                            >
-                                                <Icon className="w-3 h-3" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
                             {/* Rich Text Label */}
@@ -286,7 +271,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                         onChange={(e) => onChangeNode(selectedNode.id, { subLabel: e.target.value })}
                                         onKeyDown={descEditor.handleKeyDown}
                                         placeholder={isAnnotation ? "Write your note here..." : "Description / Sublabel"}
-                                        rows={8}
+                                        rows={6}
                                         className="w-full px-3 py-2 bg-slate-50 text-sm font-medium text-slate-900 outline-none resize-none font-mono"
                                     />
                                 </div>
@@ -310,9 +295,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                             <button
                                                 key={font.value}
                                                 onClick={() => onChangeNode(selectedNode.id, { fontFamily: font.value })}
-                                                className={`flex-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all uppercase whitespace-nowrap
-                                                    ${(selectedNode.data.fontFamily || 'inter') === font.value ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}
-                                                `}
+                                                className={`flex-1 px-2 py-1.5 rounded-md text-[10px] font-bold transition-all uppercase whitespace-nowrap
+                                                    ${(selectedNode.data.fontFamily || 'inter') === font.value ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                                                 title={font.label}
                                             >
                                                 {font.label}
@@ -325,9 +309,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                             <button
                                                 key={size}
                                                 onClick={() => onChangeNode(selectedNode.id, { fontSize: size.toString() })}
-                                                className={`flex-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all
-                                                    ${(selectedNode.data.fontSize || '16') === size.toString() ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}
-                                                `}
+                                                className={`flex-1 px-2 py-1.5 rounded-md text-[10px] font-bold transition-all
+                                                    ${(selectedNode.data.fontSize || '16') === size.toString() ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                                             >
                                                 {size}
                                             </button>
@@ -348,56 +331,15 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                         key={color}
                                         onClick={() => onChangeNode(selectedNode.id, { color })}
                                         className={`
-                      w-8 h-8 rounded-full border-2 transition-transform hover:scale-110
-                      ${selectedNode.data.color === color ? 'border-slate-600 scale-110' : 'border-transparent'}
-                    `}
+                                            w-8 h-8 rounded-full border-2 transition-transform hover:scale-110
+                                            ${selectedNode.data.color === color ? 'border-slate-600 scale-110' : 'border-transparent'}
+                                        `}
                                         style={{ backgroundColor: `var(--color-${color}-100)` }}
                                     >
                                         <div className={`w-full h-full rounded-full bg-${color}-500 opacity-20 hover:opacity-100 transition-opacity`} />
                                     </button>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* Background Color Picker - Always shown for transparency control */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                                <span>Background</span>
-                                <button
-                                    onClick={() => onChangeNode(selectedNode.id, { backgroundColor: selectedNode.data.backgroundColor ? undefined : '#ffffff' })}
-                                    className={`text-[10px] px-2 py-0.5 rounded-full border transition-all ${selectedNode.data.backgroundColor ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-slate-50 border-slate-200 text-slate-400'}`}
-                                >
-                                    {selectedNode.data.backgroundColor ? 'On' : 'Off'}
-                                </button>
-                            </label>
-                            {selectedNode.data.backgroundColor && (
-                                <div className="flex flex-wrap gap-2">
-                                    {[
-                                        '#ffffff', '#f8fafc', '#f1f5f9', '#e2e8f0', // Grays
-                                        '#fef2f2', '#fffbeb', '#f0fdf4', '#eff6ff', // Tints
-                                        '#fee2e2', '#fef3c7', '#dcfce7', '#dbeafe', // More tints
-                                    ].map((bg) => (
-                                        <button
-                                            key={bg}
-                                            onClick={() => onChangeNode(selectedNode.id, { backgroundColor: bg })}
-                                            className={`
-                                                    w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 shadow-sm
-                                                    ${selectedNode.data.backgroundColor === bg ? 'border-slate-600 scale-110' : 'border-slate-200'}
-                                                `}
-                                            style={{ backgroundColor: bg }}
-                                        />
-                                    ))}
-                                    {/* Custom Color Input Wrapper */}
-                                    <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-slate-200 group">
-                                        <input
-                                            type="color"
-                                            value={selectedNode.data.backgroundColor || '#ffffff'}
-                                            onChange={(e) => onChangeNode(selectedNode.id, { backgroundColor: e.target.value })}
-                                            className="absolute inset-0 w-full h-full cursor-pointer scale-[2] origin-center"
-                                        />
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
                         {/* Icon Picker - Hide for annotation and text */}
@@ -422,12 +364,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                     <button
                                         onClick={() => onChangeNode(selectedNode.id, { icon: 'none' })}
                                         className={`
-                            p-2 rounded-lg flex items-center justify-center transition-all
-                            ${selectedNode.data.icon === 'none'
+                                            p-2 rounded-lg flex items-center justify-center transition-all
+                                            ${selectedNode.data.icon === 'none'
                                                 ? 'bg-red-100 text-red-600 ring-1 ring-red-400'
                                                 : 'hover:bg-white hover:shadow-sm text-slate-400'
                                             }
-                            `}
+                                        `}
                                         title="No Icon"
                                     >
                                         <Ban className="w-5 h-5" />
@@ -440,18 +382,56 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                                 key={key}
                                                 onClick={() => onChangeNode(selectedNode.id, { icon: key })}
                                                 className={`
-                                    p-2 rounded-lg flex items-center justify-center transition-all
-                                    ${selectedNode.data.icon === key
+                                                    p-2 rounded-lg flex items-center justify-center transition-all
+                                                    ${selectedNode.data.icon === key
                                                         ? 'bg-indigo-100 text-indigo-600 ring-1 ring-indigo-400'
                                                         : 'hover:bg-white hover:shadow-sm text-slate-500'
                                                     }
-                                    `}
+                                                `}
                                                 title={key}
                                             >
                                                 <Icon className="w-5 h-5" />
                                             </button>
                                         );
                                     })}
+                                </div>
+
+                                {/* Custom Icon Upload */}
+                                <div className="flex items-center gap-2">
+                                    {selectedNode.data.customIconUrl ? (
+                                        <div className="flex items-center gap-2 w-full">
+                                            <div className="w-8 h-8 rounded-lg border border-slate-200 bg-white flex items-center justify-center overflow-hidden">
+                                                <img src={selectedNode.data.customIconUrl} alt="custom" className="w-5 h-5 object-contain" />
+                                            </div>
+                                            <span className="text-xs text-slate-500 flex-1">Custom icon</span>
+                                            <button
+                                                onClick={() => onChangeNode(selectedNode.id, { customIconUrl: undefined })}
+                                                className="text-[10px] px-2 py-0.5 rounded-full bg-red-50 text-red-500 border border-red-200 hover:bg-red-100 transition-colors"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <label className="flex items-center gap-2 w-full px-3 py-2 border border-dashed border-slate-300 rounded-lg hover:bg-slate-50 hover:border-indigo-400 transition-all cursor-pointer text-xs text-slate-500 hover:text-indigo-600">
+                                            <Upload className="w-3.5 h-3.5" />
+                                            <span>Upload custom icon</span>
+                                            <input
+                                                type="file"
+                                                accept="image/svg+xml,image/png,image/jpeg,image/webp"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file && selectedNode) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            onChangeNode(selectedNode.id, { customIconUrl: reader.result as string });
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -500,20 +480,22 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                         )}
 
                         <div className="pt-4 mt-4 border-t border-slate-100 flex gap-2">
-                            <button
+                            <Button
                                 onClick={() => onDuplicateNode(selectedNode.id)}
-                                className="flex-1 py-2 flex items-center justify-center gap-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors text-sm font-medium"
+                                variant="secondary"
+                                className="flex-1"
+                                icon={<Copy className="w-4 h-4" />}
                             >
-                                <Copy className="w-4 h-4" />
                                 Duplicate
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 onClick={() => onDeleteNode(selectedNode.id)}
-                                className="flex-1 py-2 flex items-center justify-center gap-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium"
+                                variant="danger"
+                                className="flex-1"
+                                icon={<Trash2 className="w-4 h-4" />}
                             >
-                                <Trash2 className="w-4 h-4" />
                                 Delete
-                            </button>
+                            </Button>
                         </div>
                     </>
                 )}
@@ -543,12 +525,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                                 });
                                             }}
                                             className={`
-                                px-2 py-1.5 rounded-lg text-xs font-medium border transition-all text-left flex items-center gap-2
-                                ${isSelected
+                                                px-2 py-1.5 rounded-lg text-xs font-medium border transition-all text-left flex items-center gap-2
+                                                ${isSelected
                                                     ? 'bg-indigo-50 border-indigo-200 text-indigo-700 ring-1 ring-indigo-200'
                                                     : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                                                 }
-                            `}
+                                            `}
                                         >
                                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: style.stroke }} />
                                             {label}
@@ -559,39 +541,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                <Type className="w-3 h-3" /> Label
-                            </label>
-                            <input
-                                type="text"
+                            <Input
+                                label="Label"
                                 value={(selectedEdge.label as string) || ''}
                                 onChange={(e) => onChangeEdge(selectedEdge.id, { label: e.target.value })}
                                 placeholder="e.g., 'If yes', 'On success'"
-                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-900 focus:ring-2 focus:ring-indigo-500 outline-none"
                             />
 
                             {/* Label Offset Controls */}
                             {(selectedEdge.label) && (
                                 <div className="space-y-1 pt-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-[10px] uppercase font-bold text-slate-400">Position on Wire</span>
-                                        <span className="text-[10px] text-slate-500">{Math.round((selectedEdge.data?.labelPosition ?? 0.5) * 100)}%</span>
-                                    </div>
-                                    <input
-                                        type="range"
+                                    <Slider
+                                        label="Position"
+                                        valueDisplay={`${Math.round((selectedEdge.data?.labelPosition ?? 0.5) * 100)}%`}
                                         min="0"
                                         max="100"
                                         step="1"
                                         value={Math.round((selectedEdge.data?.labelPosition ?? 0.5) * 100)}
                                         onChange={(e) => onChangeEdge(selectedEdge.id, { data: { ...selectedEdge.data, labelPosition: parseInt(e.target.value) / 100, labelOffsetX: 0, labelOffsetY: 0 } })}
-                                        className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                                     />
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Line Style</label>
+                            <Label>Line Style</Label>
 
                             <div className="flex flex-wrap gap-2">
                                 {/* Edge Color Picker */}
@@ -599,8 +573,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                     <button
                                         key={color}
                                         onClick={() => onChangeEdge(selectedEdge.id, { style: { ...selectedEdge.style, stroke: color } })}
-                                        className={`w-6 h-6 rounded-full border border-white shadow-sm hover:scale-110 transition-transform ${selectedEdge.style?.stroke === color ? 'ring-2 ring-slate-400 ring-offset-2' : ''
-                                            }`}
+                                        className={`w-6 h-6 rounded-full border border-white shadow-sm hover:scale-110 transition-transform ${selectedEdge.style?.stroke === color ? 'ring-2 ring-slate-400 ring-offset-2' : ''}`}
                                         style={{ backgroundColor: color }}
                                     />
                                 ))}
@@ -613,51 +586,110 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 </button>
                             </div>
 
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => onChangeEdge(selectedEdge.id, { animated: !selectedEdge.animated })}
-                                    className={`
-                        flex-1 py-2 text-xs font-medium rounded-lg border transition-all
-                        ${selectedEdge.animated
-                                            ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                                            : 'bg-white border-slate-200 text-slate-600'
-                                        }
-                    `}
-                                >
-                                    Animated
-                                </button>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-600">Animated</span>
+                                <Switch
+                                    checked={selectedEdge.animated || false}
+                                    onCheckedChange={(checked) => onChangeEdge(selectedEdge.id, { animated: checked })}
+                                />
                             </div>
+                            <Button
+                                onClick={() => {
+                                    const isBidirectional = !!selectedEdge.markerStart;
+                                    onChangeEdge(selectedEdge.id, {
+                                        markerStart: isBidirectional ? undefined : { type: MarkerType.ArrowClosed, color: selectedEdge.style?.stroke || '#94a3b8' }
+                                    });
+                                }}
+                                variant={!!selectedEdge.markerStart ? 'primary' : 'secondary'}
+                                className="flex-1"
+                            >
+                                Bidirectional
+                            </Button>
+
+                            <Button
+                                onClick={() => {
+                                    onChangeEdge(selectedEdge.id, {
+                                        source: selectedEdge.target,
+                                        target: selectedEdge.source,
+                                        sourceHandle: selectedEdge.targetHandle,
+                                        targetHandle: selectedEdge.sourceHandle
+                                    });
+                                }}
+                                variant="secondary"
+                                className="w-full"
+                                icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
+                            >
+                                Swap Direction
+                            </Button>
+
                             <div className="grid grid-cols-3 gap-2">
                                 {['default', 'smoothstep', 'step'].map(t => (
                                     <button
                                         key={t}
                                         onClick={() => onChangeEdge(selectedEdge.id, { type: t })}
-                                        className={`
-                                py-2 text-xs font-medium rounded-lg border capitalize transition-all
-                                ${selectedEdge.type === t
-                                                ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                                                : 'bg-white border-slate-200 text-slate-600'
-                                            }
-                            `}
+                                        className={`py-2 text-xs font-medium rounded-lg border capitalize transition-all ${selectedEdge.type === t ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-slate-200 text-slate-600'}`}
                                     >
                                         {t === 'default' ? 'Bezier' : t}
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Stroke Width */}
+                            <div className="space-y-1 pt-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-[10px] uppercase font-bold text-slate-400">Stroke Width</span>
+                                    <span className="text-[10px] text-slate-500">{selectedEdge.style?.strokeWidth || 2}px</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="6"
+                                    step="1"
+                                    value={Number(selectedEdge.style?.strokeWidth) || 2}
+                                    onChange={(e) => onChangeEdge(selectedEdge.id, { style: { ...selectedEdge.style, strokeWidth: parseInt(e.target.value) } })}
+                                    className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                />
+                            </div>
+
+                            {/* Dash Pattern */}
+                            <div className="space-y-1.5 pt-1">
+                                <span className="text-[10px] uppercase font-bold text-slate-400">Line Pattern</span>
+                                <div className="grid grid-cols-4 gap-1.5">
+                                    {(['solid', 'dashed', 'dotted', 'dashdot'] as const).map((pattern) => {
+                                        const currentPattern = selectedEdge.data?.dashPattern || 'solid';
+                                        const dashArrayMap: Record<string, string> = { solid: '', dashed: '8 4', dotted: '2 4', dashdot: '8 4 2 4' };
+                                        return (
+                                            <button
+                                                key={pattern}
+                                                onClick={() => onChangeEdge(selectedEdge.id, {
+                                                    data: { ...selectedEdge.data, dashPattern: pattern },
+                                                    style: { ...selectedEdge.style, strokeDasharray: dashArrayMap[pattern] }
+                                                })}
+                                                className={`py-1.5 flex items-center justify-center rounded-lg border transition-all ${currentPattern === pattern ? 'bg-indigo-50 border-indigo-200' : 'bg-white border-slate-200'}`}
+                                            >
+                                                <svg width="32" height="4" viewBox="0 0 32 4">
+                                                    <line x1="0" y1="2" x2="32" y2="2" stroke={currentPattern === pattern ? '#4f46e5' : '#94a3b8'} strokeWidth="2" strokeDasharray={dashArrayMap[pattern]} />
+                                                </svg>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="pt-4 border-t border-slate-100">
-                            <button
+                            <Button
                                 onClick={() => onDeleteEdge(selectedEdge.id)}
-                                className="w-full py-2 flex items-center justify-center gap-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors text-sm font-medium"
+                                variant="danger"
+                                className="w-full"
+                                icon={<Trash2 className="w-4 h-4" />}
                             >
-                                <Trash2 className="w-4 h-4" />
                                 Delete Connection
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 };

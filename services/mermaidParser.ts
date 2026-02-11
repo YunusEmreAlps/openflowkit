@@ -1,6 +1,6 @@
 import { createDefaultEdge } from '../constants';
 import { getDefaultColor } from '../theme';
-import { FlowNode, FlowEdge } from '../types';
+import { FlowNode, FlowEdge, NodeData } from '../types';
 
 interface ParseResult {
     nodes: FlowNode[];
@@ -23,8 +23,22 @@ const SHAPE_TO_TYPE: Record<string, string> = {
     '>': 'process',  // asymmetric → process
 };
 
+// Maps Mermaid shapes to FlowMind shape values
+const SHAPE_TO_FLOWMIND_SHAPE: Record<string, string> = {
+    '([': 'capsule',
+    '((': 'circle',
+    '{': 'diamond',
+    '{{': 'hexagon',
+    '[': 'rounded',
+    '>': 'parallelogram',
+};
+
 const detectNodeType = (shapeOpen: string): string => {
     return SHAPE_TO_TYPE[shapeOpen] || 'process';
+};
+
+const detectNodeShape = (shapeOpen: string): string | undefined => {
+    return SHAPE_TO_FLOWMIND_SHAPE[shapeOpen];
 };
 
 /**
@@ -38,7 +52,7 @@ const detectNodeType = (shapeOpen: string): string => {
  */
 export const parseMermaid = (input: string): ParseResult => {
     const lines = input.split('\n');
-    const nodesMap = new Map<string, { id: string; label: string; type: string }>();
+    const nodesMap = new Map<string, { id: string; label: string; type: string; shape?: string }>();
     const edges: Array<{ source: string; target: string; label: string }> = [];
 
     let direction: 'TB' | 'LR' = 'TB';
@@ -121,7 +135,12 @@ export const parseMermaid = (input: string): ParseResult => {
                 x: direction === 'LR' ? i * SPACING_X : col * SPACING_X,
                 y: direction === 'LR' ? 0 : row * SPACING_Y,
             },
-            data: { label: n.label, subLabel: '', color: getDefaultColor(n.type) },
+            data: {
+                label: n.label,
+                subLabel: '',
+                color: getDefaultColor(n.type),
+                ...(n.shape ? { shape: n.shape as NodeData['shape'] } : {}),
+            },
         };
     });
 
@@ -136,7 +155,7 @@ export const parseMermaid = (input: string): ParseResult => {
  * Parse a raw node string like "A[My Label]" or "B{Decision}" or "C((End))"
  * into { id, label, type }
  */
-function parseNodeDeclaration(raw: string): { id: string; label: string; type: string } | null {
+function parseNodeDeclaration(raw: string): { id: string; label: string; type: string; shape?: string } | null {
     const trimmed = raw.trim();
     if (!trimmed) return null;
 
@@ -158,7 +177,8 @@ function parseNodeDeclaration(raw: string): { id: string; label: string; type: s
             const shapeOpen = match[2];
             const label = match[3] || id;
             const type = detectNodeType(shapeOpen);
-            return { id, label, type };
+            const shape = detectNodeShape(shapeOpen);
+            return { id, label, type, shape };
         }
     }
 

@@ -7,18 +7,22 @@ export enum NodeType {
   END = 'end',
   CUSTOM = 'custom',
   ANNOTATION = 'annotation',
-  SECTION = 'section'
+  SECTION = 'section',
+  GROUP = 'group',
+  SWIMLANE = 'swimlane',
 }
 
 export interface NodeData {
   label: string;
   subLabel?: string; // Supports Markdown
   icon?: string; // Key for the icon map
+  secondaryIcon?: string; // Optional secondary icon key
+  customIconUrl?: string; // User-uploaded icon (base64 or URL)
   imageUrl?: string; // Base64 or URL
   color?: string; // Tailwind color class key (e.g., 'blue', 'red')
   align?: 'left' | 'center' | 'right';
-  shape?: 'rectangle' | 'rounded' | 'capsule';
-  rotation?: number; // New Rotation Property
+  shape?: 'rectangle' | 'rounded' | 'capsule' | 'diamond' | 'hexagon' | 'cylinder' | 'ellipse' | 'parallelogram' | 'circle';
+  rotation?: number;
   width?: number;
   height?: number;
   fontSize?: string;
@@ -38,6 +42,9 @@ export interface EdgeData {
   labelOffsetX?: number;
   labelOffsetY?: number;
   labelPosition?: number; // 0 to 1, default 0.5
+  strokeWidth?: number; // 1-6, default 2
+  dashPattern?: 'solid' | 'dashed' | 'dotted' | 'dashdot';
+  opacity?: number; // 0-1, default 1
 }
 
 export type FlowEdge = Edge<EdgeData>;

@@ -14,10 +14,13 @@ import ReactFlow, {
 import { useFlowStore } from '../store';
 import { useFlowOperations } from '../hooks/useFlowOperations';
 import { useModifierKeys } from '../hooks/useModifierKeys';
+import { useEdgeInteractions } from '../hooks/useEdgeInteractions';
 import CustomNode from './CustomNode';
 import AnnotationNode from './AnnotationNode';
 import SectionNode from './SectionNode';
 import TextNode from './TextNode';
+import GroupNode from './GroupNode';
+import SwimlaneNode from './SwimlaneNode';
 import { CustomBezierEdge, CustomSmoothStepEdge, CustomStepEdge } from './CustomEdge';
 import CustomConnectionLine from './CustomConnectionLine';
 import { ConnectMenu } from './ConnectMenu';
@@ -70,10 +73,12 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         onConnect, onSelectionChange, onNodeDoubleClick,
         onNodeDragStart, onNodeDragStop,
         onConnectStart, onConnectEnd,
-        handleAddAndConnect,
+        handleAddAndConnect, handleAddNode,
         deleteNode, deleteEdge, duplicateNode,
         updateNodeZIndex,
-        pasteSelection, copySelection
+        pasteSelection, copySelection,
+        handleAlignNodes, handleDistributeNodes, handleGroupNodes,
+        onEdgeUpdate
     } = useFlowOperations(
         recordHistory,
         (position, sourceId, sourceHandle) => setConnectMenu({ position, sourceId, sourceHandle })
@@ -81,6 +86,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
 
     // --- Keyboard Shortcuts ---
     const { isSelectionModifierPressed } = useModifierKeys();
+    useEdgeInteractions();
 
     const isEffectiveSelectMode = isSelectMode || isSelectionModifierPressed;
 
@@ -166,6 +172,15 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         closeContextMenu();
     }, [closeContextMenu]);
 
+    // Double-click on canvas → create new node at cursor
+    const onDoubleClickPane = useCallback(
+        (event: React.MouseEvent) => {
+            const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+            handleAddNode(position);
+        },
+        [screenToFlowPosition, handleAddNode]
+    );
+
 
     // --- Memoized Types ---
     const nodeTypes = useMemo(() => ({
@@ -177,6 +192,8 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         annotation: AnnotationNode,
         section: SectionNode,
         text: TextNode,
+        group: GroupNode,
+        swimlane: SwimlaneNode,
     }), []);
 
     const edgeTypes = useMemo(() => ({
@@ -188,14 +205,27 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     // IsSelectMode handling
     // Let's use a prop for now.
 
+    const [isConnecting, setIsConnecting] = useState(false);
+
+    const onConnectStartWrapper = useCallback((event: any, params: any) => {
+        setIsConnecting(true);
+        onConnectStart(event, params);
+    }, [onConnectStart]);
+
+    const onConnectEndWrapper = useCallback((event: any) => {
+        setIsConnecting(false);
+        onConnectEnd(event);
+    }, [onConnectEnd]);
+
     return (
-        <div className="w-full h-full relative" ref={reactFlowWrapper}>
+        <div className={`w-full h-full relative ${isConnecting ? 'is-connecting' : ''}`} ref={reactFlowWrapper}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange} // selection handling issues?
                 onConnect={onConnect}
+                onEdgeUpdate={onEdgeUpdate}
                 onSelectionChange={onSelectionChange}
                 onNodeDragStart={onNodeDragStart}
                 onNodeDragStop={onNodeDragStop}
@@ -204,13 +234,25 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 onPaneContextMenu={onPaneContextMenu}
                 onEdgeContextMenu={onEdgeContextMenu}
                 onPaneClick={onPaneClick}
-                onConnectStart={onConnectStart}
-                onConnectEnd={onConnectEnd}
+                onDoubleClick={onDoubleClickPane}
+                onConnectStart={onConnectStartWrapper}
+                onConnectEnd={onConnectEndWrapper}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
                 fitView // Initial fit view?
                 className="bg-slate-50"
                 minZoom={0.1}
+                connectionMode={ConnectionMode.Loose}
+                isValidConnection={(connection) => {
+                    // Prevent active duplicates (though onConnect handles it, this gives UI feedback)
+                    // We allow self-loops for now as requested in features
+                    return !edges.some(e =>
+                        e.source === connection.source &&
+                        e.target === connection.target &&
+                        e.sourceHandle === connection.sourceHandle &&
+                        e.targetHandle === connection.targetHandle
+                    );
+                }}
                 selectionOnDrag={isEffectiveSelectMode}
                 panOnDrag={!isEffectiveSelectMode}
                 selectionMode={isEffectiveSelectMode ? SelectionMode.Partial : undefined}
@@ -238,10 +280,10 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 <ConnectMenu
                     position={connectMenu.position}
                     onClose={() => setConnectMenu(null)}
-                    onSelect={(type) => {
+                    onSelect={(type, shape) => {
                         if (connectMenu) {
                             const flowPos = screenToFlowPosition(connectMenu.position);
-                            handleAddAndConnect(type, flowPos, connectMenu.sourceId, connectMenu.sourceHandle);
+                            handleAddAndConnect(type, flowPos, connectMenu.sourceId, connectMenu.sourceHandle, shape);
                         }
                     }}
                 />
@@ -273,6 +315,10 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                         onCloseContextMenu();
                     }}
                     canPaste={true}
+                    selectedCount={nodes.filter(n => n.selected).length}
+                    onAlignNodes={(dir) => { handleAlignNodes(dir); onCloseContextMenu(); }}
+                    onDistributeNodes={(dir) => { handleDistributeNodes(dir); onCloseContextMenu(); }}
+                    onGroupSelected={() => { handleGroupNodes(); onCloseContextMenu(); }}
                 />
             )}
         </div>

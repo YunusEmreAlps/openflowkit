@@ -1,9 +1,9 @@
 import React from 'react';
-import { Settings, Sparkles, StickyNote, X } from 'lucide-react';
+import { Settings, Sparkles, StickyNote, X, Database, ArrowRightLeft, Circle } from 'lucide-react';
 
 interface ConnectMenuProps {
     position: { x: number; y: number };
-    onSelect: (type: string) => void;
+    onSelect: (type: string, shape?: string) => void;
     onClose: () => void;
 }
 
@@ -43,6 +43,32 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                         <div className="flex flex-col items-start translate-y-[1px]">
                             <span className="font-bold text-slate-700 leading-none mb-1">Decision</span>
                             <span className="text-[10px] text-slate-400 font-medium">Branching logic</span>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => { onSelect('process', 'cylinder'); onClose(); }}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 active:bg-slate-100 rounded-xl transition-all group"
+                    >
+                        <div className="w-9 h-9 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center border border-emerald-100 group-hover:scale-110 transition-transform">
+                            <Database className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="flex flex-col items-start translate-y-[1px]">
+                            <span className="font-bold text-slate-700 leading-none mb-1">Database</span>
+                            <span className="text-[10px] text-slate-400 font-medium">Data storage</span>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => { onSelect('process', 'parallelogram'); onClose(); }}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 active:bg-slate-100 rounded-xl transition-all group"
+                    >
+                        <div className="w-9 h-9 bg-violet-50 text-violet-600 rounded-lg flex items-center justify-center border border-violet-100 group-hover:scale-110 transition-transform">
+                            <ArrowRightLeft className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="flex flex-col items-start translate-y-[1px]">
+                            <span className="font-bold text-slate-700 leading-none mb-1">Input / Output</span>
+                            <span className="text-[10px] text-slate-400 font-medium">Data flow</span>
                         </div>
                     </button>
 

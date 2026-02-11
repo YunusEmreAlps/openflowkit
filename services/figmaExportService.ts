@@ -299,7 +299,7 @@ export const toFigmaSVG = (nodes: Node[], edges: Edge[]): string => {
 
     // ── LAYER 4: Standard nodes (start, process, decision, end, custom) ──
     out.push(`<g id="nodes">`);
-    nodes.filter(n => n.type !== 'section' && n.type !== 'annotation').forEach(node => {
+    nodes.filter(n => n.type !== 'section' && n.type !== 'annotation' && n.type !== 'text').forEach(node => {
         const x = node.position.x;
         const y = node.position.y;
         const w = node.width || 200;
@@ -314,24 +314,75 @@ export const toFigmaSVG = (nodes: Node[], edges: Edge[]): string => {
         const activeShape = data.shape || defaults.shape;
         const theme = getNodeTheme(activeColor);
 
-        // Shape → rx
-        let rx = 12;
-        if (activeShape === 'capsule') rx = Math.min(w, h) / 2;
-        else if (activeShape === 'rectangle') rx = 2;
-
         out.push(`  <g id="node-${node.id}" filter="url(#shadow)">`);
 
-        // Main container rect
-        out.push(`    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2" />`);
+        // Shape Geometry
+        let shapePath = '';
+        let shapeExtra = ''; // For cylinder cap or other multi-path shapes
+
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+
+        switch (activeShape) {
+            case 'diamond':
+                shapePath = `M${cx},${y} L${x + w},${cy} L${cx},${y + h} L${x},${cy} Z`;
+                break;
+            case 'hexagon':
+                const hw = w / 4;
+                shapePath = `M${x + hw},${y} L${x + w - hw},${y} L${x + w},${cy} L${x + w - hw},${y + h} L${x + hw},${y + h} L${x},${cy} Z`;
+                break;
+            case 'parallelogram':
+                const skew = 20;
+                shapePath = `M${x + skew},${y} L${x + w},${y} L${x + w - skew},${y + h} L${x},${y + h} Z`;
+                break;
+            case 'ellipse':
+                shapePath = `M${x},${cy} A${w / 2},${h / 2} 0 1,1 ${x + w},${cy} A${w / 2},${h / 2} 0 1,1 ${x},${cy}`;
+                break;
+            case 'circle':
+                const r = Math.min(w, h) / 2;
+                shapePath = `M${cx - r},${cy} A${r},${r} 0 1,1 ${cx + r},${cy} A${r},${r} 0 1,1 ${cx - r},${cy}`;
+                break;
+            case 'cylinder':
+                const ry = 10;
+                // Main body
+                shapePath = `M${x},${y + ry} L${x},${y + h - ry} Q${x},${y + h} ${cx},${y + h} Q${x + w},${y + h} ${x + w},${y + h - ry} L${x + w},${y + ry} Q${x + w},${y} ${cx},${y} Q${x},${y} ${x},${y + ry} Z`;
+                // Top cap overlap
+                shapeExtra = `<ellipse cx="${cx}" cy="${y + ry}" rx="${w / 2}" ry="${ry}" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2" opacity="0.5" />`;
+                break;
+            case 'capsule':
+                const rx_cap = Math.min(w, h) / 2;
+                shapePath = `M${x + rx_cap},${y} L${x + w - rx_cap},${y} A${rx_cap},${rx_cap} 0 0,1 ${x + w},${y + h} L${x + rx_cap},${y + h} A${rx_cap},${rx_cap} 0 0,1 ${x},${y} Z`;
+                if (w < h) { // vertical capsule
+                    shapePath = `M${x},${y + rx_cap} L${x},${y + h - rx_cap} A${rx_cap},${rx_cap} 0 0,0 ${x + w},${y + h - rx_cap} L${x + w},${y + rx_cap} A${rx_cap},${rx_cap} 0 0,0 ${x},${y + rx_cap} Z`;
+                }
+                break;
+            case 'rounded':
+            default:
+                const rx = activeShape === 'rectangle' ? 2 : 12;
+                shapePath = `M${x + rx},${y} L${x + w - rx},${y} Q${x + w},${y} ${x + w},${y + rx} L${x + w},${y + h - rx} Q${x + w},${y + h} ${x + w - rx},${y + h} L${x + rx},${y + h} Q${x},${y + h} ${x},${y + h - rx} L${x},${y + rx} Q${x},${y} ${x + rx},${y} Z`;
+                break;
+        }
+
+        // Draw Shape
+        out.push(`    <path d="${shapePath}" fill="${theme.bg}" stroke="${theme.border}" stroke-width="2" />`);
+        if (shapeExtra) out.push(`    ${shapeExtra}`);
 
         // Layout: Icon (40×40) on the left, text to the right
         const pad = 16;
+        let contentX = x;
+        let contentW = w;
+
+        // Visual adjustment for Diamond/Parallelogram to keep text inside
+        if (activeShape === 'diamond') { contentX = x + w * 0.2; contentW = w * 0.6; }
+        if (activeShape === 'parallelogram') { contentX = x + 20; contentW = w - 40; }
+
+        const centerX = contentX + contentW / 2;
+        const centerY = cy;
 
         if (activeIcon) {
-            const iconBoxX = x + pad;
-            const centerY = y + h / 2;
-            const iconBoxY = centerY - 20;
             const iconBoxSize = 40;
+            const iconBoxX = centerX - (iconBoxSize + 12 + 60) / 2; // Approximate centering with text
+            const iconBoxY = centerY - 20;
 
             // Icon background box
             out.push(`    <rect x="${iconBoxX}" y="${iconBoxY}" width="${iconBoxSize}" height="${iconBoxSize}" rx="8" fill="${theme.iconBg}" stroke="rgba(0,0,0,0.05)" stroke-width="1" />`);
@@ -346,47 +397,41 @@ export const toFigmaSVG = (nodes: Node[], edges: Edge[]): string => {
 
             // Text next to icon
             const textX = iconBoxX + iconBoxSize + 12;
+            const lLines = String(data.label || 'Node').split('\n');
+            const sLines = String(data.subLabel || '').split('\n');
 
             if (data.subLabel) {
                 // Label
-                const lLines = String(data.label || 'Node').split('\n');
                 out.push(`    <text x="${textX}" y="${centerY - 8}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}">`);
                 lLines.forEach((l, i) => out.push(`      <tspan x="${textX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
 
                 // SubLabel
-                const sLines = String(data.subLabel || '').split('\n');
-                // Adjust Y for sublabel to be below label lines. 
-                // Simple approx: 
                 out.push(`    <text x="${textX}" y="${centerY + 8 + (lLines.length - 1) * 14}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="${theme.subText}">`);
                 sLines.forEach((l, i) => out.push(`      <tspan x="${textX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
             } else {
-                // Single label (centered vertically effectively)
-                const lLines = String(data.label || 'Node').split('\n');
                 out.push(`    <text x="${textX}" y="${centerY + 5}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}">`);
                 lLines.forEach((l, i) => out.push(`      <tspan x="${textX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
             }
+
         } else {
             // No icon — center text
-            const cx = x + w / 2;
-            const cy = y + h / 2;
+            const lLines = String(data.label || 'Node').split('\n');
+            const sLines = String(data.subLabel || '').split('\n');
 
             if (data.subLabel) {
-                const lLines = String(data.label || 'Node').split('\n');
-                out.push(`    <text x="${cx}" y="${cy - 8}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}" text-anchor="middle">`);
-                lLines.forEach((l, i) => out.push(`      <tspan x="${cx}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
+                out.push(`    <text x="${centerX}" y="${centerY - 8}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}" text-anchor="middle">`);
+                lLines.forEach((l, i) => out.push(`      <tspan x="${centerX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
 
-                const sLines = String(data.subLabel || '').split('\n');
-                out.push(`    <text x="${cx}" y="${cy + 8 + (lLines.length - 1) * 14}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="${theme.subText}" text-anchor="middle">`);
-                sLines.forEach((l, i) => out.push(`      <tspan x="${cx}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
+                out.push(`    <text x="${centerX}" y="${centerY + 8 + (lLines.length - 1) * 14}" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="500" fill="${theme.subText}" text-anchor="middle">`);
+                sLines.forEach((l, i) => out.push(`      <tspan x="${centerX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
             } else {
-                const lLines = String(data.label || 'Node').split('\n');
-                out.push(`    <text x="${cx}" y="${cy + 5}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}" text-anchor="middle">`);
-                lLines.forEach((l, i) => out.push(`      <tspan x="${cx}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
+                out.push(`    <text x="${centerX}" y="${centerY + 5}" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="${theme.text}" text-anchor="middle">`);
+                lLines.forEach((l, i) => out.push(`      <tspan x="${centerX}" dy="${i === 0 ? 0 : '1.2em'}">${escapeXml(l)}</tspan>`));
                 out.push(`    </text>`);
             }
         }
