@@ -19,6 +19,19 @@ const processContent = (content: string, appName: string) => {
         });
 };
 
+// Helper to slugify text (matches github-slugger behavior roughly)
+const slugify = (text: string) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')        // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')    // Remove all non-word chars
+        .replace(/\-\-+/g, '-')      // Replace multiple - with single -
+        .replace(/^-+/, '')          // Trim start
+        .replace(/-+$/, '');         // Trim end
+};
+
 // Helper to extract Table of Contents
 const extractToc = (content: string) => {
     const regex = /^(#{2,3})\s+(.*)$/gm;
@@ -28,7 +41,7 @@ const extractToc = (content: string) => {
         matches.push({
             level: match[1].length,
             text: match[2],
-            id: match[2].toLowerCase().replace(/[^\w]+/g, '-')
+            id: slugify(match[2])
         });
     }
     return matches;
@@ -48,6 +61,24 @@ export const DocsPage: React.FC = () => {
         if (!content) return [];
         return extractToc(content);
     }, [content]);
+
+    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            const offset = 80; // Header height + padding
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: "smooth"
+            });
+
+            // Optional: Update URL hash without jumping
+            window.history.pushState({}, '', `#${id}`);
+        }
+    };
 
     return (
         <div className="animate-in fade-in duration-300 min-h-[60vh] flex gap-12">
@@ -99,8 +130,9 @@ export const DocsPage: React.FC = () => {
                             <li key={i}>
                                 <a
                                     href={`#${item.id}`}
+                                    onClick={(e) => handleScroll(e, item.id)}
                                     className={`
-                                        block pl-4 py-1 border-l -ml-px transition-colors
+                                        block pl-4 py-1 border-l -ml-px transition-colors cursor-pointer
                                         ${item.level === 2 ? 'text-slate-600 hover:text-slate-900 hover:border-slate-300' : 'text-slate-400 hover:text-slate-700 pl-8 text-xs'}
                                     `}
                                 >

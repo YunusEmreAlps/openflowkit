@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { docsNavigation } from './docsData';
-import { Book, ChevronLeft } from 'lucide-react';
+import { Book, ChevronLeft, ArrowLeft } from 'lucide-react';
 
 interface DocsSidebarProps {
     className?: string;
@@ -15,14 +15,23 @@ export const DocsSidebar: React.FC<DocsSidebarProps> = ({ className = '', onClos
 
     return (
         <aside className={`w-64 border-r border-slate-200 bg-[var(--brand-surface)] flex flex-col h-full fixed inset-y-0 left-0 z-20 transition-transform duration-300 lg:translate-x-0 ${className}`}>
-            <div className="h-14 flex items-center justify-between px-4 border-b border-slate-100">
+            <div className="h-14 flex items-center gap-3 px-4 border-b border-slate-100 bg-white/50 backdrop-blur-sm">
+                <Link
+                    to="/"
+                    className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+                    title="Return to Canvas"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                </Link>
+
+                <div className="w-px h-4 bg-slate-200"></div>
+
                 <div className="flex items-center gap-2 font-semibold text-slate-900">
-                    <Book className="w-4 h-4 text-[var(--brand-primary)]" />
+                    <div className="p-1 rounded bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]">
+                        <Book className="w-3.5 h-3.5" />
+                    </div>
                     <span>Documentation</span>
                 </div>
-                <Link to="/" className="p-1 hover:bg-slate-100 rounded-md text-slate-400 hover:text-slate-600 transition-colors" title="Back to App">
-                    <ChevronLeft className="w-4 h-4" />
-                </Link>
             </div>
 
             <nav className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
