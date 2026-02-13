@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Zap, Settings, Layout, Command, Search,
-    Home, Clock, Loader2, Plus, Import, Image, FileCode, FileJson, GitBranch
+    Home, Clock, Loader2, Plus, Import, Image, FileCode, FileJson, GitBranch, Book
 } from 'lucide-react';
 import { useFlowStore } from '../store';
 import { useSnapshots } from '../hooks/useSnapshots';
@@ -98,6 +98,14 @@ export const HomePage: React.FC<HomePageProps> = ({
                         <Settings className="w-4 h-4" />
                         Settings
                     </button>
+
+                    <a
+                        href="#/docs"
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 text-[var(--brand-secondary)] hover:bg-slate-50 hover:text-slate-900 font-medium`}
+                    >
+                        <Book className="w-4 h-4" />
+                        Documentation
+                    </a>
                 </div>
 
                 <div className="mt-auto p-4 border-t border-slate-100">

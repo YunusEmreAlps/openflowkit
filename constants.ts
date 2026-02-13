@@ -93,6 +93,7 @@ export const KEYBOARD_SHORTCUTS = [
     title: 'Manipulation',
     items: [
       { label: 'Duplicate', keys: ['Cmd', 'D'] },
+      { label: 'Duplicate (Drag)', keys: ['Alt', 'Drag'] },
       { label: 'Copy', keys: ['Cmd', 'C'] },
       { label: 'Paste', keys: ['Cmd', 'V'] },
       { label: 'Group Selection', keys: ['Cmd', 'G'] },

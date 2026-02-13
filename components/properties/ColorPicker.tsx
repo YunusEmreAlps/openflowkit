@@ -11,9 +11,7 @@ const COLORS = ['slate', 'blue', 'emerald', 'amber', 'red', 'violet', 'pink', 'y
 export const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onChange }) => {
     return (
         <div className="space-y-3">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Palette className="w-3 h-3" /> Color Theme
-            </label>
+
             <div className="flex flex-wrap gap-2">
                 {COLORS.map((color) => (
                     <button

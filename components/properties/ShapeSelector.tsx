@@ -13,7 +13,7 @@ const SHAPES: { value: NodeData['shape'], label: string, svg: React.ReactNode }[
     { value: 'diamond', label: 'Diamond', svg: <polygon points="10,2 18,10 10,18 2,10" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
     { value: 'hexagon', label: 'Hexagon', svg: <polygon points="5,2 15,2 19,10 15,18 5,18 1,10" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
     { value: 'cylinder', label: 'Db', svg: <><ellipse cx="10" cy="5" rx="7" ry="3" fill="none" stroke="currentColor" strokeWidth="1.5" /><path d="M3 5 L3 15 C3 17 10 19 17 15 L17 5" fill="none" stroke="currentColor" strokeWidth="1.5" /></> },
-    { value: 'ellipse', label: 'Ellipse', svg: <ellipse cx="10" cy="10" rx="8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
+
     { value: 'parallelogram', label: 'I/O', svg: <polygon points="5,3 19,3 15,17 1,17" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
     { value: 'circle', label: 'Circle', svg: <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" strokeWidth="1.5" /> },
 ];

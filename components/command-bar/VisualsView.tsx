@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Grid, Network, Zap } from 'lucide-react';
+import { Activity, Grid, Network, Zap } from 'lucide-react';
 import { useFlowStore } from '../../store';
 import { ViewHeader } from './ViewHeader';
 
@@ -12,7 +12,7 @@ export const VisualsView = ({ onBack }: VisualsViewProps) => {
 
     return (
         <div className="flex flex-col h-full">
-            <ViewHeader title="Global Visuals" icon={<Palette className="w-4 h-4 text-[var(--brand-primary)]" />} onBack={onBack} />
+            <ViewHeader title="Connection Styles" icon={<Activity className="w-4 h-4 text-[var(--brand-primary)]" />} onBack={onBack} />
 
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
 

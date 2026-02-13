@@ -46,16 +46,16 @@ export const TemplatesView = ({
                         <div
                             key={t.id}
                             onClick={() => { onSelectTemplate?.(t); onClose(); }}
-                            className="group flex items-start gap-3 p-3 rounded-[var(--radius-md)] hover:bg-slate-50 border border-transparent hover:border-slate-200 cursor-pointer transition-all"
+                            className="group flex items-start gap-3 p-3 rounded-[var(--radius-md)] hover:bg-[var(--brand-primary-50)] border border-transparent hover:border-[var(--brand-primary-100)] cursor-pointer transition-all"
                         >
-                            <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-[var(--brand-primary-50)] text-[var(--brand-primary-600)] flex items-center justify-center shrink-0 group-hover:bg-[var(--brand-primary-100)] group-hover:scale-105 transition-all">
+                            <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-[var(--brand-primary-50)] text-[var(--brand-primary-600)] flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-[var(--brand-primary-700)] group-hover:shadow-sm transition-all scale-100 group-hover:scale-105">
                                 <Icon className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-medium text-slate-700 group-hover:text-[var(--brand-primary-700)] truncate">{t.name}</h4>
-                                <p className="text-xs text-slate-400 line-clamp-1">{t.description}</p>
+                                <h4 className="text-sm font-medium text-slate-700 group-hover:text-[var(--brand-primary-900)] truncate">{t.name}</h4>
+                                <p className="text-xs text-slate-400 group-hover:text-[var(--brand-primary-700)]/70 line-clamp-1">{t.description}</p>
                             </div>
-                            <Plus className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Plus className="w-4 h-4 text-slate-300 group-hover:text-[var(--brand-primary-400)] opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                     );
                 })}

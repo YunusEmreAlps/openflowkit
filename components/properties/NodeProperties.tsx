@@ -1,12 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Node } from 'reactflow';
 import { NodeData } from '../../types';
-import { Bold, Italic, List, ListOrdered, Code, Quote, Heading1, CheckSquare, Copy, Trash2, Box, AlignLeft, Image as ImageIcon, Type, Layout } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Code, Quote, Heading1, CheckSquare, Copy, Trash2, Box, AlignLeft, Image as ImageIcon, Type, Layout, Palette, Star, Image as ImageStart } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { ShapeSelector } from './ShapeSelector';
 import { ColorPicker } from './ColorPicker';
 import { IconPicker } from './IconPicker';
 import { ImageUpload } from './ImageUpload';
+import { CollapsibleSection } from '../ui/CollapsibleSection';
 
 interface NodePropertiesProps {
     selectedNode: Node<NodeData>;
@@ -83,6 +84,22 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
     const isImage = selectedNode.type === 'image';
     const isWireframe = selectedNode.type === 'browser' || selectedNode.type === 'mobile';
 
+    // State for progressive disclosure (accordion)
+    // Initialize open section based on node type
+    const [activeSection, setActiveSection] = useState<string>('content');
+
+    // Reset/Set default active section when selected node type changes
+    useEffect(() => {
+        if (isWireframe) setActiveSection('variant');
+        else if (isText) setActiveSection('content'); // Text nodes prioritize content
+        else if (isAnnotation) setActiveSection('content');
+        else setActiveSection('appearance'); // Standard nodes prioritize shape/appearance
+    }, [selectedNode.id, selectedNode.type]); // Re-run when selection changes
+
+    const toggleSection = (section: string) => {
+        setActiveSection(current => current === section ? '' : section);
+    };
+
     const labelInputRef = useRef<HTMLTextAreaElement>(null);
     const descInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -91,15 +108,17 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
 
     return (
         <>
-            <hr className="border-slate-100" />
+            <hr className="border-slate-100 mb-2" />
 
             {/* Wireframe Variant Section */}
             {isWireframe && (
-                <div className="space-y-3">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                        <Layout className="w-3.5 h-3.5" /> Wireframe Variant
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
+                <CollapsibleSection
+                    title="Wireframe Variant"
+                    icon={<Layout className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'variant'}
+                    onToggle={() => toggleSection('variant')}
+                >
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                         {selectedNode.type === 'browser' ? (
                             <>
                                 {['landing', 'dashboard', 'form', 'modal', 'cookie', 'pricing'].map((variant) => (
@@ -132,33 +151,34 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                             </>
                         )}
                     </div>
-                </div>
+                </CollapsibleSection>
             )}
 
             {/* Appearance Section */}
-            {!isWireframe && (
-                <div className="space-y-3">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                        <Box className="w-3.5 h-3.5" /> Appearance
-                    </label>
-                    {!isAnnotation && !isText && !isImage && (
-                        <ShapeSelector
-                            selectedShape={selectedNode.data?.shape}
-                            onChange={(shape) => onChange(selectedNode.id, { shape })}
-                        />
-                    )}
-                </div>
+            {!isWireframe && !isAnnotation && !isText && !isImage && (
+                <CollapsibleSection
+                    title="Appearance"
+                    icon={<Box className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'appearance'}
+                    onToggle={() => toggleSection('appearance')}
+                >
+                    <ShapeSelector
+                        selectedShape={selectedNode.data?.shape}
+                        onChange={(shape) => onChange(selectedNode.id, { shape })}
+                    />
+                </CollapsibleSection>
             )}
 
             {/* Image Settings Section */}
             {isImage && (
-                <div className="space-y-3">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                        <ImageIcon className="w-3.5 h-3.5" /> Image Settings
-                    </label>
-
+                <CollapsibleSection
+                    title="Image Settings"
+                    icon={<ImageIcon className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'image'}
+                    onToggle={() => toggleSection('image')}
+                >
                     {/* Transparency */}
-                    <div className="space-y-1">
+                    <div className="space-y-1 mb-3">
                         <div className="flex justify-between text-xs text-slate-500">
                             <span>Transparency</span>
                             <span>{Math.round((1 - (selectedNode.data?.transparency ?? 1)) * 100)}%</span>
@@ -175,7 +195,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                     </div>
 
                     {/* Rotation */}
-                    <div className="space-y-1">
+                    <div className="space-y-1 mb-2">
                         <div className="flex justify-between text-xs text-slate-500">
                             <span>Rotation</span>
                             <span>{selectedNode.data?.rotation ?? 0}°</span>
@@ -190,54 +210,59 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                             className="w-full accent-[var(--brand-primary)] h-2 bg-slate-200 rounded-[var(--brand-radius)] appearance-none cursor-pointer"
                         />
                     </div>
-                </div>
+                </CollapsibleSection>
             )}
 
             {/* Content Section */}
-            <div className="space-y-3">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <AlignLeft className="w-3.5 h-3.5" /> Content
-                </label>
-
-                {/* Rich Text Label */}
-                <div className="relative border border-slate-200 rounded-[var(--brand-radius)] bg-[var(--brand-background)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--brand-primary)] focus-within:border-transparent transition-all">
-                    <MarkdownToolbar onInsert={labelEditor.insert} simple />
-                    <textarea
-                        ref={labelInputRef}
-                        value={selectedNode.data?.label || ''}
-                        onChange={(e) => onChange(selectedNode.id, { label: e.target.value })}
-                        onKeyDown={labelEditor.handleKeyDown}
-                        placeholder={isAnnotation ? "Title (Optional)" : "Node Label"}
-                        rows={1}
-                        style={{ minHeight: '38px' }}
-                        className="w-full px-3 py-2 bg-[var(--brand-background)] text-sm font-medium text-[var(--brand-text)] outline-none font-mono resize-y"
-                    />
-                </div>
-
-                {/* Description */}
-                {!isText && !isImage && !isWireframe && (
+            <CollapsibleSection
+                title="Content"
+                icon={<AlignLeft className="w-3.5 h-3.5" />}
+                isOpen={activeSection === 'content'}
+                onToggle={() => toggleSection('content')}
+            >
+                <div className="space-y-3 mb-2">
+                    {/* Rich Text Label */}
                     <div className="relative border border-slate-200 rounded-[var(--brand-radius)] bg-[var(--brand-background)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--brand-primary)] focus-within:border-transparent transition-all">
-                        <MarkdownToolbar onInsert={descEditor.insert} />
+                        <MarkdownToolbar onInsert={labelEditor.insert} simple />
                         <textarea
-                            ref={descInputRef}
-                            value={selectedNode.data?.subLabel || ''}
-                            onChange={(e) => onChange(selectedNode.id, { subLabel: e.target.value })}
-                            onKeyDown={descEditor.handleKeyDown}
-                            placeholder={isAnnotation ? "Write your note here..." : "Description / Sublabel"}
-                            rows={6}
-                            className="w-full px-3 py-2 bg-[var(--brand-background)] text-sm font-medium text-[var(--brand-text)] outline-none resize-none font-mono"
+                            ref={labelInputRef}
+                            value={selectedNode.data?.label || ''}
+                            onChange={(e) => onChange(selectedNode.id, { label: e.target.value })}
+                            onKeyDown={labelEditor.handleKeyDown}
+                            placeholder={isAnnotation ? "Title (Optional)" : "Node Label"}
+                            rows={1}
+                            style={{ minHeight: '38px' }}
+                            className="w-full px-3 py-2 bg-[var(--brand-background)] text-sm font-medium text-[var(--brand-text)] outline-none font-mono resize-y"
                         />
                     </div>
-                )}
-            </div>
+
+                    {/* Description */}
+                    {!isText && !isImage && !isWireframe && (
+                        <div className="relative border border-slate-200 rounded-[var(--brand-radius)] bg-[var(--brand-background)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--brand-primary)] focus-within:border-transparent transition-all">
+                            <MarkdownToolbar onInsert={descEditor.insert} />
+                            <textarea
+                                ref={descInputRef}
+                                value={selectedNode.data?.subLabel || ''}
+                                onChange={(e) => onChange(selectedNode.id, { subLabel: e.target.value })}
+                                onKeyDown={descEditor.handleKeyDown}
+                                placeholder={isAnnotation ? "Write your note here..." : "Description / Sublabel"}
+                                rows={6}
+                                className="w-full px-3 py-2 bg-[var(--brand-background)] text-sm font-medium text-[var(--brand-text)] outline-none resize-none font-mono"
+                            />
+                        </div>
+                    )}
+                </div>
+            </CollapsibleSection>
 
             {/* Text Styling for Text Node */}
             {isText && (
-                <div className="space-y-3">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                        <Type className="w-3.5 h-3.5" /> Text Style
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
+                <CollapsibleSection
+                    title="Text Style"
+                    icon={<Type className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'textStyle'}
+                    onToggle={() => toggleSection('textStyle')}
+                >
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                         <div className="flex bg-slate-100 p-1 rounded-lg overflow-x-auto no-scrollbar">
                             {['inter', 'roboto', 'outfit', 'playfair', 'fira'].map((font) => (
                                 <button
@@ -263,32 +288,51 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                             ))}
                         </div>
                     </div>
-                </div>
+                </CollapsibleSection>
             )}
 
             {!isImage && (
-                <ColorPicker
-                    selectedColor={selectedNode.data?.color}
-                    onChange={(color) => onChange(selectedNode.id, { color })}
-                />
+                <CollapsibleSection
+                    title="Color Theme"
+                    icon={<Palette className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'color'}
+                    onToggle={() => toggleSection('color')}
+                >
+                    <ColorPicker
+                        selectedColor={selectedNode.data?.color}
+                        onChange={(color) => onChange(selectedNode.id, { color })}
+                    />
+                </CollapsibleSection>
             )}
 
             {!isAnnotation && !isText && !isImage && !isWireframe && (
-                <IconPicker
-                    selectedIcon={selectedNode.data?.icon}
-                    customIconUrl={selectedNode.data?.customIconUrl}
-                    onChange={(icon) => onChange(selectedNode.id, { icon })}
-                    onCustomIconChange={(url) => onChange(selectedNode.id, { customIconUrl: url })}
-                />
+                <CollapsibleSection
+                    title="Icon Theme"
+                    icon={<Star className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'icon'}
+                    onToggle={() => toggleSection('icon')}
+                >
+                    <IconPicker
+                        selectedIcon={selectedNode.data?.icon}
+                        customIconUrl={selectedNode.data?.customIconUrl}
+                        onChange={(icon) => onChange(selectedNode.id, { icon })}
+                        onCustomIconChange={(url) => onChange(selectedNode.id, { customIconUrl: url })}
+                    />
+                </CollapsibleSection>
             )}
 
-            <hr className="border-slate-100" />
-
             {!isText && (
-                <ImageUpload
-                    imageUrl={selectedNode.data?.imageUrl}
-                    onChange={(url) => onChange(selectedNode.id, { imageUrl: url })}
-                />
+                <CollapsibleSection
+                    title="Custom Image"
+                    icon={<ImageStart className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'upload'}
+                    onToggle={() => toggleSection('upload')}
+                >
+                    <ImageUpload
+                        imageUrl={selectedNode.data?.imageUrl}
+                        onChange={(url) => onChange(selectedNode.id, { imageUrl: url })}
+                    />
+                </CollapsibleSection>
             )}
 
             <div className="pt-4 mt-4 border-t border-slate-100 flex gap-2">

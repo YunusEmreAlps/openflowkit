@@ -181,14 +181,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         closeContextMenu();
     }, [closeContextMenu]);
 
-    // Double-click on canvas → create new node at cursor
-    const onDoubleClickPane = useCallback(
-        (event: React.MouseEvent) => {
-            const position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
-            handleAddNode(position);
-        },
-        [screenToFlowPosition, handleAddNode]
-    );
+
 
 
     // --- Memoized Types ---
@@ -250,7 +243,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 onPaneContextMenu={onPaneContextMenu}
                 onEdgeContextMenu={onEdgeContextMenu}
                 onPaneClick={onPaneClick}
-                onDoubleClick={onDoubleClickPane}
+
                 onConnectStart={onConnectStartWrapper}
                 onConnectEnd={onConnectEndWrapper}
                 onDragOver={onDragOver}

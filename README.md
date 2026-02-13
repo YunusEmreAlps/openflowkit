@@ -5,10 +5,10 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-**The Developer-First Diagramming Canvas.**  
-Turn **Mermaid**, **Text**, and **Ideas** into beautiful, interactive flowcharts instantly. Now with a powerful **Brand Identity Engine**.
+**The Open-Source, White-Label Diagramming Canvas.**  
+Build beautiful, branded flowcharts with a tool that feels like a billion-dollar startup product. **100% Free & Open Source.**
 
-FlowMind bridges the gap between **Diagram-as-Code** and visual whiteboarding. It's built for developers who love the speed of typing code but need the flexibility of a drag-and-drop canvas.
+FlowMind is the ultimate **White-Label Solution** for developers who need a premium diagramming tool embedded in their workflow, or just want a better way to diagram code.
 
 ![FlowMind Banner](public/Flow_mind_1.png)
 
@@ -16,24 +16,22 @@ FlowMind bridges the gap between **Diagram-as-Code** and visual whiteboarding. I
 
 ## 🌟 Why FlowMind?
 
-Most diagramming tools are either "Code Only" (Mermaid/PlantUML) or "Drag & Drop Only" (draw.io). FlowMind is **both**.
-
-- **📝 Mermaid & DSL Native**: Paste your Mermaid code, and it instantly renders as editable nodes.
-- **🎨 Brand Identity Engine**: Define your brand's colors, fonts, and style once, and apply it everywhere.
-- **✨ Premium Aesthetics**: Glassmorphic UI, smooth animations, and a "Billion Dollar Startup" look out of the box.
-- **⚡️ Rapid Prototyping**: Text-to-Flow capabilities let you scaffold complex systems in seconds.
-- **🧠 AI Copilot**: Stuck? Ask the built-in AI to "Add error handling" or "Explain this flow".
+-   **MIT Licensed**: Completely free to use, modify, and integrate into your own commercial projects.
+-   **True White-Label**: The entire UI dynamically adapts to **YOUR** brand. It's designed to look like *your* product, not ours.
+-   **Diagram-as-Code Native**: Paste Mermaid.js or use our DSL. We treat diagrams as data.
+-   **Premium UX**: Glassmorphism, smooth animations, and granular interactions that usually cost money.
+-   **Privacy Focused**: BYOK (Bring Your Own Key) for AI means your data stays with you.
 
 ---
 
 ## 🔥 Key Features
 
-### 🎨 Brand Identity Engine (New!)
-Customize the entire editor to match your brand or personal style.
-- **Theme Builder**: Set your **Primary**, **Secondary**, **Surface**, and **Background** colors.
-- **Typography System**: Integrates with **Google Fonts** to load your brand's typeface dynamically.
-- **UI Customization**: Adjust `Border Radius` and enable `Glassmorphism` for that premium feel.
-- **Brand Kits**: Create, save, and switch between multiple brand identities (e.g., "Dark Mode", "Client A", "Wireframe").
+### �️ White-Label Brand Engine
+Make FlowMind your own. Our state-of-the-art theming system allows you to completely re-skin the editor:
+-   **Brand Kits**: create unlimited identity presets (e.g., "Client A", "Dark Mode", "Wireframe").
+-   **Dynamic Typography**: Automatically loads and applies **Google Fonts** to match your website.
+-   **Smart Coloring**: Provide your brand's Primary Color, and we auto-generate a harmonious palette (Surface, Background, Accents).
+-   **UI Physics**: Toggle **Glassmorphism**, adjust **Corner Radiuses**, and fine-tune border weights.
 
 ### 💠 Design Systems & Styling
 Fine-grained control over how your diagrams look.
@@ -58,6 +56,18 @@ First-class support for **Mermaid.js** and our own **FlowMind DSL**.
 - **Home Dashboard**: A beautiful, minimalist dashboard to manage your recent flows and brand settings.
 - **Drag & Drop**: Intuitive drag-and-drop interface for image assets and nodes.
 - **Universal Handles**: Omni-directional connection points that just work.
+
+### 🔑 Bring Your Own Key (BYOK)
+Use your own **Gemini API Key** to power the AI features.
+-   **Privacy First**: Your key is stored locally in your browser and never sent to our servers.
+-   **Higher Limits**: Use your personal quota for heavy usage.
+-   **Cost Control**: Manage your own billing directly with Google.
+
+### 📤 Universal Export
+Export your diagrams to the format you need.
+-   **High-Res PNG**: Crystal clear images for presentations.
+-   **Native SVG**: Scalable vectors for print or web.
+-   **JSON & Mermaid**: Export the raw code to share or version control.
 
 ### 📐 Advanced Auto-Layout
 Powered by the **ELK Layout Engine** for professional-grade graph organization.

@@ -18,8 +18,8 @@ const CommandItemRow = ({ item, isSelected, onClick }: { item: CommandItem, isSe
     <div
         onClick={onClick}
         className={`
-            group flex items-center gap-3 px-4 py-2.5 mx-2 rounded-[var(--radius-md)] cursor-pointer transition-all duration-200
-            ${isSelected ? 'bg-[var(--brand-primary-50)]/80 text-[var(--brand-primary-800)] shadow-sm ring-1 ring-[var(--brand-primary-100)]' : 'text-slate-600 hover:bg-slate-50'}
+            group flex items-center gap-3 px-4 py-2.5 mx-2 rounded-[var(--radius-md)] cursor-pointer transition-all duration-200 border border-transparent
+            ${isSelected ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary-900)] border-[var(--brand-primary)] shadow-sm' : 'text-slate-600 hover:bg-[var(--brand-primary-50)] hover:border-[var(--brand-primary-100)] hover:text-[var(--brand-primary-700)]'}
         `}
     >
         <div className={`

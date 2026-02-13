@@ -457,6 +457,12 @@ export const parseMermaid = (input: string): ParseResult => {
         }
     }
 
+
+
+    if (diagramType === 'unknown') {
+        return { nodes: [], edges: [], error: 'Missing chart type declaration. Start with "flowchart TD" or related.' };
+    }
+
     if (nodesMap.size === 0) {
         return { nodes: [], edges: [], error: 'No valid nodes found.' };
     }

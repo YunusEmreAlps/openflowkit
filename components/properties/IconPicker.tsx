@@ -43,18 +43,15 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
     return (
         <div className="space-y-3">
-            <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5" /> Icon Symbol
-                </label>
-                <div className="relative w-32">
-                    <Search className="w-3 h-3 absolute left-2 top-1.5 text-[var(--brand-secondary)]" />
+            <div className="mb-2">
+                <div className="relative w-full">
+                    <Search className="w-3 h-3 absolute left-2 top-2 text-[var(--brand-secondary)]" />
                     <input
                         type="text"
-                        placeholder="Search..."
+                        placeholder="Search icons..."
                         value={iconSearch}
                         onChange={(e) => setIconSearch(e.target.value)}
-                        className="w-full pl-6 pr-2 py-1 bg-[var(--brand-background)] rounded-[calc(var(--brand-radius)-4px)] text-xs outline-none focus:ring-1 focus:ring-[var(--brand-primary)] text-[var(--brand-text)]"
+                        className="w-full pl-7 pr-2 py-1.5 bg-[var(--brand-background)] rounded-[calc(var(--brand-radius)-4px)] text-xs outline-none focus:ring-1 focus:ring-[var(--brand-primary)] text-[var(--brand-text)] border border-slate-200"
                     />
                 </div>
             </div>

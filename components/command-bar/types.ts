@@ -23,8 +23,10 @@ export interface CommandBarProps {
     nodes: Node[];
     edges: Edge[];
     onApply: (nodes: Node[], edges: Edge[]) => void;
-    onAIGenerate: (prompt: string) => Promise<void>;
+    onAIGenerate: (prompt: string, imageBase64?: string) => Promise<void>;
     isGenerating: boolean;
+    chatMessages?: { role: 'user' | 'model'; parts: { text?: string; inlineData?: any }[] }[];
+    onClearChat?: () => void;
     onUndo?: () => void;
     onRedo?: () => void;
     onFitView?: () => void;

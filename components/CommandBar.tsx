@@ -9,7 +9,8 @@ import {
     Code2,
     FileCode,
     Search,
-    Palette
+    Palette,
+    Activity
 } from 'lucide-react';
 
 import { useFlowStore } from '../store';
@@ -43,6 +44,8 @@ export const CommandBar: React.FC<CommandBarProps> = ({
     onSelectTemplate,
     initialView = 'root',
     settings,
+    chatMessages,
+    onClearChat
 }) => {
     const [view, setView] = useState<CommandView>(initialView);
     const [searchQuery, setSearchQuery] = useState('');
@@ -126,8 +129,8 @@ export const CommandBar: React.FC<CommandBarProps> = ({
         },
         {
             id: 'visuals',
-            label: 'Global Visuals...',
-            icon: <Palette className="w-4 h-4 text-pink-500" />,
+            label: 'Connection Styles...',
+            icon: <Activity className="w-4 h-4 text-pink-500" />,
             type: 'navigation',
             view: 'visuals',
             description: 'Edge styles & theme'
@@ -253,6 +256,8 @@ export const CommandBar: React.FC<CommandBarProps> = ({
                         onClose={onClose}
                         handleBack={handleBack}
                         isGenerating={isGenerating}
+                        chatMessages={chatMessages}
+                        onClearChat={onClearChat}
                     />
                 )}
                 {view === 'mermaid' && (

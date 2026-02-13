@@ -22,6 +22,80 @@ export interface LayoutOptions {
 }
 
 /**
+ * Calculate spacing dimensions based on preset and direction.
+ */
+function getSpacingDimensions(spacing: LayoutOptions['spacing'] = 'normal', isHorizontal: boolean) {
+    let nodeNode = 80;
+    let nodeLayer = 150;
+
+    switch (spacing) {
+        case 'compact':
+            nodeNode = 40;
+            nodeLayer = 80;
+            break;
+        case 'loose':
+            nodeNode = 150;
+            nodeLayer = 250;
+            break;
+        case 'normal':
+        default:
+            nodeNode = 80;
+            nodeLayer = 150;
+    }
+
+    if (isHorizontal) {
+        nodeLayer *= 1.2;
+    }
+
+    return {
+        nodeNode: String(nodeNode),
+        nodeLayer: String(nodeLayer),
+        component: String(nodeLayer)
+    };
+}
+
+/**
+ * Get algorithm-specific ELK options.
+ */
+function getAlgorithmOptions(algorithm: LayoutAlgorithm, layerSpacing: number) {
+    const options: Record<string, string> = {};
+
+    // Algorithm ID mapping
+    switch (algorithm) {
+        case 'mrtree': options['elk.algorithm'] = 'org.eclipse.elk.mrtree'; break;
+        case 'force': options['elk.algorithm'] = 'org.eclipse.elk.force'; break;
+        case 'stress': options['elk.algorithm'] = 'org.eclipse.elk.stress'; break;
+        case 'radial': options['elk.algorithm'] = 'org.eclipse.elk.radial'; break;
+        default: options['elk.algorithm'] = `org.eclipse.elk.${algorithm}`;
+    }
+
+    // Algorithm-specific tuning
+    if (algorithm === 'layered') {
+        Object.assign(options, {
+            'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+            'elk.layered.crossingMinimization.thoroughness': '20',
+            'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+            'elk.edgeRouting': 'ORTHOGONAL',
+            'elk.layered.spacing.edgeNodeBetweenLayers': '50',
+            'elk.layered.spacing.edgeEdgeBetweenLayers': '40',
+            'elk.separateConnectedComponents': 'true',
+            'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
+        });
+    } else if (algorithm === 'force') {
+        Object.assign(options, {
+            'elk.force.iterations': '500',
+            'elk.force.repulsivePower': String(layerSpacing / 20),
+        });
+    } else if (algorithm === 'stress') {
+        options['elk.stress.desiredEdgeLength'] = String(layerSpacing);
+    } else if (algorithm === 'radial') {
+        options['elk.radial.radius'] = String(layerSpacing);
+    }
+
+    return options;
+}
+
+/**
  * Perform auto-layout using ELK.
  * Returns a new array of nodes with updated positions.
  */
@@ -30,97 +104,35 @@ export async function getElkLayout(
     edges: Edge[],
     options: LayoutOptions = {}
 ): Promise<Node[]> {
-    const {
-        direction = 'TB',
-        algorithm = 'layered',
-        spacing = 'normal',
-    } = options;
+    const { direction = 'TB', algorithm = 'layered', spacing = 'normal' } = options;
 
     const elkDirection = DIRECTION_MAP[direction] || 'DOWN';
+    const isHorizontal = direction === 'LR' || direction === 'RL';
 
-    // Spacing presets
-    let nodeSpacing = 60;
-    let layerSpacing = 100;
+    // 1. Calculate Configuration
+    const dims = getSpacingDimensions(spacing, isHorizontal);
+    const algoOptions = getAlgorithmOptions(algorithm, parseFloat(dims.nodeLayer));
 
-    switch (spacing) {
-        case 'compact':
-            nodeSpacing = 30;
-            layerSpacing = 60;
-            break;
-        case 'loose':
-            nodeSpacing = 100;
-            layerSpacing = 150;
-            break;
-        case 'normal':
-        default:
-            nodeSpacing = 60;
-            layerSpacing = 100;
-    }
-
-    // Adjust for horizontal layout
-    if (direction === 'LR' || direction === 'RL') {
-        // Swap or adjust if needed, but usually standard spacing works fine
-        // Maybe increase layer spacing for text readability
-        layerSpacing *= 1.2;
-    }
-
-    // Algorithm specific mapping
-    let elkAlgorithm = `org.eclipse.elk.${algorithm}`;
-    if (algorithm === 'mrtree') elkAlgorithm = 'org.eclipse.elk.mrtree';
-    if (algorithm === 'force') elkAlgorithm = 'org.eclipse.elk.force';
-    if (algorithm === 'stress') elkAlgorithm = 'org.eclipse.elk.stress';
-    // Radial is org.eclipse.elk.radial
-
-    // Build the ELK graph
+    // 2. Build Graph
     const elkGraph: ElkNode = {
         id: 'root',
         layoutOptions: {
-            'elk.algorithm': elkAlgorithm,
             'elk.direction': elkDirection,
-
-            // Spacing
-            'elk.spacing.nodeNode': String(nodeSpacing),
-            'elk.layered.spacing.nodeNodeBetweenLayers': String(layerSpacing),
-            'elk.spacing.componentComponent': String(layerSpacing),
-
-            // Algorithm Specifics
-            ...(algorithm === 'layered' ? {
-                'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-                'elk.layered.crossingMinimization.thoroughness': '10',
-                'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-                'elk.edgeRouting': 'ORTHOGONAL',
-                'elk.layered.spacing.edgeNodeBetweenLayers': '40',
-                'elk.layered.spacing.edgeEdgeBetweenLayers': '30',
-                'elk.separateConnectedComponents': 'true',
-                'elk.layered.considerModelOrder.strategy': 'NODES_AND_EDGES',
-            } : {}),
-
-            ...(algorithm === 'force' ? {
-                'elk.force.iterations': '300',
-                'elk.force.repulsivePower': String(layerSpacing / 20),
-            } : {}),
-
-            ...(algorithm === 'stress' ? {
-                'elk.stress.desiredEdgeLength': String(layerSpacing),
-            } : {}),
-
-            ...(algorithm === 'radial' ? {
-                'elk.radial.radius': String(layerSpacing),
-            } : {}),
-
-            // Padding
-            'elk.padding': '[top=40,left=40,bottom=40,right=40]',
+            'elk.spacing.nodeNode': dims.nodeNode,
+            'elk.layered.spacing.nodeNodeBetweenLayers': dims.nodeLayer,
+            'elk.spacing.componentComponent': dims.component,
+            'elk.padding': '[top=50,left=50,bottom=50,right=50]',
+            ...algoOptions,
         },
         children: nodes.map((node) => {
-            const w = node.width || (node.data as any)?.width || NODE_WIDTH;
-            const h = node.height || (node.data as any)?.height || NODE_HEIGHT;
+            // Use MEASURED dimensions to prevent overlap
+            const w = (node as any).measured?.width ?? node.width ?? (node.data as any)?.width ?? NODE_WIDTH;
+            const h = (node as any).measured?.height ?? node.height ?? (node.data as any)?.height ?? NODE_HEIGHT;
             return {
                 id: node.id,
                 width: w,
                 height: h,
-                layoutOptions: {
-                    'elk.portConstraints': 'FREE',
-                },
+                layoutOptions: { 'elk.portConstraints': 'FREE' },
             };
         }),
         edges: edges
@@ -132,10 +144,10 @@ export async function getElkLayout(
             })) as ElkExtendedEdge[],
     };
 
-    // Run ELK layout
+    // 3. Execute Layout
     const layoutResult = await elk.layout(elkGraph);
 
-    // Map ELK positions back to React Flow nodes
+    // 4. Map Results
     const positionMap = new Map<string, { x: number; y: number }>();
     layoutResult.children?.forEach((elkNode) => {
         positionMap.set(elkNode.id, {
@@ -147,9 +159,6 @@ export async function getElkLayout(
     return nodes.map((node) => {
         const pos = positionMap.get(node.id);
         if (!pos) return node;
-        return {
-            ...node,
-            position: { x: pos.x, y: pos.y },
-        };
+        return { ...node, position: { x: pos.x, y: pos.y } };
     });
 }

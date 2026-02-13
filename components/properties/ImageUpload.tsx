@@ -22,9 +22,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ imageUrl, onChange }) 
 
     return (
         <div className="space-y-3">
-            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                <ImageIcon className="w-3 h-3" /> Attached Image
-            </label>
+
             <div className="flex flex-col gap-3">
 
                 {imageUrl ? (

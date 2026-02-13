@@ -9,8 +9,8 @@ import { useDesignSystem } from '../hooks/useDesignSystem';
 
 const getDefaults = (type: string) => {
   switch (type) {
-    case 'start': return { color: 'emerald', icon: null, shape: 'capsule' };
-    case 'end': return { color: 'red', icon: null, shape: 'capsule' };
+    case 'start': return { color: 'emerald', icon: null, shape: 'rounded' };
+    case 'end': return { color: 'red', icon: null, shape: 'rounded' };
     case 'decision': return { color: 'amber', icon: null, shape: 'diamond' };
     case 'annotation': return { color: 'yellow', icon: null, shape: 'rounded' };
     case 'custom': return { color: 'violet', icon: null, shape: 'rounded' };

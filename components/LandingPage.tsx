@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Zap, Command, Share2, Layout, MousePointer2, Cpu, GitBranch } from 'lucide-react';
 import { useFlowStore } from '../store';
+import { Button } from './ui/Button';
 
 interface LandingPageProps {
     onLaunch: () => void;
@@ -163,7 +164,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
                 {/* Footer / CTA */}
                 <div className="text-center py-20 border-t border-white/5">
                     <h2 className="text-4xl font-bold tracking-tight mb-8">Ready to ship better systems?</h2>
-                    <Button onClick={onLaunch} size="lg" className="h-14 px-10 rounded-full text-lg">
+                    <Button onClick={onLaunch} size="lg" className="h-14 px-10 rounded-full text-lg bg-white text-black hover:bg-slate-200 border-none">
                         Open Editor Now
                     </Button>
                 </div>
@@ -173,12 +174,4 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunch }) => {
     );
 };
 
-// Simple Button Component for Landing Page to avoid dependencies
-const Button = ({ children, onClick, className, size }: any) => (
-    <button
-        onClick={onClick}
-        className={`bg-white text-black font-bold hover:bg-slate-200 transition-colors ${className}`}
-    >
-        {children}
-    </button>
-);
+

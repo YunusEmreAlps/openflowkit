@@ -71,6 +71,7 @@ export interface BrandConfig {
     appName: string;
     logoUrl: string | null;
     faviconUrl: string | null; // Added favicon
+    apiKey?: string; // [NEW] Gemini API Key
     logoStyle: 'icon' | 'text' | 'both' | 'wide';
     colors: {
         primary: string; // Base color for auto-generation
@@ -95,6 +96,7 @@ export const DEFAULT_BRAND_CONFIG: BrandConfig = {
     appName: 'FlowMind',
     logoUrl: null,
     faviconUrl: null,
+    apiKey: undefined,
     logoStyle: 'both',
     colors: {
         primary: '#6366f1',
@@ -235,8 +237,8 @@ export const useFlowStore = create<FlowState>()(
             },
 
             globalEdgeOptions: {
-                type: 'default',
-                animated: false,
+                type: 'smoothstep',
+                animated: true,
                 strokeWidth: 2,
             },
 
@@ -274,7 +276,7 @@ export const useFlowStore = create<FlowState>()(
                 const newEdge = createDefaultEdge(connection.source!, connection.target!);
 
                 // Apply global options
-                if (globalEdgeOptions.type !== 'default') newEdge.type = globalEdgeOptions.type;
+                newEdge.type = globalEdgeOptions.type === 'default' ? undefined : globalEdgeOptions.type;
                 newEdge.animated = globalEdgeOptions.animated;
                 newEdge.style = {
                     ...newEdge.style,

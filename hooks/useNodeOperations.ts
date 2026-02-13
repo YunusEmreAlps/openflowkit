@@ -130,9 +130,27 @@ export const useNodeOperations = (recordHistory: () => void) => {
     }, [setNodes, recordHistory, setSelectedNodeId]);
 
     // --- Drag Operations ---
-    const onNodeDragStart = useCallback(() => {
+    const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
         recordHistory();
-    }, [recordHistory]);
+
+        // Alt + Drag Duplication
+        if (event.altKey) {
+            const newNodeId = `${Date.now()}`;
+            const newNode: Node = {
+                ...node,
+                id: newNodeId,
+                selected: false, // The static clone should not be selected
+                position: { ...node.position }, // Clone executes at START position
+                // We might want to reset zIndex or ensure it's correct?
+                zIndex: (node.zIndex || 0) - 1, // Put clone slightly behind?
+            };
+
+            // Add the CLONE (which stays behind)
+            setNodes((nds) => nds.concat(newNode));
+
+            // The user continues dragging the ORIGINAL 'node'.
+        }
+    }, [recordHistory, setNodes]);
 
     const onNodeDrag = useCallback((_event: React.MouseEvent, _node: Node, draggedNodes: Node[]) => {
         const { nodes: storeNodes, edges, setEdges, viewSettings } = useFlowStore.getState();

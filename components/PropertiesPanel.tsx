@@ -1,7 +1,7 @@
 import React from 'react';
 import { Node, Edge } from 'reactflow';
 import { NodeData } from '../types';
-import { Layout, ArrowRight, X } from 'lucide-react';
+import { Layout, ArrowRight, X, Settings2 } from 'lucide-react';
 import { NodeProperties } from './properties/NodeProperties';
 import { EdgeProperties } from './properties/EdgeProperties';
 
@@ -40,7 +40,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 <h3 className="font-semibold text-[var(--brand-text)] flex items-center gap-2">
                     {selectedNode ? (
                         <>
-                            <Layout className="w-4 h-4 text-[var(--brand-primary)]" />
+                            <Settings2 className="w-4 h-4 text-[var(--brand-primary)]" />
                             <span>{isAnnotation ? 'Sticky Note' : 'Node Settings'}</span>
                         </>
                     ) : (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Rainbow, Settings, Check, ChevronDown, Clock, FolderOpen, AlignJustify, Palette, Home } from 'lucide-react';
+import { Rainbow, Settings, Check, ChevronDown, Clock, FolderOpen, AlignJustify, Palette, Home, Play } from 'lucide-react';
 import { FlowTab } from '../types';
 import { FlowTabs } from './FlowTabs';
 import { ExportMenu } from './ExportMenu';
@@ -33,6 +33,7 @@ interface TopNavProps {
     onImportJSON: () => void;
     onHistory: () => void;
     onGoHome: () => void;
+    onPlay: () => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -57,6 +58,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     onImportJSON,
     onHistory,
     onGoHome,
+    onPlay,
 }) => {
     const { brandConfig } = useFlowStore();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -181,7 +183,7 @@ export const TopNav: React.FC<TopNavProps> = ({
 
             {/* Right: Actions */}
             <div className="flex items-center gap-3 min-w-[240px] justify-end">
-                <div className="flex items-center gap-0.5 p-1">
+                <div className="flex items-center gap-0.5 p-1 bg-slate-100/50 border border-slate-200/60 rounded-[var(--radius-md)]">
                     <Tooltip text="Version History" side="bottom">
                         <button
                             onClick={onHistory}
@@ -201,16 +203,29 @@ export const TopNav: React.FC<TopNavProps> = ({
                     </Tooltip>
                 </div>
 
-                <div className="h-8 w-px bg-slate-200/50 mx-1" />
+                <div className="h-8 w-px bg-slate-200/50 mx-2" />
 
-                <ExportMenu
-                    onExportPNG={onExportPNG}
-                    onExportJSON={onExportJSON}
-                    onExportMermaid={onExportMermaid}
-                    onExportPlantUML={onExportPlantUML}
-                    onExportFlowMindDSL={onExportFlowMindDSL}
-                    onExportFigma={onExportFigma}
-                />
+                <div className="flex items-center gap-2">
+                    {/* Playback Button */}
+                    <Tooltip text="Playback Mode" side="bottom">
+                        <button
+                            onClick={onPlay}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-900 rounded-[var(--radius-md)] shadow-sm transition-all active:scale-95"
+                        >
+                            <Play className="w-4 h-4" />
+                            <span>Play</span>
+                        </button>
+                    </Tooltip>
+
+                    <ExportMenu
+                        onExportPNG={onExportPNG}
+                        onExportJSON={onExportJSON}
+                        onExportMermaid={onExportMermaid}
+                        onExportPlantUML={onExportPlantUML}
+                        onExportFlowMindDSL={onExportFlowMindDSL}
+                        onExportFigma={onExportFigma}
+                    />
+                </div>
 
                 <SettingsModal
                     isOpen={isSettingsOpen}

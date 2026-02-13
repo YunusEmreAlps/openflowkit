@@ -58,7 +58,11 @@ export const parseFlowMindDSL = (input: string): ParseResult => {
         const dirMatch = line.match(/^direction:\s*(TB|LR|TD|RL|BT)\s*$/i);
         if (dirMatch) {
             const d = dirMatch[1].toUpperCase();
-            direction = (d === 'LR' || d === 'RL') ? 'LR' : 'TB';
+            if (d === 'LR' || d === 'RL') {
+                direction = 'LR';
+            } else {
+                direction = 'TB';
+            }
             continue;
         }
 

@@ -7,11 +7,11 @@ import { Slider } from '../ui/Slider';
 import { Switch } from '../ui/Switch';
 import {
     RotateCw, Upload, Type, Palette, Box, ChevronDown, ExternalLink,
-    Plus, Trash2, Copy, Check, Edit2, ArrowLeft, LayoutTemplate, Download
+    Plus, Trash2, Copy, Check, Edit2, ArrowLeft, LayoutTemplate, Download, Sparkles
 } from 'lucide-react';
 
 // --- Types ---
-type EditorTab = 'identity' | 'colors' | 'typography' | 'ui';
+type EditorTab = 'identity' | 'colors' | 'typography' | 'ui' | 'ai';
 
 // --- Main Component ---
 export const BrandSettings = () => {
@@ -208,6 +208,7 @@ const BrandEditorView = ({ kitId, onBack }: { kitId: string, onBack: () => void 
                 <TabButton active={activeTab === 'colors'} onClick={() => setActiveTab('colors')} icon={<Palette className="w-3.5 h-3.5" />} label="Colors" />
                 <TabButton active={activeTab === 'typography'} onClick={() => setActiveTab('typography')} icon={<Type className="w-3.5 h-3.5" />} label="Type" />
                 <TabButton active={activeTab === 'ui'} onClick={() => setActiveTab('ui')} icon={<LayoutTemplate className="w-3.5 h-3.5" />} label="UI & Shape" />
+                <TabButton active={activeTab === 'ai'} onClick={() => setActiveTab('ai')} icon={<Sparkles className="w-3.5 h-3.5" />} label="AI" />
             </div>
 
             {/* Content */}
@@ -216,6 +217,7 @@ const BrandEditorView = ({ kitId, onBack }: { kitId: string, onBack: () => void 
                 {activeTab === 'colors' && <ColorsEditor config={kit} update={setBrandConfig} />}
                 {activeTab === 'typography' && <TypographyEditor config={kit} update={setBrandConfig} />}
                 {activeTab === 'ui' && <UIEditor config={kit} update={setBrandConfig} />}
+                {activeTab === 'ai' && <AIEditor config={kit} update={setBrandConfig} />}
             </div>
         </div>
     );
@@ -327,6 +329,58 @@ const UIEditor = ({ config, update }: { config: BrandKit, update: any }) => (
         <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
             <span className="text-sm font-medium text-slate-700">Glassmorphism</span>
             <Switch checked={config.ui.glassmorphism} onCheckedChange={c => update({ ui: { ...config.ui, glassmorphism: c } })} />
+        </div>
+    </div>
+);
+
+const AIEditor = ({ config, update }: { config: BrandKit, update: any }) => (
+    <div className="space-y-6">
+        <div className="space-y-3">
+            <Label>Gemini API Key</Label>
+            <div className="relative">
+                <Input
+                    type="password"
+                    value={config.apiKey || ''}
+                    onChange={e => update({ apiKey: e.target.value })}
+                    placeholder="AIzaSy..."
+                    className="pr-10"
+                />
+            </div>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+                Your key is stored locally in your browser and used directly to communicate with Google's API.
+                It is never sent to our servers.
+            </p>
+            <div className="pt-2">
+                <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-primary)] hover:underline font-medium"
+                >
+                    Get a Gemini API Key <ExternalLink className="w-3 h-3" />
+                </a>
+            </div>
+        </div>
+
+        <div className="p-4 bg-[var(--brand-primary)]/5 border border-[var(--brand-primary)]/20 rounded-lg">
+            <h4 className="flex items-center gap-2 text-xs font-semibold text-[var(--brand-primary)] mb-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                Why use your own key?
+            </h4>
+            <ul className="space-y-2">
+                <li className="flex gap-2 text-xs text-slate-600">
+                    <Check className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+                    <span>Higher rate limits and quotas</span>
+                </li>
+                <li className="flex gap-2 text-xs text-slate-600">
+                    <Check className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+                    <span>Control over your own billing</span>
+                </li>
+                <li className="flex gap-2 text-xs text-slate-600">
+                    <Check className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+                    <span>Access to newer models if available</span>
+                </li>
+            </ul>
         </div>
     </div>
 );

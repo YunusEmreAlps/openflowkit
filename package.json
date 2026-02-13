@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.40.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@types/tinycolor2": "^1.4.6",
     "dagre": "0.8.5",
     "elkjs": "^0.11.0",
@@ -23,9 +24,12 @@
     "react-dom": "^19.2.4",
     "react-markdown": "9.0.1",
     "react-router-dom": "^7.13.0",
+    "react-syntax-highlighter": "^16.1.0",
     "reactflow": "^11.11.4",
+    "rehype-slug": "^6.0.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "4.0.0",
+    "remark-slug": "^7.0.1",
     "tinycolor2": "^1.6.0",
     "zustand": "^5.0.11"
   },
