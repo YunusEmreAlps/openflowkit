@@ -11,7 +11,7 @@ Built for technical teams who need to bridge the gap between code and high-fidel
 
 OpenFlowKit is a professional-grade **White-Label Solution** for developers. Whether you're embedding a canvas into your SaaS or building your own diagramming tool, OpenFlowKit provides the performance of **React Flow** with a billionaire-tier designer aesthetic.
 
-![OpenFlowKit Canvas](public/readme/canvas%201.png)
+![OpenFlowKit Canvas]<img width="1410" height="728" alt="Openflowkit_image" src="https://github.com/user-attachments/assets/0d97bb35-2f3b-491f-979b-0fd7d7f15135" />
 
 ## 📋 Table of Contents
 - [Why OpenFlowKit?](#-why-openflowkit)
