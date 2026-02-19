@@ -4,7 +4,7 @@
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=for-the-badge&logo=typescript)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
-[![Product Hunt](https://img.shields.io/badge/Product_Hunt-Launch_Soon-orange?style=for-the-badge&logo=product-hunt)](https://www.producthunt.com/posts/openflowkit)
+[![Product Hunt](https://img.shields.io/badge/Product_Hunt-Launched-orange?style=for-the-badge&logo=product-hunt)](https://www.producthunt.com/products/openflowkit)
 
 **The Open-Source, White-Label Diagramming Engine.**  
 Built for technical teams who need to bridge the gap between code and high-fidelity design. **100% Free & MIT Licensed.**
