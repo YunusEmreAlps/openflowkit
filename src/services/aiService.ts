@@ -105,7 +105,7 @@ export async function generateDiagramFromChat(
     customBaseUrl?: string
 ): Promise<string> {
     if (!apiKey) {
-        throw new Error("API Key is missing. Please add it in Settings → Brand → Flowpilot.");
+        throw new Error("API Key is missing. Please add it in Settings → Flowpilot AI.");
     }
 
     const userPrompt = `User Request: ${newMessage}${currentDSL ? `\n\nCURRENT CONTENT (The user wants to update this):\n${currentDSL}` : ''}\n\nGenerate or update the FlowMind DSL based on this request.`;
