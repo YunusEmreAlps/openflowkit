@@ -115,7 +115,6 @@ export async function generateDiagramFromChat(
         return generateDiagramFromChatGemini(history, newMessage, currentDSL, imageBase64, apiKey, modelId);
     }
 
-
     // Claude uses Anthropic's message format
     if (provider === 'claude') {
         const messages = [

@@ -11,6 +11,7 @@ import { BrandSettings } from './SettingsModal/BrandSettings';
 import { GeneralSettings } from './SettingsModal/GeneralSettings';
 import { ShortcutsSettings } from './SettingsModal/ShortcutsSettings';
 import { PrivacySettings } from './SettingsModal/PrivacySettings';
+import { AISettings } from './SettingsModal/AISettings';
 import { FlowSnapshot } from '@/lib/types';
 import { SidebarItem } from './ui/SidebarItem';
 import { WelcomeModal } from './WelcomeModal';
@@ -35,7 +36,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     const { brandConfig } = useFlowStore();
     const { snapshots, deleteSnapshot } = useSnapshots();
     const [internalActiveTab, setInternalActiveTab] = useState<'home' | 'settings'>('home');
-    const [activeSettingsTab, setActiveSettingsTab] = useState<'brand' | 'general' | 'shortcuts' | 'privacy'>('brand');
+    const [activeSettingsTab, setActiveSettingsTab] = useState<'brand' | 'general' | 'shortcuts' | 'privacy' | 'ai'>('brand');
 
     const activeTab = propActiveTab || internalActiveTab;
 
@@ -247,6 +248,12 @@ export const HomePage: React.FC<HomePageProps> = ({
                                     General
                                 </SidebarItem>
                                 <SidebarItem
+                                    isActive={activeSettingsTab === 'ai'}
+                                    onClick={() => setActiveSettingsTab('ai')}
+                                >
+                                    Flowpilot AI
+                                </SidebarItem>
+                                <SidebarItem
                                     isActive={activeSettingsTab === 'shortcuts'}
                                     onClick={() => setActiveSettingsTab('shortcuts')}
                                 >
@@ -265,6 +272,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                                 <div className="max-w-2xl">
                                     {activeSettingsTab === 'brand' && <BrandSettings />}
                                     {activeSettingsTab === 'general' && <GeneralSettings />}
+                                    {activeSettingsTab === 'ai' && <AISettings />}
                                     {activeSettingsTab === 'shortcuts' && <ShortcutsSettings />}
                                     {activeSettingsTab === 'privacy' && <PrivacySettings />}
                                 </div>

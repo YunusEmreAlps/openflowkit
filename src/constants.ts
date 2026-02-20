@@ -112,7 +112,6 @@ export const KEYBOARD_SHORTCUTS = [
     title: 'Help',
     items: [
       { label: 'Keyboard Shortcuts', keys: ['?'] },
-      { label: 'Keyboard Shortcuts', keys: ['Cmd', '/'] },
       { label: 'Command Bar', keys: ['Cmd', 'K'] },
     ]
   },

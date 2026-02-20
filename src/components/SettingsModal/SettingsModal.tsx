@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { X, Settings, Keyboard } from 'lucide-react';
+import { X, Settings, Keyboard, Sparkles } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { GeneralSettings } from './GeneralSettings';
 import { ShortcutsSettings } from './ShortcutsSettings';
+import { AISettings } from './AISettings';
 import { useFlowStore } from '../../store';
 import { SidebarItem } from '../ui/SidebarItem';
 
 interface SettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    initialTab?: 'general' | 'shortcuts';
+    initialTab?: 'general' | 'shortcuts' | 'ai';
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, initialTab = 'general' }) => {
-    const [activeTab, setActiveTab] = useState<'general' | 'shortcuts'>(initialTab);
+    const [activeTab, setActiveTab] = useState<'general' | 'shortcuts' | 'ai'>(initialTab);
 
     // Update active tab if initialTab changes when opening
     React.useEffect(() => {
@@ -21,7 +22,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, i
             setActiveTab(initialTab);
         }
     }, [isOpen, initialTab]);
-    const { brandConfig, viewSettings, toggleGrid, toggleSnap, toggleMiniMap } = useFlowStore();
+    const { brandConfig } = useFlowStore();
 
     if (!isOpen) return null;
 
@@ -44,6 +45,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, i
                     </SidebarItem>
 
                     <SidebarItem
+                        icon={<Sparkles className="w-4 h-4" />}
+                        isActive={activeTab === 'ai'}
+                        onClick={() => setActiveTab('ai')}
+                    >
+                        Flowpilot AI
+                    </SidebarItem>
+
+                    <SidebarItem
                         icon={<Keyboard className="w-4 h-4" />}
                         isActive={activeTab === 'shortcuts'}
                         onClick={() => setActiveTab('shortcuts')}
@@ -62,8 +71,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, i
                 <div className="flex-1 flex flex-col min-h-0 bg-white/50">
                     <div className="flex items-center justify-between p-4 border-b border-slate-100">
                         <h2 className="text-lg font-semibold text-slate-800">
-                            {activeTab === 'general' && 'General Settings'}
-                            {activeTab === 'shortcuts' && 'Keyboard Shortcuts'}
+                            {{
+                                general: 'General Settings',
+                                ai: 'Flowpilot Configurations',
+                                shortcuts: 'Keyboard Shortcuts',
+                            }[activeTab]}
                         </h2>
                         <button
                             onClick={onClose}
@@ -76,6 +88,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, i
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <div className="p-6">
                             {activeTab === 'general' && <GeneralSettings />}
+                            {activeTab === 'ai' && <AISettings />}
                             {activeTab === 'shortcuts' && <ShortcutsSettings />}
                         </div>
                     </div>

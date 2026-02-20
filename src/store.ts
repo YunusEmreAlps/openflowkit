@@ -71,14 +71,24 @@ interface ViewSettings {
 
 export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'nvidia' | 'cerebras' | 'mistral' | 'custom';
 
+export interface AISettings {
+    provider: AIProvider;
+    apiKey?: string;
+    model?: string;
+    customBaseUrl?: string;
+}
+
+export const DEFAULT_AI_SETTINGS: AISettings = {
+    provider: 'gemini',
+    apiKey: undefined,
+    model: undefined,
+    customBaseUrl: undefined,
+};
+
 export interface BrandConfig {
     appName: string;
     logoUrl: string | null;
     faviconUrl: string | null;
-    apiKey?: string;        // API Key for the selected provider
-    aiModel?: string;       // Model ID override
-    aiProvider?: AIProvider; // AI Provider selection
-    customBaseUrl?: string; // For 'custom' provider
     logoStyle: 'icon' | 'text' | 'both' | 'wide';
     colors: {
         primary: string;
@@ -105,10 +115,6 @@ export const DEFAULT_BRAND_CONFIG: BrandConfig = {
     appName: 'OpenFlowKit',
     logoUrl: null,
     faviconUrl: '/favicon.svg',
-    apiKey: undefined,
-    aiModel: undefined,
-    aiProvider: 'gemini',
-    customBaseUrl: undefined,
     logoStyle: 'both',
     colors: {
         primary: '#E95420',
@@ -162,6 +168,9 @@ interface FlowState {
     viewSettings: ViewSettings;
     globalEdgeOptions: GlobalEdgeOptions;
 
+    // AI Settings (Global)
+    aiSettings: AISettings;
+
     // Brand
     brandConfig: BrandConfig;
     brandKits: BrandKit[];
@@ -204,6 +213,8 @@ interface FlowState {
     setSmartRoutingEnabled: (enabled: boolean) => void;
     toggleAnalytics: (enabled: boolean) => void;
 
+    // AI Actions
+    setAISettings: (settings: Partial<AISettings>) => void;
 
     // Brand Actions
     setBrandConfig: (config: Partial<BrandConfig>) => void;
@@ -258,6 +269,8 @@ export const useFlowStore = create<FlowState>()(
                 animated: true,
                 strokeWidth: 2,
             },
+
+            aiSettings: DEFAULT_AI_SETTINGS,
 
             brandConfig: DEFAULT_BRAND_CONFIG,
             brandKits: [DEFAULT_BRAND_KIT],
@@ -498,6 +511,10 @@ export const useFlowStore = create<FlowState>()(
                 viewSettings: { ...state.viewSettings, analyticsEnabled: enabled }
             })),
 
+            // AI Actions
+            setAISettings: (settings) => set((state) => ({
+                aiSettings: { ...state.aiSettings, ...settings }
+            })),
 
             // Brand Actions
             setBrandConfig: (config) => set((state) => {
@@ -509,16 +526,8 @@ export const useFlowStore = create<FlowState>()(
             }),
             resetBrandConfig: () => set((state) => {
                 const defaultKit = state.brandKits.find(k => k.id === 'default') || DEFAULT_BRAND_KIT;
-                // Reset active to default values but keep ID? Or reset completely to default kit?
-                // "Reset" usually means reset to default values.
-                // If we are editing a custom kit, reset might mean "reset to default colors".
-                // But generally "reset brand config" implies going back to default brand.
-
-                // Let's make reset just switch to default kit?
-                return {
-                    brandConfig: defaultKit,
-                    activeBrandKitId: 'default'
-                };
+                // Switches back to the default brand kit
+                return { brandConfig: defaultKit, activeBrandKitId: 'default' };
             }),
 
             addBrandKit: (name: string, base?: BrandConfig) => set((state) => {
@@ -584,6 +593,7 @@ export const useFlowStore = create<FlowState>()(
                 activeDesignSystemId: state.activeDesignSystemId,
                 viewSettings: state.viewSettings,
                 globalEdgeOptions: state.globalEdgeOptions,
+                aiSettings: state.aiSettings,
                 brandConfig: state.brandConfig,
                 brandKits: state.brandKits,
                 activeBrandKitId: state.activeBrandKitId,

@@ -1,6 +1,43 @@
-import { createDefaultEdge } from '@/constants';
-import { getDefaultColor } from '@/theme';
+import { MarkerType } from 'reactflow';
+import type React from 'react';
 import { FlowNode, FlowEdge, NodeData } from './types';
+
+// ---- Inlined edge factory (from app constants) ----
+// Kept here so the lib has zero cross-boundary dependencies.
+const EDGE_STYLE: React.CSSProperties = { stroke: '#94a3b8', strokeWidth: 2 };
+const EDGE_LABEL_STYLE: React.CSSProperties = { fill: '#334155', fontWeight: 500, fontSize: 12 };
+const EDGE_LABEL_BG_STYLE: React.CSSProperties = { fill: '#ffffff', stroke: '#cbd5e1', strokeWidth: 1 };
+
+const DEFAULT_EDGE_OPTIONS = {
+    type: 'smoothstep' as const,
+    markerEnd: { type: MarkerType.ArrowClosed },
+    animated: true,
+    style: EDGE_STYLE,
+    labelStyle: EDGE_LABEL_STYLE,
+    labelBgStyle: EDGE_LABEL_BG_STYLE,
+    labelBgPadding: [8, 4] as [number, number],
+    labelBgBorderRadius: 4,
+};
+
+const createDefaultEdge = (source: string, target: string, label?: string, id?: string) => ({
+    id: id || `e-${source}-${target}-${Date.now()}`,
+    source,
+    target,
+    label,
+    ...DEFAULT_EDGE_OPTIONS,
+});
+
+// ---- Inlined node color defaults (from app theme) ----
+const NODE_TYPE_DEFAULTS: Record<string, string> = {
+    start: 'emerald',
+    end: 'red',
+    decision: 'amber',
+    custom: 'violet',
+    process: 'slate',
+};
+
+const getDefaultColor = (type: string): string =>
+    NODE_TYPE_DEFAULTS[type] || 'slate';
 
 export interface ParseResult {
     nodes: FlowNode[];

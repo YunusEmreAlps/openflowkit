@@ -65,94 +65,71 @@ Your job:
 
 `;
 
-const processImage = (imageBase64?: string) => {
+function processImage(imageBase64?: string): { mimeType: string; cleanBase64: string } {
   const regex = /^data:image\/([^;]+);base64,/;
   const match = imageBase64?.match(regex);
   const mimeType = match ? `image/${match[1]}` : 'image/png';
   const cleanBase64 = imageBase64?.replace(regex, '') || '';
   return { mimeType, cleanBase64 };
-};
+}
 
-export const generateDiagramFromChat = async (
+export async function generateDiagramFromChat(
   history: ChatMessage[],
   newMessage: string,
   currentDSL?: string,
   imageBase64?: string,
-  userApiKey?: string, // [NEW] Optional user key
-  modelId?: string // [NEW] Optional model override
-): Promise<string> => {
+  userApiKey?: string,
+  modelId?: string
+): Promise<string> {
   const apiKey = userApiKey || process.env.API_KEY;
 
   if (!apiKey) {
-    throw new Error("API Key is missing. Please add it in Settings > Brand > AI or set API_KEY env var.");
+    throw new Error("API Key is missing. Please add it in Settings → Brand → Flowpilot.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
 
-  // Construct the new message part
-  const newMessageContent: { role: 'user' | 'model'; parts: { text?: string; inlineData?: any }[] } = {
-    role: 'user',
+  const newMessageContent = {
+    role: 'user' as const,
     parts: [
       {
-        text: `
-        User Request: ${newMessage}
-        ${currentDSL ? `\nCURRENT CONTENT (The user wants to update this):\n${currentDSL}` : ''}
-        
-        Generate or update the FlowMind DSL based on this request.
-        `
+        text: `User Request: ${newMessage}${currentDSL ? `\nCURRENT CONTENT (The user wants to update this):\n${currentDSL}` : ''}\n\nGenerate or update the FlowMind DSL based on this request.`
       }
-    ]
+    ] as { text?: string; inlineData?: any }[]
   };
 
   if (imageBase64) {
     const { mimeType, cleanBase64 } = processImage(imageBase64);
-    newMessageContent.parts.push({
-      inlineData: {
-        data: cleanBase64,
-        mimeType: mimeType
-      }
-    });
+    newMessageContent.parts.push({ inlineData: { data: cleanBase64, mimeType } });
   }
 
-  // Combine history with the new message
-  // Map internal ChatMessage to the SDK's expected format if needed
-  const contents = [
-    ...history.map(h => ({
-      role: h.role,
-      parts: h.parts
-    })),
-    newMessageContent
-  ];
+  const contents = [...history, newMessageContent];
 
   const response = await ai.models.generateContent({
     model: modelId || GEMINI_DEFAULT_MODEL,
-    contents: contents,
+    contents,
     config: {
       systemInstruction: getSystemInstruction(),
       responseMimeType: "text/plain",
     }
   });
 
-  if (!response.text) {
-    throw new Error("No response from AI");
-  }
+  if (!response.text) throw new Error("No response from AI");
 
   return response.text;
-};
+}
 
-export const generateDiagramFromPrompt = async (
+export async function generateDiagramFromPrompt(
   prompt: string,
   currentNodesJSON: string,
   focusedContextJSON?: string,
   imageBase64?: string,
   userApiKey?: string
-): Promise<string> => {
-  // Wrapper using the chat function for a single turn
+): Promise<string> {
+  const contextParts = [
+    currentNodesJSON && `Current Diagram State (JSON): ${currentNodesJSON}`,
+    focusedContextJSON && `Focused Context (Selected Nodes): ${focusedContextJSON}`,
+  ].filter(Boolean).join('\n');
 
-  // Construct the "Current State" context string similar to the old prompt
-  let contextString = "";
-  if (currentNodesJSON) contextString += `Current Diagram State (JSON): ${currentNodesJSON}\n`;
-  if (focusedContextJSON) contextString += `Focused Context (Selected Nodes): ${focusedContextJSON}`;
-
-  return generateDiagramFromChat([], prompt, contextString, imageBase64, userApiKey);
-};
+  return generateDiagramFromChat([], prompt, contextParts || undefined, imageBase64, userApiKey);
+}

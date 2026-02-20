@@ -10,7 +10,7 @@ import { useToast } from '../components/ui/ToastContext';
 export const useAIGeneration = (
   recordHistory: () => void
 ) => {
-  const { nodes, edges, setNodes, setEdges, brandConfig, globalEdgeOptions } = useFlowStore();
+  const { nodes, edges, setNodes, setEdges, aiSettings, globalEdgeOptions } = useFlowStore();
   const { fitView } = useReactFlow();
   const { addToast } = useToast();
   const [isAIOpen, setIsAIOpen] = useState(false);
@@ -53,10 +53,10 @@ export const useAIGeneration = (
         prompt,
         currentGraph,
         imageBase64,
-        brandConfig.apiKey,
-        brandConfig.aiModel,
-        brandConfig.aiProvider || 'gemini',
-        brandConfig.customBaseUrl
+        aiSettings.apiKey,
+        aiSettings.model,
+        aiSettings.provider || 'gemini',
+        aiSettings.customBaseUrl
       );
 
       // 3. Update Chat History
@@ -162,7 +162,7 @@ export const useAIGeneration = (
     } finally {
       setIsGenerating(false);
     }
-  }, [nodes, edges, recordHistory, setNodes, setEdges, fitView, addToast, chatMessages, brandConfig.apiKey, globalEdgeOptions]);
+  }, [nodes, edges, recordHistory, setNodes, setEdges, fitView, addToast, chatMessages, aiSettings.apiKey, aiSettings.model, aiSettings.provider, aiSettings.customBaseUrl, globalEdgeOptions]);
 
   return { isAIOpen, setIsAIOpen, isGenerating, handleAIRequest, chatMessages, clearChat };
 };
