@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import { useFlowStore } from '../store';
 import { X, Keyboard, Command, MousePointer2, Pencil, Sparkles } from 'lucide-react';
 import { KEYBOARD_SHORTCUTS } from '../constants';
 
 export function KeyboardShortcutsModal(): React.JSX.Element | null {
+    const { t } = useTranslation();
     const { viewSettings, setShortcutsHelpOpen } = useFlowStore();
     const { isShortcutsHelpOpen } = viewSettings;
 
@@ -29,14 +31,14 @@ export function KeyboardShortcutsModal(): React.JSX.Element | null {
                             <Keyboard className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold leading-none">Keyboard Shortcuts</h2>
-                            <p className="text-xs text-slate-500 mt-1">Master your workflow with speed.</p>
+                            <h2 className="text-lg font-bold leading-none">{t('keyboardShortcutsModal.title')}</h2>
+                            <p className="text-xs text-slate-500 mt-1">{t('keyboardShortcutsModal.subtitle')}</p>
                         </div>
                     </div>
                     <button
                         onClick={() => setShortcutsHelpOpen(false)}
                         className="p-2 hover:bg-slate-100 rounded-full transition-all active:scale-90"
-                        aria-label="Close shortcuts modal"
+                        aria-label={t('keyboardShortcutsModal.closeAriaLabel')}
                     >
                         <X size={20} className="text-slate-400 hover:text-slate-600" />
                     </button>
@@ -60,7 +62,12 @@ export function KeyboardShortcutsModal(): React.JSX.Element | null {
                 {/* Footer Info */}
                 <div className="px-8 py-5 bg-slate-50 text-center border-t border-slate-100">
                     <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest leading-relaxed">
-                        Pro tip: Hold <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[10px] font-bold mx-1">Alt</kbd> to enable selection box while dragging.
+                        <Trans
+                            i18nKey="keyboardShortcutsModal.proTip"
+                            components={{
+                                key: <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[10px] font-bold mx-1">Alt</kbd>
+                            }}
+                        />
                     </p>
                 </div>
             </div>
@@ -84,12 +91,13 @@ interface ShortcutGroupProps {
 }
 
 function ShortcutGroup({ title, icon, children }: ShortcutGroupProps): React.JSX.Element {
+    const { t } = useTranslation();
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
                 {icon}
                 <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">
-                    {title}
+                    {t(`${title}`, title)}
                 </h3>
             </div>
             <div className="space-y-3">
@@ -105,10 +113,11 @@ interface ShortcutItemProps {
 }
 
 function ShortcutItem({ keys, label }: ShortcutItemProps): React.JSX.Element {
+    const { t } = useTranslation();
     return (
         <div className="flex items-center justify-between group py-0.5">
             <span className="text-sm font-medium text-slate-600 transition-colors group-hover:text-[var(--brand-primary)]">
-                {label}
+                {t(`${label}`, label)}
             </span>
             <div className="flex gap-1.5">
                 {keys.map((k, i) => (

@@ -1,7 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
-interface Props {
+interface Props extends WithTranslation {
     children?: ReactNode;
     fallback?: ReactNode;
     className?: string;
@@ -12,7 +13,7 @@ interface State {
     error?: Error;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
+class ErrorBoundaryComponent extends Component<Props, State> {
     public state: State = {
         hasError: false
     };
@@ -26,6 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
     }
 
     public render() {
+        const { t } = this.props;
         if (this.state.hasError) {
             if (this.props.fallback) {
                 return this.props.fallback;
@@ -39,11 +41,11 @@ export class ErrorBoundary extends Component<Props, State> {
                         </div>
 
                         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                            Something went wrong
+                            {t('errorBoundary.title')}
                         </h1>
 
                         <p className="text-slate-600 dark:text-slate-400 mb-8">
-                            We encountered an unexpected error. Please try refreshing the page.
+                            {t('errorBoundary.description')}
                         </p>
 
                         {this.state.error && (
@@ -57,7 +59,7 @@ export class ErrorBoundary extends Component<Props, State> {
                             className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors w-full"
                         >
                             <RefreshCcw size={18} />
-                            Reload Page
+                            {t('errorBoundary.reloadPage')}
                         </button>
                     </div>
                 </div>
@@ -67,3 +69,5 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.children;
     }
 }
+
+export const ErrorBoundary = withTranslation()(ErrorBoundaryComponent);

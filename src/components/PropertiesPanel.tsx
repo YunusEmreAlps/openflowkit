@@ -4,6 +4,7 @@ import { NodeData } from '@/lib/types';
 import { Layout, ArrowRight, X, Settings2 } from 'lucide-react';
 import { NodeProperties } from './properties/NodeProperties';
 import { EdgeProperties } from './properties/EdgeProperties';
+import { useTranslation } from 'react-i18next';
 
 interface PropertiesPanelProps {
     selectedNode: Node<NodeData> | null;
@@ -30,6 +31,8 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     onUpdateZIndex,
     onClose
 }) => {
+    const { t } = useTranslation();
+    
     if (!selectedNode && !selectedEdge) return null;
 
     const isAnnotation = selectedNode?.type === 'annotation';
@@ -41,12 +44,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     {selectedNode ? (
                         <>
                             <Settings2 className="w-4 h-4 text-[var(--brand-primary)]" />
-                            <span>{isAnnotation ? 'Sticky Note' : 'Node Settings'}</span>
+                            <span>{isAnnotation ? t('propertiesPanel.stickyNote') : t('propertiesPanel.nodeSettings')}</span>
                         </>
                     ) : (
                         <>
                             <ArrowRight className="w-4 h-4 text-[var(--brand-primary)]" />
-                            <span>Connection</span>
+                            <span>{t('propertiesPanel.connection')}</span>
                         </>
                     )}
                 </h3>

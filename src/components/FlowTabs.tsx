@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { FlowTab } from '@/lib/types';
 import { useFlowStore } from '../store';
+import { useTranslation } from 'react-i18next';
 
 interface FlowTabsProps {
   tabs: FlowTab[];
@@ -20,6 +21,7 @@ export const FlowTabs: React.FC<FlowTabsProps> = ({
   onCloseTab,
   onRenameTab,
 }) => {
+  const { t } = useTranslation();
   const buttonStyle = useFlowStore(state => state.brandConfig.ui.buttonStyle);
   const isBeveled = buttonStyle === 'beveled';
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
@@ -84,7 +86,7 @@ export const FlowTabs: React.FC<FlowTabsProps> = ({
                 e.stopPropagation();
                 onCloseTab(tab.id);
               }}
-              title="Close Tab"
+              title={t('flowTabs.closeTab')}
               className={`
                 p-0.5 rounded-full hover:bg-slate-200 transition-colors opacity-0 group-hover:opacity-100
                 ${activeTabId === tab.id ? 'text-[var(--brand-primary-400)] hover:text-[var(--brand-primary)]' : 'text-slate-400 hover:text-slate-600'}
@@ -98,7 +100,7 @@ export const FlowTabs: React.FC<FlowTabsProps> = ({
         <button
           onClick={onAddTab}
           className={`p-1.5 ml-1 rounded-full text-slate-400 hover:text-[var(--brand-primary)] hover:bg-[var(--brand-primary-50)] transition-colors ${isBeveled ? 'btn-beveled bg-white' : ''}`}
-          title="New Flow Tab"
+          title={t('flowTabs.newFlowTab')}
         >
           <Plus className="w-4 h-4" />
         </button>

@@ -18,16 +18,40 @@
     "select": "Select",
     "selectAll": "Select All",
     "duplicate": "Duplicate",
+    "duplicateDrag": "Duplicate and Drag",
     "copy": "Copy",
     "paste": "Paste",
     "zoomIn": "Zoom In",
     "zoomOut": "Zoom Out",
+    "zoomInOut": "Zoom In/Out",
     "resetZoom": "Reset Zoom",
+    "panCanvas": "Pan Canvas",
+    "fitView": "Fit View",
+    "nudgeNode": "Nudge Node",
+    "groupSelection": "Group Selection",
+    "keyboardShortcuts": "Keyboard Shortcuts",
+    "commandBar": "Command Bar",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
     "help": "Help",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "bringToFront": "Bring to Front",
+    "sendToBack": "Send to Back",
+    "reverseDirection": "Reverse Direction",
+    "deleteConnection": "Delete Connection",
+    "itemsSelected": "{{count}} items selected",
+    "align": "Align",
+    "alignLeft": "Align Left",
+    "alignCenter": "Align Center",
+    "alignRight": "Align Right",
+    "alignTop": "Align Top",
+    "alignMiddle": "Align Middle",
+    "alignBottom": "Align Bottom",
+    "distribute": "Distribute",
+    "distributeHorizontally": "Distribute Horizontally",
+    "distributeVertically": "Distribute Vertically",
+    "group": "Group"
   },
   "nav": {
     "home": "Home",
@@ -559,10 +583,13 @@
       "subtitle": "Manage your brand identities",
       "active": "Active",
       "editKit": "Edit Kit",
-      "duplicate": "Duplicate",
-      "delete": "Delete",
       "deleteConfirm": "Delete this kit?",
-      "createNewKit": "Create New Kit"
+      "createNewKit": "Create New Kit",
+      "newIdentity": "New Identity",
+      "activeKit": "Active Kit",
+      "inactive": "Inactive",
+      "setActive": "Set Active",
+      "resetToDefaults": "Reset to Defaults"
     },
     "shortcutsHint": "You can also press ? to view these anytime.",
     "privacy": {
@@ -584,5 +611,100 @@
   "customNodes": {
     "browserContent": "Browser Content",
     "mobileContent": "Mobile Content"
+  },
+  "keyboardShortcutsModal": {
+    "title": "Keyboard Shortcuts",
+    "subtitle": "Master your workflow with speed.",
+    "closeAriaLabel": "Close shortcuts modal",
+    "proTip": "Pro tip: Hold <key>?</key> to enable selection box while dragging."  },
+  "toolbar": {
+    "selectMode": "Select Mode (V)",
+    "panMode": "Pan Mode (H)",
+    "flowpilot": "Flowpilot (Cmd+K)",
+    "templates": "Templates",
+    "addItem": "Add Item",
+    "addToCanvas": "Add to Canvas",
+    "node": "Node",
+    "stickyNote": "Sticky Note",
+    "section": "Section",
+    "text": "Text",
+    "wireframes": "Wireframes",
+    "image": "Image",
+    "autoLayout": "Auto Layout",
+    "clearCanvas": "Clear Canvas",
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Y)"
+  },
+  "flowEditor": {
+    "cannotCloseLastTab": "Cannot close the last tab.",
+    "mermaidCopied": "Mermaid diagram copied to clipboard!",
+    "plantUMLCopied": "PlantUML diagram copied to clipboard!",
+    "dslCopied": "OpenFlow DSL copied to clipboard!",
+    "dslCopyFailed": "Failed to copy DSL",
+    "figmaCopied": "Diagram copied for Figma! You can now paste (Cmd+V) in Figma.",
+    "figmaExportFailed": "Figma Export Failed: {{message}}",
+    "applyingLayout": "Applying layout…",
+    "emptyState": {
+      "title": "Start Building",
+      "description": "Your canvas is empty. Generate a flow with Flowpilot, use a template, or start from scratch.",
+      "generateWithFlowpilot": "Generate with Flowpilot",
+      "browseTemplates": "Browse Templates",
+      "addBlankNode": "Add Blank Node"
+    }
+  },
+  "annotationNode": {
+    "placeholder": "*Double click to edit note*"
+  },
+  "connectMenu": {
+    "createNewNode": "Create New Node",
+    "process": "Process",
+    "processDesc": "Standard action",
+    "decision": "Decision",
+    "decisionDesc": "Branching logic",
+    "database": "Database",
+    "databaseDesc": "Data storage",
+    "inputOutput": "Input / Output",
+    "inputOutputDesc": "Data flow",
+    "note": "Note",
+    "noteDesc": "Documentation",
+    "releaseToConnect": "Release to connect"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "We encountered an unexpected error. Please try refreshing the page.",
+    "reloadPage": "Reload Page"
+  },
+  "navigationControls": {
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fitView": "Fit View",
+    "keyboardShortcuts": "Keyboard Shortcuts"
+  },
+  "playbackControls": {
+    "stop": "Stop"
+  },
+  "snapshotsPanel": {
+    "title": "Version History",
+    "saveCurrentVersion": "Save Current Version",
+    "versionName": "Version Name (e.g. 'Before Refactor')",
+    "noSnapshots": "No snapshots saved yet.",
+    "restoreVersion": "Restore version",
+    "deleteVersion": "Delete version",
+    "nodes": "{{count}} nodes",
+    "edges": "{{count}} edges"
+  },
+  "templatesPanel": {
+    "title": "Flow Templates",
+    "searchPlaceholder": "Search templates...",
+    "noTemplates": "No templates found."
+  },
+  "propertiesPanel": {
+    "stickyNote": "Sticky Note",
+    "nodeSettings": "Node Settings",
+    "connection": "Connection"
+  },
+  "flowTabs": {
+    "closeTab": "Close Tab",
+    "newFlowTab": "New Flow Tab"
   }
 }

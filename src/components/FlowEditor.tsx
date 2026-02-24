@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Sparkles, Plus, Layout } from 'lucide-react';
 import { Button } from './ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useReactFlow, getRectOfNodes } from 'reactflow';
 import { useFlowStore } from '../store';
 import { getElkLayout, LayoutAlgorithm } from '../services/elkLayout';
@@ -33,6 +34,7 @@ interface FlowEditorProps {
 }
 
 export function FlowEditor({ onGoHome }: FlowEditorProps) {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const navigate = useNavigate();
 
@@ -94,11 +96,11 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
 
     const handleCloseTab = useCallback((tabId: string) => {
         if (tabs.length === 1) {
-            alert("Cannot close the last tab.");
+            alert(t('flowEditor.cannotCloseLastTab'));
             return;
         }
         closeTab(tabId);
-    }, [tabs.length, closeTab]);
+    }, [tabs.length, closeTab, t]);
 
     const handleRenameTab = useCallback((tabId: string, newName: string) => {
         updateTab(tabId, { name: newName });
@@ -208,43 +210,43 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         const text = toMermaid(nodes, edges);
         try {
             await navigator.clipboard.writeText(text);
-            alert('Mermaid diagram copied to clipboard!');
+            alert(t('flowEditor.mermaidCopied'));
         } catch (err) {
             console.error('Failed to copy', err);
         }
-    }, [nodes, edges]);
+    }, [nodes, edges, t]);
 
     const handleExportPlantUML = useCallback(async () => {
         const text = toPlantUML(nodes, edges);
         try {
             await navigator.clipboard.writeText(text);
-            alert('PlantUML diagram copied to clipboard!');
+            alert(t('flowEditor.plantUMLCopied'));
         } catch (err) {
             console.error('Failed to copy', err);
         }
-    }, [nodes, edges]);
+    }, [nodes, edges, t]);
 
     const handleExportOpenFlowDSL = useCallback(async () => {
         const text = toOpenFlowDSL(nodes, edges);
         try {
             await navigator.clipboard.writeText(text);
-            addToast('OpenFlow DSL copied to clipboard!', 'success');
+            addToast(t('flowEditor.dslCopied'), 'success');
         } catch (err) {
             console.error('Failed to copy', err);
-            addToast('Failed to copy DSL', 'error');
+            addToast(t('flowEditor.dslCopyFailed'), 'error');
         }
-    }, [nodes, edges, addToast]);
+    }, [nodes, edges, addToast, t]);
 
     const handleExportFigma = useCallback(async () => {
         try {
             const svg = toFigmaSVG(nodes, edges);
             await navigator.clipboard.writeText(svg);
-            addToast('Diagram copied for Figma! You can now paste (Cmd+V) in Figma.', 'success');
+            addToast(t('flowEditor.figmaCopied'), 'success');
         } catch (err: any) {
             console.error('Failed to copy Figma SVG:', err);
-            addToast(`Figma Export Failed: ${err?.message || err}`, 'error');
+            addToast(t('flowEditor.figmaExportFailed', { message: err?.message || err }), 'error');
         }
-    }, [nodes, edges, addToast]);
+    }, [nodes, edges, addToast, t]);
 
     const handleRestoreSnapshot = useCallback((snapshot: any) => {
         restoreSnapshot(snapshot, setNodes, setEdges);
@@ -305,7 +307,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        <span className="text-sm font-medium text-slate-600">Applying layout…</span>
+                        <span className="text-sm font-medium text-slate-600">{t('flowEditor.applyingLayout')}</span>
                     </div>
                 </div>
             )}
@@ -427,9 +429,9 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <h3 className="text-xl font-bold text-[var(--brand-text)]">Start Building</h3>
+                            <h3 className="text-xl font-bold text-[var(--brand-text)]">{t('flowEditor.emptyState.title')}</h3>
                             <p className="text-[var(--brand-text-secondary)] text-sm max-w-xs mx-auto">
-                                Your canvas is empty. Generate a flow with Flowpilot, use a template, or start from scratch.
+                                {t('flowEditor.emptyState.description')}
                             </p>
                         </div>
 
@@ -441,7 +443,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                                 className="w-full shadow-lg"
                                 icon={<Sparkles className="w-4 h-4" />}
                             >
-                                Generate with Flowpilot
+                                {t('flowEditor.emptyState.generateWithFlowpilot')}
                             </Button>
 
                             <Button
@@ -451,7 +453,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                                 className="w-full"
                                 icon={<Layout className="w-4 h-4" />}
                             >
-                                Browse Templates
+                                {t('flowEditor.emptyState.browseTemplates')}
                             </Button>
 
                             <Button
@@ -461,7 +463,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                                 className="w-full"
                                 icon={<Plus className="w-4 h-4" />}
                             >
-                                Add Blank Node
+                                {t('flowEditor.emptyState.addBlankNode')}
                             </Button>
                         </div>
                     </div>

@@ -19,11 +19,19 @@
     "select": "Seç",
     "selectAll": "Tümünü Seç",
     "duplicate": "Çoğalt",
+    "duplicateDrag": "Çoğalt ve Sürükle",
     "copy": "Kopyala",
     "paste": "Yapıştır",
     "zoomIn": "Yakınlaştır",
     "zoomOut": "Uzaklaştır",
+    "zoomInOut": "Yakınlaştır/Uzaklaştır",
     "resetZoom": "Yakınlaştırmayı Sıfırla",
+    "panCanvas": "Tuvali Kaydır",
+    "fitView": "Görünüme Sığdır",
+    "nudgeNode": "Düğümü Hafifçe Taşı",
+    "groupSelection": "Seçimi Grupla",
+    "keyboardShortcuts": "Klavye Kısayolları",
+    "commandBar": "Komut Çubuğu",
     "loading": "Yükleniyor...",
     "error": "Hata",
     "success": "Başarılı",
@@ -31,7 +39,23 @@
     "help": "Yardım",
     "docs": "Dokümantasyon",
     "getStarted": "Hemen Başla",
-    "publicBeta": "v1.0 Public Beta"
+    "publicBeta": "v1.0 Public Beta",
+    "bringToFront": "Öne Getir",
+    "sendToBack": "Arkaya Gönder",
+    "reverseDirection": "Yönü Tersine Çevir",
+    "deleteConnection": "Bağlantıyı Sil",
+    "itemsSelected": "{{count}} öğe seçildi",
+    "align": "Hizala",
+    "alignLeft": "Sola Hizala",
+    "alignCenter": "Ortala",
+    "alignRight": "Sağa Hizala",
+    "alignTop": "Üste Hizala",
+    "alignMiddle": "Ortala",
+    "alignBottom": "Alta Hizala",
+    "distribute": "Dağıt",
+    "distributeHorizontally": "Yatay Dağıt",
+    "distributeVertically": "Dikey Dağıt",
+    "group": "Grupla"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -564,10 +588,13 @@
       "subtitle": "Marka kimliklerinizi yönetin",
       "active": "Aktif",
       "editKit": "Kiti Düzenle",
-      "duplicate": "Çoğalt",
-      "delete": "Sil",
       "deleteConfirm": "Bu kit silinsin mi?",
-      "createNewKit": "Yeni Kit Oluştur"
+      "createNewKit": "Yeni Kit Oluştur",
+      "newIdentity": "Yeni Kimlik",
+      "activeKit": "Aktif Kit",
+      "inactive": "Pasif",
+      "setActive": "Aktif Yap",
+      "resetToDefaults": "Varsayılan Ayarları Sıfırla"
     },
     "shortcutsHint": "İstediğiniz zaman ? tuşuna basarak bunları görüntüleyebilirsiniz.",
     "privacy": {
@@ -589,5 +616,100 @@
   "customNodes": {
     "browserContent": "Tarayıcı İçeriği",
     "mobileContent": "Mobil İçerik"
+  },
+  "keyboardShortcutsModal": {
+    "title": "Klavye Kısayolları",
+    "subtitle": "İş akışınıza hızla hakim olun.",
+    "closeAriaLabel": "Kısayol modalını kapat",
+    "proTip": "İpucu: Sürüklerken seçim kutusu etkinleştirmek için <key>?</key> tuşunu basılı tutun."  },
+  "toolbar": {
+    "selectMode": "Seçim Modu (V)",
+    "panMode": "Kaydırma Modu (H)",
+    "flowpilot": "Flowpilot (Cmd+K)",
+    "templates": "Şablonlar",
+    "addItem": "Öğe Ekle",
+    "addToCanvas": "Tuvale Ekle",
+    "node": "Düğüm",
+    "stickyNote": "Yapışkan Not",
+    "section": "Bölüm",
+    "text": "Metin",
+    "wireframes": "Tel Çerçeveler",
+    "image": "Resim",
+    "autoLayout": "Otomatik Düzen",
+    "clearCanvas": "Tuvali Temizle",
+    "undo": "Geri Al (Ctrl+Z)",
+    "redo": "Yinele (Ctrl+Y)"
+  },
+  "flowEditor": {
+    "cannotCloseLastTab": "Son sekmeyi kapatamazsınız.",
+    "mermaidCopied": "Mermaid diyagramı panoya kopyalandı!",
+    "plantUMLCopied": "PlantUML diyagramı panoya kopyalandı!",
+    "dslCopied": "OpenFlow DSL panoya kopyalandı!",
+    "dslCopyFailed": "DSL kopyalanamadı",
+    "figmaCopied": "Diyagram Figma için kopyalandı! Artık Figma'da yapıştırabilirsiniz (Cmd+V).",
+    "figmaExportFailed": "Figma Dışa Aktarma Başarısız: {{message}}",
+    "applyingLayout": "Düzen uygulanıyor…",
+    "emptyState": {
+      "title": "İnşaya Başlayın",
+      "description": "Tuvaliniz boş. Flowpilot ile bir akış oluşturun, bir şablon kullanın veya sıfırdan başlayın.",
+      "generateWithFlowpilot": "Flowpilot ile Oluştur",
+      "browseTemplates": "Şablonlara Gözat",
+      "addBlankNode": "Boş Düğüm Ekle"
+    }
+  },
+  "annotationNode": {
+    "placeholder": "*Düzenlemek için çift tıklayın*"
+  },
+  "connectMenu": {
+    "createNewNode": "Yeni Düğüm Oluştur",
+    "process": "İşlem",
+    "processDesc": "Standart eylem",
+    "decision": "Karar",
+    "decisionDesc": "Dallanma mantığı",
+    "database": "Veritabanı",
+    "databaseDesc": "Veri depolama",
+    "inputOutput": "Giriş / Çıkış",
+    "inputOutputDesc": "Veri akışı",
+    "note": "Not",
+    "noteDesc": "Dokümantasyon",
+    "releaseToConnect": "Bağlamak için bırak"
+  },
+  "errorBoundary": {
+    "title": "Bir şeyler yanlış gitti",
+    "description": "Beklenmeyen bir hatayla karşılaştık. Lütfen sayfayı yenilemeyi deneyin.",
+    "reloadPage": "Sayfayı Yenile"
+  },
+  "navigationControls": {
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "fitView": "Görünüme Sığdır",
+    "keyboardShortcuts": "Klavye Kısayolları"
+  },
+  "playbackControls": {
+    "stop": "Durdur"
+  },
+  "snapshotsPanel": {
+    "title": "Sürüm Geçmişi",
+    "saveCurrentVersion": "Mevcut Sürümü Kaydet",
+    "versionName": "Sürüm Adı (örn. 'Yeniden Yapılandırma Öncesi')",
+    "noSnapshots": "Henüz kaydedilmiş anlık görüntü yok.",
+    "restoreVersion": "Sürümü geri yükle",
+    "deleteVersion": "Sürümü sil",
+    "nodes": "{{count}} düğüm",
+    "edges": "{{count}} bağlantı"
+  },
+  "templatesPanel": {
+    "title": "Akış Şablonları",
+    "searchPlaceholder": "Şablonlarda ara...",
+    "noTemplates": "Şablon bulunamadı."
+  },
+  "propertiesPanel": {
+    "stickyNote": "Yapışkan Not",
+    "nodeSettings": "Düğüm Ayarları",
+    "connection": "Bağlantı"
+  },
+  "flowTabs": {
+    "closeTab": "Sekmeyi Kapat",
+    "newFlowTab": "Yeni Akış Sekmesi"
   }
 }

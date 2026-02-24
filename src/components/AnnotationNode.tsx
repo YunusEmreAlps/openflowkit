@@ -3,8 +3,10 @@ import { NodeProps, NodeResizer } from 'reactflow';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { NodeData } from '@/lib/types';
+import { useTranslation } from 'react-i18next';
 
 const AnnotationNode = ({ data, selected }: NodeProps<NodeData>) => {
+  const { t } = useTranslation();
   return (
     <>
       <NodeResizer 
@@ -29,7 +31,7 @@ const AnnotationNode = ({ data, selected }: NodeProps<NodeData>) => {
             )}
             <div className="text-xs text-yellow-800 font-medium leading-relaxed markdown-content flex-1 overflow-hidden">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {data.subLabel || '*Double click to edit note*'}
+                    {data.subLabel || t('annotationNode.placeholder')}
                 </ReactMarkdown>
             </div>
         </div>

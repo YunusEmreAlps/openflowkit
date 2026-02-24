@@ -18,6 +18,7 @@ import {
     ArrowDownFromLine,
     Group,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface ContextMenuProps {
     id: string | null;
@@ -55,6 +56,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     onDistributeNodes,
     onGroupSelected,
 }) => {
+    const { t } = useTranslation();
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -76,25 +78,25 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             {type === 'node' && (
                 <>
                     <button onClick={onCopy} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                        <Copy className="w-4 h-4" /> Copy
+                        <Copy className="w-4 h-4" /> {t('common.copy')}
                     </button>
                     <button onClick={onDuplicate} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                        <CopyPlus className="w-4 h-4" /> Duplicate
+                        <CopyPlus className="w-4 h-4" /> {t('common.duplicate')}
                     </button>
 
                     <div className="h-px bg-slate-100 my-1" />
 
                     <button onClick={onBringToFront} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                        <BringToFront className="w-4 h-4" /> Bring to Front
+                        <BringToFront className="w-4 h-4" /> {t('common.bringToFront')}
                     </button>
                     <button onClick={onSendToBack} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                        <SendToBack className="w-4 h-4" /> Send to Back
+                        <SendToBack className="w-4 h-4" /> {t('common.sendToBack')}
                     </button>
 
                     <div className="h-px bg-slate-100 my-1" />
 
                     <button onClick={onDelete} className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left">
-                        <Trash2 className="w-4 h-4" /> Delete
+                        <Trash2 className="w-4 h-4" /> {t('common.delete')}
                     </button>
                 </>
             )}
@@ -106,7 +108,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                         disabled={!canPaste}
                         className={`flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors w-full text-left ${!canPaste ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <ClipboardPaste className="w-4 h-4" /> Paste
+                        <ClipboardPaste className="w-4 h-4" /> {t('common.paste')}
                     </button>
                 </>
             )}
@@ -114,11 +116,11 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             {type === 'edge' && (
                 <>
                     <button onClick={onDuplicate} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                        <Replace className="w-4 h-4" /> Reverse Direction
+                        <Replace className="w-4 h-4" /> {t('common.reverseDirection')}
                     </button>
                     <div className="h-px bg-slate-100 my-1" />
                     <button onClick={onDelete} className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left">
-                        <Trash2 className="w-4 h-4" /> Delete Connection
+                        <Trash2 className="w-4 h-4" /> {t('common.deleteConnection')}
                     </button>
                 </>
             )}
@@ -126,30 +128,30 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             {type === 'multi' && (
                 <>
                     <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {selectedCount} items selected
+                        {t('common.itemsSelected', { count: selectedCount })}
                     </div>
 
                     {/* Align */}
                     {onAlignNodes && (
                         <>
-                            <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase">Align</div>
+                            <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase">{t('common.align')}</div>
                             <div className="grid grid-cols-3 gap-0.5 px-2 pb-1">
-                                <button onClick={() => onAlignNodes('left')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Left">
+                                <button onClick={() => onAlignNodes('left')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignLeft')}>
                                     <AlignStartVertical className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onAlignNodes('center')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Center">
+                                <button onClick={() => onAlignNodes('center')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignCenter')}>
                                     <AlignCenterVertical className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onAlignNodes('right')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Right">
+                                <button onClick={() => onAlignNodes('right')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignRight')}>
                                     <AlignEndVertical className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onAlignNodes('top')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Top">
+                                <button onClick={() => onAlignNodes('top')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignTop')}>
                                     <AlignStartHorizontal className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onAlignNodes('middle')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Middle">
+                                <button onClick={() => onAlignNodes('middle')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignMiddle')}>
                                     <AlignCenterHorizontal className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onAlignNodes('bottom')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title="Align Bottom">
+                                <button onClick={() => onAlignNodes('bottom')} className="flex items-center justify-center p-1.5 hover:bg-slate-50 rounded text-slate-500 hover:text-slate-700" title={t('common.alignBottom')}>
                                     <AlignEndHorizontal className="w-3.5 h-3.5" />
                                 </button>
                             </div>
@@ -160,12 +162,12 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                     {onDistributeNodes && (
                         <>
                             <div className="h-px bg-slate-100 my-0.5" />
-                            <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase">Distribute</div>
+                            <div className="px-3 py-1 text-[10px] font-semibold text-slate-400 uppercase">{t('common.distribute')}</div>
                             <button onClick={() => onDistributeNodes('horizontal')} className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                                <ArrowRightFromLine className="w-4 h-4" /> Space Horizontally
+                                <ArrowRightFromLine className="w-4 h-4" /> {t('common.distributeHorizontally')}
                             </button>
                             <button onClick={() => onDistributeNodes('vertical')} className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md transition-colors w-full text-left">
-                                <ArrowDownFromLine className="w-4 h-4" /> Space Vertically
+                                <ArrowDownFromLine className="w-4 h-4" /> {t('common.distributeVertically')}
                             </button>
                         </>
                     )}
@@ -175,14 +177,14 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                         <>
                             <div className="h-px bg-slate-100 my-0.5" />
                             <button onClick={onGroupSelected} className="flex items-center gap-2 px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors w-full text-left">
-                                <Group className="w-4 h-4" /> Group Selected
+                                <Group className="w-4 h-4" /> {t('common.group')}
                             </button>
                         </>
                     )}
 
                     <div className="h-px bg-slate-100 my-0.5" />
                     <button onClick={onDelete} className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors w-full text-left">
-                        <Trash2 className="w-4 h-4" /> Delete Selected ({selectedCount})
+                        <Trash2 className="w-4 h-4" /> {t('common.delete')} ({selectedCount})
                     </button>
                 </>
             )}

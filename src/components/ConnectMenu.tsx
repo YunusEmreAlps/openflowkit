@@ -1,5 +1,6 @@
 import React from 'react';
 import { Settings, Sparkles, StickyNote, X, Database, ArrowRightLeft, Circle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ConnectMenuProps {
     position: { x: number; y: number };
@@ -8,6 +9,7 @@ interface ConnectMenuProps {
 }
 
 export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) => {
+    const { t } = useTranslation();
     return (
         <>
             <div className="fixed inset-0 z-[60]" onClick={onClose} />
@@ -17,7 +19,7 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
             >
                 <div className="p-1.5 space-y-0.5">
                     <div className="px-3 py-2 mb-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">Create New Node</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em]">{t('connectMenu.createNewNode')}</p>
                     </div>
 
                     <button
@@ -28,8 +30,8 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                             <Settings className="w-4.5 h-4.5" />
                         </div>
                         <div className="flex flex-col items-start translate-y-[1px]">
-                            <span className="font-bold text-slate-700 leading-none mb-1">Process</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Standard action</span>
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.process')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.processDesc')}</span>
                         </div>
                     </button>
 
@@ -41,8 +43,8 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                             <Sparkles className="w-4.5 h-4.5" />
                         </div>
                         <div className="flex flex-col items-start translate-y-[1px]">
-                            <span className="font-bold text-slate-700 leading-none mb-1">Decision</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Branching logic</span>
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.decision')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.decisionDesc')}</span>
                         </div>
                     </button>
 
@@ -54,8 +56,8 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                             <Database className="w-4.5 h-4.5" />
                         </div>
                         <div className="flex flex-col items-start translate-y-[1px]">
-                            <span className="font-bold text-slate-700 leading-none mb-1">Database</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Data storage</span>
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.database')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.databaseDesc')}</span>
                         </div>
                     </button>
 
@@ -67,8 +69,8 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                             <ArrowRightLeft className="w-4.5 h-4.5" />
                         </div>
                         <div className="flex flex-col items-start translate-y-[1px]">
-                            <span className="font-bold text-slate-700 leading-none mb-1">Input / Output</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Data flow</span>
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.inputOutput')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.inputOutputDesc')}</span>
                         </div>
                     </button>
 
@@ -80,14 +82,14 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                             <StickyNote className="w-4.5 h-4.5" />
                         </div>
                         <div className="flex flex-col items-start translate-y-[1px]">
-                            <span className="font-bold text-slate-700 leading-none mb-1">Note</span>
-                            <span className="text-[10px] text-slate-400 font-medium">Documentation</span>
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.note')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.noteDesc')}</span>
                         </div>
                     </button>
                 </div>
 
                 <div className="bg-slate-50/80 px-4 py-2 flex items-center justify-between border-t border-slate-100">
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Release to connect</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">{t('connectMenu.releaseToConnect')}</span>
                     <button onClick={onClose} className="p-1 hover:bg-slate-200 rounded-full text-slate-400 transition-colors">
                         <X className="w-3 h-3" />
                     </button>

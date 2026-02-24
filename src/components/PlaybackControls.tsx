@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, X, Square } from 'lucide-react';
 import { Button } from './ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface PlaybackControlsProps {
     isPlaying: boolean;
@@ -21,6 +22,7 @@ export function PlaybackControls({
     onPrev,
     onStop
 }: PlaybackControlsProps) {
+    const { t } = useTranslation();
     return (
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center p-1.5 bg-white/90 backdrop-blur-xl shadow-2xl rounded-[var(--radius-lg)] border border-white/20 ring-1 ring-black/5 transition-all duration-300 z-50 gap-1">
 
@@ -78,7 +80,7 @@ export function PlaybackControls({
                 onClick={onStop}
                 className="h-10 px-3 text-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-[var(--radius-sm)]"
             >
-                Stop
+                {t('playbackControls.stop')}
             </Button>
         </div>
     );

@@ -11,6 +11,7 @@ import {
     RotateCw, Upload, Type, Palette, Box, ExternalLink,
     Plus, Trash2, Copy, Check, Edit2, ArrowLeft, LayoutTemplate, Sparkles, ChevronDown, Shield, Zap, Lock
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // --- Types ---
 type EditorTab = 'identity' | 'colors' | 'typography' | 'ui';
@@ -58,6 +59,7 @@ export function BrandSettings(): React.ReactElement {
 
 // --- List View ---
 function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
+    const { t } = useTranslation();
     const {
         brandKits, activeBrandKitId, setActiveBrandKitId,
         addBrandKit, deleteBrandKit
@@ -70,8 +72,8 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                     <LayoutTemplate className="w-4 h-4" />
                 </div>
                 <div className="flex-1">
-                    <h2 className="text-sm font-semibold text-slate-900">Brand Kits</h2>
-                    <p className="text-xs text-slate-500">Manage your brand identities</p>
+                    <h2 className="text-sm font-semibold text-slate-900">{t('settingsModal.brand.title')}</h2>
+                    <p className="text-xs text-slate-500">{t('settingsModal.brand.subtitle')}</p>
                 </div>
             </div>
 
@@ -99,7 +101,7 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                                     {isActive && (
                                         <div className="flex items-center gap-1 text-[10px] font-semibold text-[var(--brand-primary)] uppercase tracking-wider mt-0.5">
                                             <Check className="w-3 h-3" />
-                                            Active
+                                            {t('settingsModal.brand.active')}
                                         </div>
                                     )}
                                 </div>
@@ -109,7 +111,7 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                                 <Button
                                     variant="ghost" size="icon"
                                     className="h-8 w-8 text-slate-400 hover:text-[var(--brand-primary)]"
-                                    title="Edit Kit"
+                                    title={t('settingsModal.brand.editKit')}
                                     onClick={(e) => { e.stopPropagation(); onSelect(kit.id); }}
                                 >
                                     <Edit2 className="w-4 h-4" />
@@ -117,7 +119,7 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                                 <Button
                                     variant="ghost" size="icon"
                                     className="h-8 w-8 text-slate-400 hover:text-[var(--brand-primary)]"
-                                    title="Duplicate"
+                                    title={t('common.duplicate')}
                                     onClick={(e) => { e.stopPropagation(); addBrandKit(`${kit.name} (Copy)`, kit); }}
                                 >
                                     <Copy className="w-4 h-4" />
@@ -126,8 +128,8 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                                     <Button
                                         variant="ghost" size="icon"
                                         className="h-8 w-8 text-slate-400 hover:text-red-600"
-                                        title="Delete"
-                                        onClick={(e) => { e.stopPropagation(); if (confirm('Delete this kit?')) deleteBrandKit(kit.id); }}
+                                        title={t('common.delete')}
+                                        onClick={(e) => { e.stopPropagation(); if (confirm(t('settingsModal.brand.deleteConfirm'))) deleteBrandKit(kit.id); }}
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -142,9 +144,9 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
                 <Button
                     className="w-full justify-center bg-[var(--brand-primary)] hover:opacity-90 text-white"
                     icon={<Plus className="w-4 h-4" />}
-                    onClick={() => addBrandKit("New Identity")}
+                    onClick={() => addBrandKit(t('settingsModal.brand.newIdentity'))}
                 >
-                    Create New Kit
+                    {t('settingsModal.brand.createNewKit')}
                 </Button>
             </div>
         </div>
@@ -161,6 +163,7 @@ const EDITOR_TABS: { id: EditorTab; label: string; icon: React.ReactNode }[] = [
 
 // --- Editor View ---
 function BrandEditorView({ kitId, onBack }: BrandEditorViewProps): React.ReactElement {
+    const { t } = useTranslation();
     const {
         brandKits, updateBrandKitName, setBrandConfig, activeBrandKitId,
         setActiveBrandKitId, resetBrandConfig
@@ -212,19 +215,19 @@ function BrandEditorView({ kitId, onBack }: BrandEditorViewProps): React.ReactEl
                     />
                     <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">
-                            {isLive ? 'Active Kit' : 'Inactive'}
+                            {isLive ? t('settingsModal.brand.activeKit') : t('settingsModal.brand.inactive')}
                         </span>
                         {!isLive && (
                             <button
                                 onClick={() => setActiveBrandKitId(kit.id)}
                                 className="text-[10px] text-[var(--brand-primary)] hover:underline font-medium"
                             >
-                                Set Active
+                                {t('settingsModal.brand.setActive')}
                             </button>
                         )}
                     </div>
                 </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400" onClick={resetBrandConfig} title="Reset to Defaults">
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400" onClick={resetBrandConfig} title={t('settingsModal.brand.resetToDefaults')}>
                     <RotateCw className="w-4 h-4" />
                 </Button>
             </div>

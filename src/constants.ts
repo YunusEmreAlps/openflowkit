@@ -81,38 +81,38 @@ export const EDGE_DASH_PATTERNS: Record<string, { label: string; strokeDasharray
 // --- Keyboard Shortcuts ---
 export const KEYBOARD_SHORTCUTS = [
   {
-    title: 'Essentials',
+    title: 'shortcuts.essentials',
     items: [
-      { label: 'Undo', keys: ['Cmd', 'Z'] },
-      { label: 'Redo', keys: ['Cmd', 'Shift', 'Z'] },
-      { label: 'Select All', keys: ['Cmd', 'A'] },
-      { label: 'Delete', keys: ['Backspace'] },
+      { label: 'common.undo', keys: ['Cmd', 'Z'] },
+      { label: 'common.redo', keys: ['Cmd', 'Shift', 'Z'] },
+      { label: 'common.selectAll', keys: ['Cmd', 'A'] },
+      { label: 'common.delete', keys: ['Backspace'] },
     ]
   },
   {
-    title: 'Manipulation',
+    title: 'shortcuts.manipulation',
     items: [
-      { label: 'Duplicate', keys: ['Cmd', 'D'] },
-      { label: 'Duplicate (Drag)', keys: ['Alt', 'Drag'] },
-      { label: 'Copy', keys: ['Cmd', 'C'] },
-      { label: 'Paste', keys: ['Cmd', 'V'] },
-      { label: 'Group Selection', keys: ['Cmd', 'G'] },
+      { label: 'common.duplicate', keys: ['Cmd', 'D'] },
+      { label: 'common.duplicateDrag', keys: ['Alt', 'Drag'] },
+      { label: 'common.copy', keys: ['Cmd', 'C'] },
+      { label: 'common.paste', keys: ['Cmd', 'V'] },
+      { label: 'common.groupSelection', keys: ['Cmd', 'G'] },
     ]
   },
   {
-    title: 'Navigation',
+    title: 'shortcuts.navigation',
     items: [
-      { label: 'Pan Canvas', keys: ['Space', 'Drag'] },
-      { label: 'Zoom In/Out', keys: ['Cmd', '+/-'] },
-      { label: 'Fit View', keys: ['Shift', '1'] },
-      { label: 'Nudge Node', keys: ['Arrows'] },
+      { label: 'common.panCanvas', keys: ['Space', 'Drag'] },
+      { label: 'common.zoomInOut', keys: ['Cmd', '+/-'] },
+      { label: 'common.fitView', keys: ['Shift', '1'] },
+      { label: 'common.nudgeNode', keys: ['Arrows'] },
     ]
   },
   {
-    title: 'Help',
+    title: 'shortcuts.help',
     items: [
-      { label: 'Keyboard Shortcuts', keys: ['?'] },
-      { label: 'Command Bar', keys: ['Cmd', 'K'] },
+      { label: 'common.keyboardShortcuts', keys: ['?'] },
+      { label: 'common.commandBar', keys: ['Cmd', 'K'] },
     ]
   },
 ];
