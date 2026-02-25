@@ -43,6 +43,7 @@ export const docsNavigation: DocSection[] = [
     {
         title: 'Guides & Use Cases',
         items: [
+            { title: 'Prompting AI Agents', slug: 'prompting-agents' },
             { title: 'Mermaid vs. OpenFlow', slug: 'mermaid-vs-openflow' },
             { title: 'AWS Architecture Diagram', slug: 'aws-architecture' },
             { title: 'Payment Flow Visualization', slug: 'payment-flow' },
