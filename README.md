@@ -362,7 +362,10 @@ We are building the open standard for diagramming. PRs for new Mermaid features,
 
 ## 🌍 Special Thanks
 
-OpenFlowKit is now global! A massive shout-out to **[Yunus Emre Alpuş](https://github.com/YunusEmreAlps)** for leading the internationalization (i18n) effort and providing the initial Turkish localization. His contributions paved the way for our expansion into Spanish, German, French, Japanese, and Chinese.
+OpenFlowKit is now global and more powerful! A massive shout-out to our community:
+
+- **[Yunus Emre Alpuş](https://github.com/YunusEmreAlps)** for leading the internationalization (i18n) effort and providing the initial Turkish localization. His contributions paved the way for our expansion into Spanish, German, French, Japanese, and Chinese.
+- **[Naman Dhakad](https://github.com/namandhakad712)** for integrating **Mistral AI** as a Flowpilot provider, expanding our AI ecosystem and improving the developer experience across all providers.
 
 ---
 
