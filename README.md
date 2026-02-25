@@ -24,7 +24,6 @@ OpenFlowKit is a professional-grade canvas that combines the power of **React Fl
 - [Architecture](#-architecture--project-structure)
 - [Getting Started](#-getting-started)
 - [Extensibility & Self-Hosting](#-extensibility--self-hosting)
-- [Contributors](#-contributors)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -349,34 +348,6 @@ The AI layer (`useAIGeneration.ts`) and provider client (`geminiService.ts`) are
    npm test
    ```
 
----
-
-## 👥 Contributors
-
-Thanks to everyone who has contributed to OpenFlowKit!
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/Vrun-design">
-        <img src="https://github.com/Vrun-design.png" width="80" height="80" style="border-radius:50%" alt="Varun"/><br />
-        <sub><b>Varun</b></sub>
-      </a><br />
-      <sub>Creator & Maintainer</sub>
-    </td>
-    <td align="center">
-      <a href="https://github.com/YunusEmreAlps">
-        <img src="https://github.com/YunusEmreAlps.png" width="80" height="80" style="border-radius:50%" alt="Yunus Emre Alpu&#351;"/><br />
-        <sub><b>Yunus Emre Alpu&#351;</b></sub>
-      </a><br />
-      <sub>i18n · Turkish Localization</sub>
-    </td>
-  </tr>
-</table>
-
-Want to see your name here? Check out our [Contributing](#-contributing) guide — PRs are always welcome!
-
----
 
 ## 🤝 Contributing
 
