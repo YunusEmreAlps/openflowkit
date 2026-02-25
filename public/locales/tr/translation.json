@@ -20,6 +20,7 @@
     "selectAll": "Tümünü Seç",
     "duplicate": "Çoğalt",
     "duplicateDrag": "Çoğalt ve Sürükle",
+    "upload": "Yükle",
     "copy": "Kopyala",
     "paste": "Yapıştır",
     "zoomIn": "Yakınlaştır",
@@ -55,7 +56,10 @@
     "distribute": "Dağıt",
     "distributeHorizontally": "Yatay Dağıt",
     "distributeVertically": "Dikey Dağıt",
-    "group": "Grupla"
+    "group": "Grupla",
+    "export": "Dışa Aktar",
+    "exportDiagram": "Diyagramı Dışa Aktar",
+    "exportAs": "Farklı Dışa Aktar"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -119,6 +123,23 @@
     "addNode": "Düğüm Ekle",
     "deleteNode": "Düğümü Sil",
     "duplicateNode": "Düğümü Çoğalt"
+  },
+  "nodes": {
+    "newNode": "Yeni Düğüm",
+    "processStep": "İşlem Adımı",
+    "note": "Not",
+    "addCommentsHere": "Yorumlarınızı buraya ekleyin.",
+    "newSection": "Yeni Bölüm",
+    "text": "Metin",
+    "image": "Resim",
+    "group": "Grup",
+    "items": "öğe",
+    "database": "Veritabanı",
+    "inputOutput": "Giriş / Çıkış",
+    "branch": "Dal"
+  },
+  "actions": {
+    "clearCanvasConfirm": "Tuvali temizlemek istediğinizden emin misiniz?"
   },
   "landing": {
     "nav": {
@@ -227,7 +248,14 @@
     "provider": "Yapay Zeka Sağlayıcı",
     "model": "Model",
     "apiKey": "API Anahtarı",
-    "placeholder": "Akış şemanızı açıklayın..."
+    "placeholder": "Akış şemanızı açıklayın...",
+    "settingsSubtitle": "Tercih ettiğiniz yapay zeka sağlayıcısını, modeli ve API anahtarını aşağıdan yapılandırın.",
+    "howToGetKey": "API anahtarı nasıl alınır",
+    "openConsole": "Konsolu Aç",
+    "pasteKeyStep": "Yukarıdaki alana yapıştırın — asla bizimle paylaşılmaz",
+    "customEndpointTitle": "Özel endpoint nedir?",
+    "customModelHint": "Endpoint'iniz için tam model kimliğini girin",
+    "privacyTitle": "Gizlilik ve Şifreleme"
   },
   "playback": {
     "title": "Oynatma",
@@ -393,7 +421,7 @@
     "documentation": "Dokümantasyon",
     "returnToCanvas": "Tuvale Dön",
     "onThisPage": "Bu Sayfada"
-  },  
+  },
   "chatbot": {
     "greeting": "Merhaba, size nasıl yardımcı olabilirim?",
     "tagline": "Akıllı rehberiniz",
@@ -594,7 +622,23 @@
       "activeKit": "Aktif Kit",
       "inactive": "Pasif",
       "setActive": "Aktif Yap",
-      "resetToDefaults": "Varsayılan Ayarları Sıfırla"
+      "resetToDefaults": "Varsayılan Ayarları Sıfırla",
+      "tabIdentity": "Kimlik",
+      "tabColors": "Renkler",
+      "tabType": "Yazı Tipi",
+      "tabUI": "UI ve Şekil",
+      "appName": "Uygulama Adı",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "logoStyle": "Logo Stili",
+      "fontFamily": "Yazı Tipi Ailesi",
+      "googleFontsHint": "Google Fonts'tan dinamik olarak yüklenir",
+      "cornerRadius": "Köşe Yarıçapı",
+      "glassmorphism": "Cam Efekti",
+      "beveledButtons": "Kabartmalı Düğmeler",
+      "beveledButtonsHint": "Düğmelere derinlik ve kenarlık ekler",
+      "showBetaBadge": "Beta Rozetini Göster",
+      "showBetaBadgeHint": "Logo yanında BETA çipini göster"
     },
     "shortcutsHint": "İstediğiniz zaman ? tuşuna basarak bunları görüntüleyebilirsiniz.",
     "privacy": {
@@ -621,7 +665,8 @@
     "title": "Klavye Kısayolları",
     "subtitle": "İş akışınıza hızla hakim olun.",
     "closeAriaLabel": "Kısayol modalını kapat",
-    "proTip": "İpucu: Sürüklerken seçim kutusu etkinleştirmek için <key>?</key> tuşunu basılı tutun."  },
+    "proTip": "İpucu: Sürüklerken seçim kutusu etkinleştirmek için <key>?</key> tuşunu basılı tutun."
+  },
   "toolbar": {
     "selectMode": "Seçim Modu (V)",
     "panMode": "Kaydırma Modu (H)",

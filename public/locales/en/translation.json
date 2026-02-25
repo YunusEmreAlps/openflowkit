@@ -19,6 +19,7 @@
     "selectAll": "Select All",
     "duplicate": "Duplicate",
     "duplicateDrag": "Duplicate and Drag",
+    "upload": "Upload",
     "copy": "Copy",
     "paste": "Paste",
     "zoomIn": "Zoom In",
@@ -51,7 +52,10 @@
     "distribute": "Distribute",
     "distributeHorizontally": "Distribute Horizontally",
     "distributeVertically": "Distribute Vertically",
-    "group": "Group"
+    "group": "Group",
+    "export": "Export",
+    "exportDiagram": "Export Diagram",
+    "exportAs": "Export As"
   },
   "nav": {
     "home": "Home",
@@ -115,6 +119,23 @@
     "addNode": "Add Node",
     "deleteNode": "Delete Node",
     "duplicateNode": "Duplicate Node"
+  },
+  "nodes": {
+    "newNode": "New Node",
+    "processStep": "Process Step",
+    "note": "Note",
+    "addCommentsHere": "Add your comments here.",
+    "newSection": "New Section",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "items": "items",
+    "database": "Database",
+    "inputOutput": "Input / Output",
+    "branch": "Branch"
+  },
+  "actions": {
+    "clearCanvasConfirm": "Are you sure you want to clear the canvas?"
   },
   "landing": {
     "nav": {
@@ -223,7 +244,14 @@
     "provider": "AI Provider",
     "model": "Model",
     "apiKey": "API Key",
-    "placeholder": "Describe your flowchart..."
+    "placeholder": "Describe your flowchart...",
+    "settingsSubtitle": "Configure your preferred AI provider, model, and API key below.",
+    "howToGetKey": "How to get your API key",
+    "openConsole": "Open Console",
+    "pasteKeyStep": "Paste it in the field above — never shared with us",
+    "customEndpointTitle": "What is a custom endpoint?",
+    "customModelHint": "Enter the exact model ID for your endpoint",
+    "privacyTitle": "Privacy & Encryption"
   },
   "playback": {
     "title": "Playback",
@@ -253,7 +281,7 @@
     "privacy": "Your diagrams, API keys, and data stay locally on your device.",
     "analytics": "We only count anonymous page visits.",
     "features": {
-      "beautifulByDefault":  "Beautiful by default",
+      "beautifulByDefault": "Beautiful by default",
       "automatedLayouts": "Automated layouts and professional themes.",
       "privateSecure": "Private and Secure",
       "localFirst": "Local-first architecture keeps your data safe."
@@ -589,7 +617,23 @@
       "activeKit": "Active Kit",
       "inactive": "Inactive",
       "setActive": "Set Active",
-      "resetToDefaults": "Reset to Defaults"
+      "resetToDefaults": "Reset to Defaults",
+      "tabIdentity": "Identity",
+      "tabColors": "Colors",
+      "tabType": "Type",
+      "tabUI": "UI & Shape",
+      "appName": "App Name",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "logoStyle": "Logo Style",
+      "fontFamily": "Font Family",
+      "googleFontsHint": "Dynamically loaded from Google Fonts",
+      "cornerRadius": "Corner Radius",
+      "glassmorphism": "Glassmorphism",
+      "beveledButtons": "Beveled Buttons",
+      "beveledButtonsHint": "Add depth and borders to buttons",
+      "showBetaBadge": "Show Beta Badge",
+      "showBetaBadgeHint": "Display the BETA chip next to logo"
     },
     "shortcutsHint": "You can also press ? to view these anytime.",
     "privacy": {
@@ -616,7 +660,8 @@
     "title": "Keyboard Shortcuts",
     "subtitle": "Master your workflow with speed.",
     "closeAriaLabel": "Close shortcuts modal",
-    "proTip": "Pro tip: Hold <key>?</key> to enable selection box while dragging."  },
+    "proTip": "Pro tip: Hold <key>?</key> to enable selection box while dragging."
+  },
   "toolbar": {
     "selectMode": "Select Mode (V)",
     "panMode": "Pan Mode (H)",

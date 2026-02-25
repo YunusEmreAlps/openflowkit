@@ -20,6 +20,7 @@
     "selectAll": "Tümünü Seç",
     "duplicate": "Çoğalt",
     "duplicateDrag": "Çoğalt ve Sürükle",
+    "upload": "Yükle",
     "copy": "Kopyala",
     "paste": "Yapıştır",
     "zoomIn": "Yakınlaştır",
@@ -55,7 +56,10 @@
     "distribute": "Dağıt",
     "distributeHorizontally": "Yatay Dağıt",
     "distributeVertically": "Dikey Dağıt",
-    "group": "Grupla"
+    "group": "Grupla",
+    "export": "Dışa Aktar",
+    "exportDiagram": "Diyagramı Dışa Aktar",
+    "exportAs": "Farklı Dışa Aktar"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -104,7 +108,16 @@
     "mermaid": "Mermaid Olarak Dışa Aktar",
     "plantuml": "PlantUML Olarak Dışa Aktar",
     "openflowdsl": "OpenFlow DSL Olarak Dışa Aktar",
-    "figma": "Figma'ya Aktar"
+    "figma": "Figma'ya Aktar",
+    "exportDiagram": "Diyagramı Dışa Aktar",
+    "exportAs": "Farklı Dışa Aktar",
+    "jsonLabel": "JSON Dosyası",
+    "openflowdslLabel": "{{appName}} DSL",
+    "figmaEditable": "Figma'da Düzenlenebilir",
+    "hintTransparent4K": "Şeffaf (4K)",
+    "hintWhiteBg4K": "Beyaz Arka Plan (4K)",
+    "hintDownload": "İndir",
+    "hintClipboard": "Panoya kopyala"
   },
   "import": {
     "title": "İçe Aktar",
@@ -119,6 +132,23 @@
     "addNode": "Düğüm Ekle",
     "deleteNode": "Düğümü Sil",
     "duplicateNode": "Düğümü Çoğalt"
+  },
+  "nodes": {
+    "newNode": "Yeni Düğüm",
+    "processStep": "İşlem Adımı",
+    "note": "Not",
+    "addCommentsHere": "Yorumlarınızı buraya ekleyin.",
+    "newSection": "Yeni Bölüm",
+    "text": "Metin",
+    "image": "Resim",
+    "group": "Grup",
+    "items": "öğe",
+    "database": "Veritabanı",
+    "inputOutput": "Giriş / Çıkış",
+    "branch": "Dal"
+  },
+  "actions": {
+    "clearCanvasConfirm": "Tuvali temizlemek istediğinizden emin misiniz?"
   },
   "landing": {
     "nav": {
@@ -227,7 +257,14 @@
     "provider": "Yapay Zeka Sağlayıcı",
     "model": "Model",
     "apiKey": "API Anahtarı",
-    "placeholder": "Akış şemanızı açıklayın..."
+    "placeholder": "Akış şemanızı açıklayın...",
+    "settingsSubtitle": "Tercih ettiğiniz yapay zeka sağlayıcısını, modeli ve API anahtarını aşağıdan yapılandırın.",
+    "howToGetKey": "API anahtarı nasıl alınır",
+    "openConsole": "Konsolu Aç",
+    "pasteKeyStep": "Yukarıdaki alana yapıştırın — asla bizimle paylaşılmaz",
+    "customEndpointTitle": "Özel endpoint nedir?",
+    "customModelHint": "Endpoint'iniz için tam model kimliğini girin",
+    "privacyTitle": "Gizlilik ve Şifreleme"
   },
   "playback": {
     "title": "Oynatma",
@@ -393,7 +430,7 @@
     "documentation": "Dokümantasyon",
     "returnToCanvas": "Tuvale Dön",
     "onThisPage": "Bu Sayfada"
-  },  
+  },
   "chatbot": {
     "greeting": "Merhaba, size nasıl yardımcı olabilirim?",
     "tagline": "Akıllı rehberiniz",
@@ -581,6 +618,232 @@
         "custom": {
           "hint": "Herhangi bir OpenAI uyumlu endpoint"
         }
+      },
+      "models": {
+        "gemini": {
+          "gemini-2.5-flash-lite": {
+            "label": "2.5 Flash Lite",
+            "hint": "En hızlı · Ücretsiz katman varsayılanı",
+            "category": "Hız",
+            "badge": "Varsayılan"
+          },
+          "gemini-2.5-flash": {
+            "label": "2.5 Flash",
+            "hint": "En iyi fiyat/performans dengesi",
+            "category": "Hız"
+          },
+          "gemini-2.5-pro": {
+            "label": "2.5 Pro",
+            "hint": "En iyi akıl yürütme · Karmaşık diyagramlar",
+            "category": "Akıl Yürütme"
+          },
+          "gemini-3-flash": {
+            "label": "3 Flash",
+            "hint": "Sınır hızı + zeka",
+            "category": "Önceki",
+            "badge": "Yeni"
+          },
+          "gemini-3-pro": {
+            "label": "3 Pro",
+            "hint": "En güçlü · Çok modlu",
+            "category": "Önceki",
+            "badge": "Yeni"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 mini",
+            "hint": "Hızlı · Maliyet verimli",
+            "category": "Hız",
+            "badge": "Varsayılan"
+          },
+          "gpt-5": {
+            "label": "GPT-5",
+            "hint": "Amiral gemisi · En yetenekli",
+            "category": "Amiral Gemisi"
+          },
+          "gpt-5.2": {
+            "label": "GPT-5.2",
+            "hint": "Son güncelleme · Geliştirilmiş akıl yürütme",
+            "category": "Akıl Yürütme",
+            "badge": "Yeni"
+          },
+          "o4-mini": {
+            "label": "o4-mini",
+            "hint": "Gelişmiş akıl yürütme · Hızlı",
+            "category": "Akıl Yürütme",
+            "badge": "Akıl Yürütme"
+          },
+          "o3": {
+            "label": "o3",
+            "hint": "Derin akıl yürütme · Karmaşık görevler",
+            "category": "Akıl Yürütme",
+            "badge": "Akıl Yürütme"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5",
+            "hint": "En hızlı · En uygun fiyatlı",
+            "category": "Hız"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5",
+            "hint": "Dengeli zeka ve hız",
+            "category": "Amiral Gemisi"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6",
+            "hint": "Son Sonnet · En iyi kodlama",
+            "category": "Amiral Gemisi",
+            "badge": "Varsayılan"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6",
+            "hint": "En zeki · 1M jeton bağlamı",
+            "category": "Akıl Yürütme",
+            "badge": "Amiral Gemisi"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout",
+            "hint": "Ücretsiz katman · Çok hızlı",
+            "category": "Hız",
+            "badge": "Ücretsiz"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick",
+            "hint": "Daha yetenekli · Ücretsiz katman",
+            "category": "Hız",
+            "badge": "Ücretsiz"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen3 32B",
+            "hint": "Gelişmiş akıl yürütme · Araç kullanımı",
+            "category": "Akıl Yürütme"
+          },
+          "llama-3.3-70b-versatile": {
+            "label": "Llama 3.3 70B Versatile",
+            "hint": "Çok yönlü model",
+            "category": "Performans",
+            "badge": "Performans"
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout",
+            "hint": "Verimli · Çok modlu",
+            "category": "Hız"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B",
+            "hint": "Hafif · Görsel-dil · Hızlı",
+            "category": "Hız"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek-V3.2 (685B)",
+            "hint": "Son sürüm · GPT-5 seviyesinde",
+            "category": "Amiral Gemisi",
+            "badge": "Yeni"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B",
+            "hint": "Güçlü akıl yürütme modeli",
+            "category": "Akıl Yürütme"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking",
+            "hint": "Gelişmiş akıl yürütme · Araç kullanımı",
+            "category": "Akıl Yürütme"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT-OSS 120B",
+            "hint": "120B parametre · WSE-3'te hızlı",
+            "category": "Hız",
+            "badge": "Varsayılan"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen3 32B",
+            "hint": "2.403 jeton/sn · Endüstrinin en hızlısı",
+            "category": "Hız",
+            "badge": "🚀 En Hızlı"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen3 235B A22B",
+            "hint": "Amiral gemisi · En iyi kalite",
+            "category": "Amiral Gemisi",
+            "badge": "Amiral Gemisi"
+          },
+          "zai-glm-4.7": {
+            "label": "Zai-GLM 4.7",
+            "hint": "Gelişmiş akıl yürütme · Araç kullanımı",
+            "category": "Akıl Yürütme"
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small",
+            "hint": "Hızlı · Maliyet verimli · 32k bağlam",
+            "category": "Hız",
+            "badge": "Ücretsiz"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium",
+            "hint": "Dengeli kalite-maliyet · En iyi varsayılan",
+            "category": "Amiral Gemisi",
+            "badge": "Varsayılan"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large",
+            "hint": "En yetenekli · 128k bağlam · Amiral gemisi",
+            "category": "Amiral Gemisi",
+            "badge": "Amiral Gemisi"
+          },
+          "codestral-latest": {
+            "label": "Codestral",
+            "hint": "Kod için optimize edilmiş · 256k bağlam",
+            "category": "Kodlama",
+            "badge": "Kod"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large",
+            "hint": "Görsel + akıl yürütme · Çok modlu",
+            "category": "Çok Modlu",
+            "badge": "Görsel"
+          }
+        },
+        "custom": {
+          "custom": {
+            "label": "Özel Model",
+            "hint": "Model kimliğinizi aşağıya girin",
+            "category": "Özel"
+          }
+        }
+      },
+      "byok": {
+        "dataPrivacy": "Verileriniz asla sunucularımızdan geçmez",
+        "control": "Maliyet ve hız sınırları üzerinde tam kontrol",
+        "flexibility": "Yeniden bağlamadan istediğiniz zaman sağlayıcıları değiştirin",
+        "cuttingEdge": "Son teknoloji modellere çıktıkları an erişin"
+      },
+      "customEndpointText": "Herhangi bir <1>OpenAI uyumlu</1> API endpoint'i — yerel veya uzak. Şunlar için harika:",
+      "customEndpointMustSupport": "<1>POST /chat/completions</1> (OpenAI formatı) desteklemelidir",
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama",
+          "hint": "Yerel · Ücretsiz"
+        },
+        "lmStudio": {
+          "name": "LM Studio",
+          "hint": "Yerel · Ücretsiz"
+        },
+        "together": {
+          "name": "Together.ai",
+          "hint": "Bulut · Hızlı"
+        }
       }
     },
     "brand": {
@@ -594,7 +857,23 @@
       "activeKit": "Aktif Kit",
       "inactive": "Pasif",
       "setActive": "Aktif Yap",
-      "resetToDefaults": "Varsayılan Ayarları Sıfırla"
+      "resetToDefaults": "Varsayılan Ayarları Sıfırla",
+      "tabIdentity": "Kimlik",
+      "tabColors": "Renkler",
+      "tabType": "Yazı Tipi",
+      "tabUI": "UI ve Şekil",
+      "appName": "Uygulama Adı",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "logoStyle": "Logo Stili",
+      "fontFamily": "Yazı Tipi Ailesi",
+      "googleFontsHint": "Google Fonts'tan dinamik olarak yüklenir",
+      "cornerRadius": "Köşe Yarıçapı",
+      "glassmorphism": "Cam Efekti",
+      "beveledButtons": "Kabartmalı Düğmeler",
+      "beveledButtonsHint": "Düğmelere derinlik ve kenarlık ekler",
+      "showBetaBadge": "Beta Rozetini Göster",
+      "showBetaBadgeHint": "Logo yanında BETA çipini göster"
     },
     "shortcutsHint": "İstediğiniz zaman ? tuşuna basarak bunları görüntüleyebilirsiniz.",
     "privacy": {
@@ -621,7 +900,8 @@
     "title": "Klavye Kısayolları",
     "subtitle": "İş akışınıza hızla hakim olun.",
     "closeAriaLabel": "Kısayol modalını kapat",
-    "proTip": "İpucu: Sürüklerken seçim kutusu etkinleştirmek için <key>?</key> tuşunu basılı tutun."  },
+    "proTip": "İpucu: Sürüklerken seçim kutusu etkinleştirmek için <key>?</key> tuşunu basılı tutun."
+  },
   "toolbar": {
     "selectMode": "Seçim Modu (V)",
     "panMode": "Kaydırma Modu (H)",

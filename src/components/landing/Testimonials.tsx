@@ -59,7 +59,7 @@ export function Testimonials(): React.ReactElement {
                         </div>
                     </a>
 
-                    {/* Community Card */}
+                    {/* Contributors Card */}
                     <div className="group relative bg-[#111] rounded-2xl p-8 border border-white/5 hover:border-white/20 transition-all duration-300 overflow-hidden flex flex-col justify-between h-[340px]">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/10 rounded-full blur-[60px] -mr-16 -mt-16 transition-opacity opacity-0 group-hover:opacity-20"></div>
 
@@ -67,6 +67,7 @@ export function Testimonials(): React.ReactElement {
                             <div className="w-12 h-12 rounded-xl bg-brand-blue/10 flex items-center justify-center border border-brand-blue/20 group-hover:scale-110 transition-transform">
                                 <Users className="w-5 h-5 text-brand-blue" />
                             </div>
+                            <span className="text-[10px] font-mono text-white/30 border border-white/10 px-2 py-1 rounded bg-white/5">Contributors</span>
                         </div>
 
                         <div>
@@ -76,14 +77,24 @@ export function Testimonials(): React.ReactElement {
                             </p>
 
                             <div className="flex items-center -space-x-3">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#111] bg-white/10 overflow-hidden relative z-0 hover:z-10 transition-transform hover:scale-110">
+                                {[
+                                    { login: 'Vrun-design', name: 'Varun' },
+                                    { login: 'YunusEmreAlps', name: 'Yunus Emre' },
+                                ].map((c) => (
+                                    <a
+                                        key={c.login}
+                                        href={`https://github.com/${c.login}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        title={c.name}
+                                        className="w-10 h-10 rounded-full border-2 border-[#111] overflow-hidden relative z-0 hover:z-10 transition-transform hover:scale-110 block"
+                                    >
                                         <img
-                                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 14}`}
-                                            alt="Avatar"
+                                            src={`https://github.com/${c.login}.png?size=80`}
+                                            alt={c.name}
                                             className="w-full h-full object-cover bg-white/5"
                                         />
-                                    </div>
+                                    </a>
                                 ))}
                                 <div className="w-10 h-10 rounded-full border-2 border-[#111] bg-[#222] flex items-center justify-center text-[10px] text-white font-medium z-0">
                                     +You

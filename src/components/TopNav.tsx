@@ -101,14 +101,14 @@ export const TopNav: React.FC<TopNavProps> = ({
                             <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setIsMenuOpen(false)} />
                             <div className="absolute top-full left-0 mt-3 w-56 bg-white/90 backdrop-blur-xl rounded-[var(--radius-lg)] shadow-2xl border border-white/50 ring-1 ring-black/5 p-2 flex flex-col gap-1 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
                                 <div className="px-3 py-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                    {t('menu.title', 'Menu')}
+                                    {t('nav.menu', 'Menu')}
                                 </div>
                                 <button
                                     onClick={() => { onGoHome(); setIsMenuOpen(false); }}
                                     className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-600 hover:bg-[var(--brand-primary-50)] hover:text-[var(--brand-primary)] rounded-[var(--radius-sm)] transition-all font-medium"
                                 >
                                     <Home className="w-4 h-4" />
-                                    {t('menu.goToDashboard', 'Go to Dashboard')}
+                                    {t('nav.goToDashboard', 'Go to Dashboard')}
                                 </button>
                                 <div className="my-1 border-t border-slate-100" />
                                 <button
@@ -116,7 +116,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                                     className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-600 hover:bg-[var(--brand-primary-50)] hover:text-[var(--brand-primary)] rounded-[var(--radius-sm)] transition-all"
                                 >
                                     <Settings className="w-4 h-4" />
-                                    {t('menu.canvasSettings', 'Canvas Settings')}
+                                    {t('nav.canvasSettings', 'Canvas Settings')}
                                 </button>
 
                             </div>
@@ -150,9 +150,9 @@ export const TopNav: React.FC<TopNavProps> = ({
                                         />
                                     </div>
                                 ) : (
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-primary-50)] rounded-[var(--radius-md)] border border-[var(--brand-primary-100)] opacity-80 hover:opacity-100 transition-opacity cursor-help" title={t('menu.uploadWideLogo', 'Upload a wide logo in Brand Settings to see it here')}>
+                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-primary-50)] rounded-[var(--radius-md)] border border-[var(--brand-primary-100)] opacity-80 hover:opacity-100 transition-opacity cursor-help" title={t('nav.uploadWideLogo', 'Upload a wide logo in Brand Settings to see it here')}>
                                         <OpenFlowLogo className="w-4 h-4" />
-                                        <span className="text-xs font-semibold whitespace-nowrap">{t('menu.wideLogo', 'Your Wide Logo')}</span>
+                                        <span className="text-xs font-semibold whitespace-nowrap">{t('nav.wideLogo', 'Your Wide Logo')}</span>
                                     </div>
                                 )}
                             </div>
@@ -168,7 +168,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                         {/* BETA Chip */}
                         {(brandConfig.ui.showBeta ?? true) && (
                             <div className="flex items-center justify-center px-1.5 py-0.5 rounded-full bg-[var(--brand-primary-50)] border border-[var(--brand-primary-200)]">
-                                <span className="text-[10px] font-extrabold text-[var(--brand-primary)] tracking-widest leading-none">{t('menu.beta', 'BETA')}</span>
+                                <span className="text-[10px] font-extrabold text-[var(--brand-primary)] tracking-widest leading-none">{t('nav.beta', 'BETA')}</span>
                             </div>
                         )}
                     </div>

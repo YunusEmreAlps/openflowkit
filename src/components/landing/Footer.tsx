@@ -22,7 +22,21 @@ export function Footer({ onLaunch }: FooterProps): React.ReactElement {
           <span className="text-brand-secondary text-xs font-medium">{t('footer.mitLicensed')}</span>
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
+          <a
+            href="https://www.producthunt.com/products/openflowkit?embed=true&utm_source=badge-top-post-topic-badge&utm_medium=badge&utm_campaign=badge-openflowkit"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:block hover:opacity-90 transition-opacity"
+          >
+            <img
+              alt="Product Hunt"
+              width="180"
+              height="39"
+              src="https://api.producthunt.com/widgets/embed-image/v1/top-post-topic-badge.svg?post_id=1081019&theme=light&period=weekly&topic_id=44&t=1772031326630"
+              className="h-8 w-auto"
+            />
+          </a>
           <a href="https://github.com/Vrun-design/FlowMind" target="_blank" rel="noreferrer" className="text-brand-secondary hover:text-brand-primary transition-colors group" aria-label="GitHub">
             <Github className="w-4 h-4 group-hover:scale-110 transition-transform" />
           </a>

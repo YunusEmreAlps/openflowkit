@@ -153,13 +153,15 @@ function BrandListView({ onSelect }: BrandListViewProps): React.ReactElement {
     );
 }
 
-// Tab definitions for the editor
-const EDITOR_TABS: { id: EditorTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'identity', label: 'Identity', icon: <Box className="w-3.5 h-3.5" /> },
-    { id: 'colors', label: 'Colors', icon: <Palette className="w-3.5 h-3.5" /> },
-    { id: 'typography', label: 'Type', icon: <Type className="w-3.5 h-3.5" /> },
-    { id: 'ui', label: 'UI & Shape', icon: <LayoutTemplate className="w-3.5 h-3.5" /> },
-];
+// Tab definitions for the editor — labels resolved at render time via t()
+function editorTabs(t: (k: string) => string): { id: EditorTab; label: string; icon: React.ReactNode }[] {
+    return [
+        { id: 'identity', label: t('settingsModal.brand.tabIdentity'), icon: <Box className="w-3.5 h-3.5" /> },
+        { id: 'colors', label: t('settingsModal.brand.tabColors'), icon: <Palette className="w-3.5 h-3.5" /> },
+        { id: 'typography', label: t('settingsModal.brand.tabType'), icon: <Type className="w-3.5 h-3.5" /> },
+        { id: 'ui', label: t('settingsModal.brand.tabUI'), icon: <LayoutTemplate className="w-3.5 h-3.5" /> },
+    ];
+}
 
 // --- Editor View ---
 function BrandEditorView({ kitId, onBack }: BrandEditorViewProps): React.ReactElement {
@@ -234,7 +236,7 @@ function BrandEditorView({ kitId, onBack }: BrandEditorViewProps): React.ReactEl
 
             {/* Tabs */}
             <div className="flex p-2 gap-1 bg-white border-b border-slate-100 overflow-x-auto">
-                {EDITOR_TABS.map(tab => (
+                {editorTabs(t).map(tab => (
                     <TabButton
                         key={tab.id}
                         active={activeTab === tab.id}
@@ -264,6 +266,7 @@ interface ImageUploadFieldProps {
 }
 
 function ImageUploadField({ label, previewUrl, previewSize, placeholder, fieldKey, update }: ImageUploadFieldProps): React.ReactElement {
+    const { t } = useTranslation();
     const previewClass = previewSize === 'lg' ? 'w-20 h-20' : 'w-10 h-10';
 
     function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -286,7 +289,7 @@ function ImageUploadField({ label, previewUrl, previewSize, placeholder, fieldKe
                 </div>
                 <div className="space-y-2">
                     <label className="block">
-                        <span className="sr-only">Upload {label}</span>
+                        <span className="sr-only">{t('common.upload')} {label}</span>
                         <input
                             type="file"
                             className="block w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[var(--brand-primary)]/10 file:text-[var(--brand-primary)] hover:file:bg-[var(--brand-primary)]/20"
@@ -295,7 +298,7 @@ function ImageUploadField({ label, previewUrl, previewSize, placeholder, fieldKe
                     </label>
                     {previewUrl && (
                         <button onClick={() => update({ [fieldKey]: null })} className="text-xs text-red-500 hover:underline">
-                            Remove {label}
+                            {t('common.delete')} {label}
                         </button>
                     )}
                 </div>
@@ -306,15 +309,16 @@ function ImageUploadField({ label, previewUrl, previewSize, placeholder, fieldKe
 
 // --- Identity Editor ---
 function IdentityEditor({ config, update }: EditorProps): React.ReactElement {
+    const { t } = useTranslation();
     return (
         <div className="space-y-6">
             <div className="space-y-3">
-                <Label>App Name</Label>
+                <Label>{t('settingsModal.brand.appName')}</Label>
                 <Input value={config.appName} onChange={e => update({ appName: e.target.value })} />
             </div>
 
             <ImageUploadField
-                label="Logo"
+                label={t('settingsModal.brand.logo')}
                 previewUrl={config.logoUrl}
                 previewSize="lg"
                 placeholder={<Upload className="text-slate-300" />}
@@ -323,7 +327,7 @@ function IdentityEditor({ config, update }: EditorProps): React.ReactElement {
             />
 
             <ImageUploadField
-                label="Favicon"
+                label={t('settingsModal.brand.favicon')}
                 previewUrl={config.faviconUrl}
                 previewSize="sm"
                 placeholder={<ExternalLink className="text-slate-300 w-4 h-4" />}
@@ -332,7 +336,7 @@ function IdentityEditor({ config, update }: EditorProps): React.ReactElement {
             />
 
             <div className="space-y-3">
-                <Label>Logo Style</Label>
+                <Label>{t('settingsModal.brand.logoStyle')}</Label>
                 <div className="flex bg-slate-100 p-1 rounded-lg">
                     {(['both', 'icon', 'wide', 'text'] as const).map((s) => (
                         <button
@@ -368,10 +372,11 @@ function ColorsEditor({ config, update }: EditorProps): React.ReactElement {
 }
 
 function TypographyEditor({ config, update }: EditorProps): React.ReactElement {
+    const { t } = useTranslation();
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <Label>Font Family</Label>
+                <Label>{t('settingsModal.brand.fontFamily')}</Label>
                 <select
                     value={config.typography.fontFamily}
                     onChange={e => update({ typography: { ...config.typography, fontFamily: e.target.value } })}
@@ -386,30 +391,31 @@ function TypographyEditor({ config, update }: EditorProps): React.ReactElement {
                     <option value="Playfair Display">Playfair Display</option>
                     <option value="Outfit">Outfit</option>
                 </select>
-                <p className="text-[10px] text-slate-400">Dynamically loaded from Google Fonts</p>
+                <p className="text-[10px] text-slate-400">{t('settingsModal.brand.googleFontsHint')}</p>
             </div>
         </div>
     );
 }
 
 function UIEditor({ config, update }: EditorProps): React.ReactElement {
+    const { t } = useTranslation();
     return (
         <div className="space-y-6">
             <Slider
-                label={`Corner Radius: ${config.shape.radius}px`}
+                label={`${t('settingsModal.brand.cornerRadius')}: ${config.shape.radius}px`}
                 min={0} max={24} value={config.shape.radius}
                 onChange={e => update({ shape: { ...config.shape, radius: Number(e.target.value) } })}
             />
 
             <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
-                <span className="text-sm font-medium text-slate-700">Glassmorphism</span>
+                <span className="text-sm font-medium text-slate-700">{t('settingsModal.brand.glassmorphism')}</span>
                 <Switch checked={config.ui.glassmorphism} onCheckedChange={c => update({ ui: { ...config.ui, glassmorphism: c } })} />
             </div>
 
             <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
                 <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-700">Beveled Buttons</span>
-                    <span className="text-[10px] text-slate-500">Add depth and borders to buttons</span>
+                    <span className="text-sm font-medium text-slate-700">{t('settingsModal.brand.beveledButtons')}</span>
+                    <span className="text-[10px] text-slate-500">{t('settingsModal.brand.beveledButtonsHint')}</span>
                 </div>
                 <Switch
                     checked={config.ui.buttonStyle === 'beveled'}
@@ -419,8 +425,8 @@ function UIEditor({ config, update }: EditorProps): React.ReactElement {
 
             <div className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg">
                 <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-700">Show Beta Badge</span>
-                    <span className="text-[10px] text-slate-500">Display the BETA chip next to logo</span>
+                    <span className="text-sm font-medium text-slate-700">{t('settingsModal.brand.showBetaBadge')}</span>
+                    <span className="text-[10px] text-slate-500">{t('settingsModal.brand.showBetaBadgeHint')}</span>
                 </div>
                 <Switch
                     checked={config.ui.showBeta ?? true}

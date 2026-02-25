@@ -1,10 +1,16 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import Backend from 'i18next-http-backend';
+
+import enTranslation from './locales/en/translation.json';
+import trTranslation from './locales/tr/translation.json';
+import deTranslation from './locales/de/translation.json';
+import frTranslation from './locales/fr/translation.json';
+import esTranslation from './locales/es/translation.json';
+import zhTranslation from './locales/zh/translation.json';
+import jaTranslation from './locales/ja/translation.json';
 
 i18n
-  .use(Backend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -13,8 +19,14 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-    backend: {
-      loadPath: '/locales/{{lng}}/translation.json',
+    resources: {
+      en: { translation: enTranslation },
+      tr: { translation: trTranslation },
+      de: { translation: deTranslation },
+      fr: { translation: frTranslation },
+      es: { translation: esTranslation },
+      zh: { translation: zhTranslation },
+      ja: { translation: jaTranslation },
     },
     detection: {
       order: ['localStorage', 'navigator'],

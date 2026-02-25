@@ -19,6 +19,7 @@
     "selectAll": "Select All",
     "duplicate": "Duplicate",
     "duplicateDrag": "Duplicate and Drag",
+    "upload": "Upload",
     "copy": "Copy",
     "paste": "Paste",
     "zoomIn": "Zoom In",
@@ -51,7 +52,10 @@
     "distribute": "Distribute",
     "distributeHorizontally": "Distribute Horizontally",
     "distributeVertically": "Distribute Vertically",
-    "group": "Group"
+    "group": "Group",
+    "export": "Export",
+    "exportDiagram": "Export Diagram",
+    "exportAs": "Export As"
   },
   "nav": {
     "home": "Home",
@@ -99,8 +103,17 @@
     "json": "Export as JSON",
     "mermaid": "Export as Mermaid",
     "plantuml": "Export as PlantUML",
-    "openflowdsl": "Export as OpenFlow DSL",
-    "figma": "Export to Figma"
+    "openflowdsl": "Export as {{appName}} DSL",
+    "figma": "Export to Figma",
+    "exportDiagram": "Export Diagram",
+    "exportAs": "Export As",
+    "jsonLabel": "JSON File",
+    "openflowdslLabel": "{{appName}} DSL",
+    "figmaEditable": "Figma Editable",
+    "hintTransparent4K": "Transparent (4K)",
+    "hintWhiteBg4K": "White Background (4K)",
+    "hintDownload": "Download",
+    "hintClipboard": "Copy to clipboard"
   },
   "import": {
     "title": "Import",
@@ -115,6 +128,23 @@
     "addNode": "Add Node",
     "deleteNode": "Delete Node",
     "duplicateNode": "Duplicate Node"
+  },
+  "nodes": {
+    "newNode": "New Node",
+    "processStep": "Process Step",
+    "note": "Note",
+    "addCommentsHere": "Add your comments here.",
+    "newSection": "New Section",
+    "text": "Text",
+    "image": "Image",
+    "group": "Group",
+    "items": "items",
+    "database": "Database",
+    "inputOutput": "Input / Output",
+    "branch": "Branch"
+  },
+  "actions": {
+    "clearCanvasConfirm": "Are you sure you want to clear the canvas?"
   },
   "landing": {
     "nav": {
@@ -223,7 +253,14 @@
     "provider": "AI Provider",
     "model": "Model",
     "apiKey": "API Key",
-    "placeholder": "Describe your flowchart..."
+    "placeholder": "Describe your flowchart...",
+    "settingsSubtitle": "Configure your preferred AI provider, model, and API key below.",
+    "howToGetKey": "How to get your API key",
+    "openConsole": "Open Console",
+    "pasteKeyStep": "Paste it in the field above — never shared with us",
+    "customEndpointTitle": "What is a custom endpoint?",
+    "customModelHint": "Enter the exact model ID for your endpoint",
+    "privacyTitle": "Privacy & Encryption"
   },
   "playback": {
     "title": "Playback",
@@ -253,7 +290,7 @@
     "privacy": "Your diagrams, API keys, and data stay locally on your device.",
     "analytics": "We only count anonymous page visits.",
     "features": {
-      "beautifulByDefault":  "Beautiful by default",
+      "beautifulByDefault": "Beautiful by default",
       "automatedLayouts": "Automated layouts and professional themes.",
       "privateSecure": "Private and Secure",
       "localFirst": "Local-first architecture keeps your data safe."
@@ -576,6 +613,232 @@
         "custom": {
           "hint": "Any OpenAI-compatible endpoint"
         }
+      },
+      "models": {
+        "gemini": {
+          "gemini-2.5-flash-lite": {
+            "label": "2.5 Flash Lite",
+            "hint": "Fastest · Free tier default",
+            "category": "Speed",
+            "badge": "Default"
+          },
+          "gemini-2.5-flash": {
+            "label": "2.5 Flash",
+            "hint": "Best price/performance balance",
+            "category": "Speed"
+          },
+          "gemini-2.5-pro": {
+            "label": "2.5 Pro",
+            "hint": "Best reasoning · Complex diagrams",
+            "category": "Reasoning"
+          },
+          "gemini-3-flash": {
+            "label": "3 Flash",
+            "hint": "Frontier speed + intelligence",
+            "category": "Legacy",
+            "badge": "New"
+          },
+          "gemini-3-pro": {
+            "label": "3 Pro",
+            "hint": "Most powerful · Multimodal",
+            "category": "Legacy",
+            "badge": "New"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 mini",
+            "hint": "Fast · Cost-efficient",
+            "category": "Speed",
+            "badge": "Default"
+          },
+          "gpt-5": {
+            "label": "GPT-5",
+            "hint": "Flagship model · Most capable",
+            "category": "Flagship"
+          },
+          "gpt-5.2": {
+            "label": "GPT-5.2",
+            "hint": "Latest update · Improved reasoning",
+            "category": "Reasoning",
+            "badge": "New"
+          },
+          "o4-mini": {
+            "label": "o4-mini",
+            "hint": "Advanced reasoning · Fast",
+            "category": "Reasoning",
+            "badge": "Reasoning"
+          },
+          "o3": {
+            "label": "o3",
+            "hint": "Deep reasoning · Complex tasks",
+            "category": "Reasoning",
+            "badge": "Reasoning"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5",
+            "hint": "Fastest · Most affordable",
+            "category": "Speed"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5",
+            "hint": "Balanced intelligence & speed",
+            "category": "Flagship"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6",
+            "hint": "Latest Sonnet · Best coding",
+            "category": "Flagship",
+            "badge": "Default"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6",
+            "hint": "Most intelligent · 1M token context",
+            "category": "Reasoning",
+            "badge": "Flagship"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout",
+            "hint": "Free tier · Very fast",
+            "category": "Speed",
+            "badge": "Free"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick",
+            "hint": "More capable · Free tier",
+            "category": "Speed",
+            "badge": "Free"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen3 32B",
+            "hint": "Advanced reasoning · Tool use",
+            "category": "Reasoning"
+          },
+          "llama-3.3-70b-versatile": {
+            "label": "Llama 3.3 70B Versatile",
+            "hint": "Versatile model",
+            "category": "Performance",
+            "badge": "Performance"
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout",
+            "hint": "Efficient · Multi-modal",
+            "category": "Speed"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B",
+            "hint": "Lightweight · Vision-language · Fast",
+            "category": "Speed"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek-V3.2 (685B)",
+            "hint": "Latest · GPT-5 comparable",
+            "category": "Flagship",
+            "badge": "New"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B",
+            "hint": "Strong reasoning model",
+            "category": "Reasoning"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking",
+            "hint": "Advanced reasoning · Tool use",
+            "category": "Reasoning"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT-OSS 120B",
+            "hint": "120B params · Fast on WSE-3",
+            "category": "Speed",
+            "badge": "Default"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen3 32B",
+            "hint": "2,403 tok/s · Industry fastest",
+            "category": "Speed",
+            "badge": "🚀 Fastest"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen3 235B A22B",
+            "hint": "Flagship · Best quality",
+            "category": "Flagship",
+            "badge": "Flagship"
+          },
+          "zai-glm-4.7": {
+            "label": "Zai-GLM 4.7",
+            "hint": "Advanced reasoning · Tool use",
+            "category": "Reasoning"
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small",
+            "hint": "Fast · Cost-efficient · 32k context",
+            "category": "Speed",
+            "badge": "Free"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium",
+            "hint": "Balanced quality-cost · Best default",
+            "category": "Flagship",
+            "badge": "Default"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large",
+            "hint": "Most capable · 128k context · Flagship",
+            "category": "Flagship",
+            "badge": "Flagship"
+          },
+          "codestral-latest": {
+            "label": "Codestral",
+            "hint": "Code-optimized · 256k context",
+            "category": "Coding",
+            "badge": "Code"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large",
+            "hint": "Vision + reasoning · Multimodal",
+            "category": "Multimodal",
+            "badge": "Vision"
+          }
+        },
+        "custom": {
+          "custom": {
+            "label": "Custom Model",
+            "hint": "Enter your model ID below",
+            "category": "Custom"
+          }
+        }
+      },
+      "byok": {
+        "dataPrivacy": "Your data never passes through our servers",
+        "control": "Full control over cost and rate limits",
+        "flexibility": "Switch providers anytime without re-linking",
+        "cuttingEdge": "Access cutting-edge models as soon as they launch"
+      },
+      "customEndpointText": "Any <1>OpenAI-compatible</1> API endpoint — local or remote. Great for:",
+      "customEndpointMustSupport": "Must support <1>POST /chat/completions</1> (OpenAI format)",
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama",
+          "hint": "Local · Free"
+        },
+        "lmStudio": {
+          "name": "LM Studio",
+          "hint": "Local · Free"
+        },
+        "together": {
+          "name": "Together.ai",
+          "hint": "Cloud · Fast"
+        }
       }
     },
     "brand": {
@@ -589,7 +852,23 @@
       "activeKit": "Active Kit",
       "inactive": "Inactive",
       "setActive": "Set Active",
-      "resetToDefaults": "Reset to Defaults"
+      "resetToDefaults": "Reset to Defaults",
+      "tabIdentity": "Identity",
+      "tabColors": "Colors",
+      "tabType": "Type",
+      "tabUI": "UI & Shape",
+      "appName": "App Name",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "logoStyle": "Logo Style",
+      "fontFamily": "Font Family",
+      "googleFontsHint": "Dynamically loaded from Google Fonts",
+      "cornerRadius": "Corner Radius",
+      "glassmorphism": "Glassmorphism",
+      "beveledButtons": "Beveled Buttons",
+      "beveledButtonsHint": "Add depth and borders to buttons",
+      "showBetaBadge": "Show Beta Badge",
+      "showBetaBadgeHint": "Display the BETA chip next to logo"
     },
     "shortcutsHint": "You can also press ? to view these anytime.",
     "privacy": {
@@ -616,7 +895,8 @@
     "title": "Keyboard Shortcuts",
     "subtitle": "Master your workflow with speed.",
     "closeAriaLabel": "Close shortcuts modal",
-    "proTip": "Pro tip: Hold <key>?</key> to enable selection box while dragging."  },
+    "proTip": "Pro tip: Hold <key>?</key> to enable selection box while dragging."
+  },
   "toolbar": {
     "selectMode": "Select Mode (V)",
     "panMode": "Pan Mode (H)",

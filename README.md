@@ -3,13 +3,14 @@
 ![OpenFlowKit](https://img.shields.io/badge/OpenFlowKit-Diagram_As_Code-indigo?style=for-the-badge&logo=github)
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=for-the-badge&logo=typescript)
+![i18n](https://img.shields.io/badge/i18n-EN%20%7C%20TR-blueviolet?style=for-the-badge&logo=globe)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 [![Product Hunt](https://img.shields.io/badge/Product_Hunt-Launched-orange?style=for-the-badge&logo=product-hunt)](https://www.producthunt.com/products/openflowkit)
 
 **The Open-Source, White-Label Diagramming Engine.**  
 Built for developers and technical teams who want diagrams that actually look good. **100% Free & MIT Licensed.**
 
-OpenFlowKit is a professional-grade canvas that combines the power of **React Flow**, **Diagram-as-Code**, and **AI generation** into one privacy-first, fully white-labelable tool.
+OpenFlowKit is a professional-grade canvas that combines the power of **React Flow**, **Diagram-as-Code**, and **AI generation** into one privacy-first, fully white-labelable tool — now with full **internationalization support**.
 
 ![OpenFlowKit Canvas](public/readme/1.png)
 
@@ -19,9 +20,11 @@ OpenFlowKit is a professional-grade canvas that combines the power of **React Fl
 - [Flowpilot — AI Generation](#-flowpilot--ai-diagram-generation)
 - [Node Types](#-node-types)
 - [Export Formats](#-export-formats)
+- [Internationalization](#-internationalization-i18n)
 - [Architecture](#-architecture--project-structure)
 - [Getting Started](#-getting-started)
 - [Extensibility & Self-Hosting](#-extensibility--self-hosting)
+- [Contributors](#-contributors)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -35,6 +38,7 @@ OpenFlowKit is a professional-grade canvas that combines the power of **React Fl
 - **High-Fidelity UX**: Glassmorphism, smooth animations, and CAD-inspired aesthetics out of the box.
 - **Privacy First**: Local-first architecture. Your data never leaves your device.
 - **BYOK AI**: Bring your own API key for 7 providers — Gemini, OpenAI, Claude, Groq, NVIDIA, Cerebras, Mistral, or any custom OpenAI-compatible endpoint.
+- **Fully Internationalized**: Complete i18n support with English and Turkish — language persists across navigation via localStorage.
 
 ---
 
@@ -48,6 +52,15 @@ Don't just embed a tool—embed **your brand**. Our engine generates harmonious 
 - **Design System Panel**: Fine-tune glassmorphism, corner radii, border weights, node padding, and edge styles from a unified panel.
 
 ![White-Label Brand Engine](public/readme/5.png)
+
+### 🌍 Internationalization (i18n)
+Full multi-language support powered by **react-i18next**:
+
+- **Languages**: English (full) · Turkish (full) · German, French, Spanish, Chinese, Japanese (UI-only)
+- **Persistent Selection**: Chosen language saves to `localStorage` and restores on every page load/navigation — no resets.
+- **Bundled Translations**: All translation files are imported at build time (no runtime HTTP fetches that could fail) ensuring instant availability.
+- **Scope**: Every UI surface is translated — node properties, edge operations, dialogs, toolbar, navigation, settings, documentation, and more.
+- **Language Selector**: Globe icon in the nav bar — switch languages live without a page reload.
 
 ### 🤖 Flowpilot — AI Diagram Generation
 Generate entire diagrams from a text prompt. Bring your own API key — your key never leaves your device.
@@ -164,6 +177,47 @@ Every standard node supports:
 
 ---
 
+## 🌍 Internationalization (i18n)
+
+OpenFlowKit ships with a production-ready i18n system built on **react-i18next**.
+
+### Supported Languages
+
+| Language | Code | Coverage | Status |
+|----------|------|----------|--------|
+| English | `en` | Full app + docs | ✅ Complete |
+| Turkish | `tr` | Full app + docs | ✅ Complete |
+| German | `de` | UI only | 🔄 Partial |
+| French | `fr` | UI only | 🔄 Partial |
+| Spanish | `es` | UI only | 🔄 Partial |
+| Chinese | `zh` | UI only | 🔄 Partial |
+| Japanese | `ja` | UI only | 🔄 Partial |
+
+### How It Works
+
+- **Bundled at build time**: Translations are imported as JSON modules — no runtime fetches, no 404s, no fallbacks.
+- **Language detection order**: `localStorage` → browser `navigator` language.
+- **Persistence**: Your selection writes to `localStorage` under the key `i18nextLng` and is restored on every page navigation.
+- **Live switching**: The `LanguageSelector` component switches languages without any page reload.
+- **Translation files**: Located in `src/i18n/locales/{lang}/translation.json`.
+
+### Adding a New Language
+
+```bash
+# 1. Copy the English base file
+cp src/i18n/locales/en/translation.json src/i18n/locales/de/translation.json
+
+# 2. Translate the values (keys stay in English)
+
+# 3. Register in config
+# src/i18n/config.ts → add: import deTranslation from './locales/de/translation.json';
+#                            resources: { de: { translation: deTranslation } }
+
+# 4. Add to LANGUAGES array in LanguageSelector.tsx
+```
+
+---
+
 ## 🏗️ Architecture & Project Structure
 
 Built for performance and extensibility:
@@ -172,6 +226,7 @@ Built for performance and extensibility:
 - **State**: [Zustand](https://zustand-demo.pmnd.rs/) for high-performance persistence
 - **Language**: [TypeScript 5.8](https://www.typescriptlang.org/) — strict, zero type errors
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) + CSS Design Tokens
+- **i18n**: [react-i18next](https://react.i18next.com/) + bundled JSON translations
 
 ### Project Map
 
@@ -195,19 +250,29 @@ OpenFlowKit/
 │   │   ├── ExportMenu.tsx       # Export format picker
 │   │   ├── CommandBar.tsx       # Spotlight-style command palette
 │   │   ├── PlaybackControls.tsx # Presentation mode controls
+│   │   ├── LanguageSelector.tsx # Live language switcher (EN/TR/…)
 │   │   ├── HomePage.tsx         # File management & Dashboard
 │   │   └── WelcomeModal.tsx     # User onboarding
 │   ├── hooks/
-│   │   ├── useAIGeneration.ts   # Flowpilot AI integration
-│   │   ├── useBrandTheme.ts     # Dynamic branding injection
-│   │   ├── useDesignSystem.ts   # Design system token access
-│   │   ├── useFlowHistory.ts    # Undo/Redo operations
-│   │   ├── useFlowExport.ts     # SVG/PNG/JPG export
-│   │   ├── usePlayback.ts       # Presentation mode logic
+│   │   ├── useFlowOperations.ts   # Composed flow operations (i18n-aware)
+│   │   ├── useNodeOperations.ts   # Node add/delete/duplicate (i18n-aware)
+│   │   ├── useEdgeOperations.ts   # Edge connect/delete (i18n-aware)
+│   │   ├── useLayoutOperations.ts # Align/Distribute/Group (i18n-aware)
+│   │   ├── useAIGeneration.ts     # Flowpilot AI integration
+│   │   ├── useBrandTheme.ts       # Dynamic branding injection
+│   │   ├── useDesignSystem.ts     # Design system token access
+│   │   ├── useFlowHistory.ts      # Undo/Redo operations
+│   │   ├── useFlowExport.ts       # SVG/PNG/JPG export
+│   │   ├── usePlayback.ts         # Presentation mode logic
 │   │   ├── useKeyboardShortcuts.ts # Hotkey bindings
-│   │   ├── useAutoSave.ts       # Persistence & LocalStorage
-│   │   ├── useSnapshots.ts      # Version history management
+│   │   ├── useAutoSave.ts         # Persistence & LocalStorage
+│   │   ├── useSnapshots.ts        # Version history management
 │   │   └── useClipboardOperations.ts # Copy/Paste with offset
+│   ├── i18n/
+│   │   ├── config.ts            # react-i18next setup (bundled imports)
+│   │   └── locales/
+│   │       ├── en/translation.json  # English (full coverage)
+│   │       └── tr/translation.json  # Turkish (full coverage)
 │   ├── lib/
 │   │   ├── mermaidParser.ts     # Mermaid.js → nodes/edges
 │   │   ├── flowmindDSLParserV2.ts # OpenFlow DSL V2 parser
@@ -225,7 +290,9 @@ OpenFlowKit/
 │   │   └── templates.ts         # 5 starter templates
 │   ├── store.ts                 # Global Zustand state
 │   └── theme.ts                 # Color palettes & design tokens
-├── docs/                        # Documentation source files
+├── docs/
+│   ├── en/                      # English documentation
+│   └── tr/                      # Turkish documentation
 ├── public/                      # Static assets & provider logos
 └── index.css                    # Tailwind & custom styling
 ```
@@ -277,14 +344,47 @@ The AI layer (`useAIGeneration.ts`) and provider client (`geminiService.ts`) are
    Go to **Settings → Flowpilot**, select your provider, and paste your API key.  
    Your key is stored locally — never sent to our servers.
 
+4. **Run tests**
+   ```bash
+   npm test
+   ```
+
+---
+
+## 👥 Contributors
+
+Thanks to everyone who has contributed to OpenFlowKit!
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Vrun-design">
+        <img src="https://github.com/Vrun-design.png" width="80" height="80" style="border-radius:50%" alt="Varun"/><br />
+        <sub><b>Varun</b></sub>
+      </a><br />
+      <sub>Creator & Maintainer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/YunusEmreAlps">
+        <img src="https://github.com/YunusEmreAlps.png" width="80" height="80" style="border-radius:50%" alt="Yunus Emre Alpu&#351;"/><br />
+        <sub><b>Yunus Emre Alpu&#351;</b></sub>
+      </a><br />
+      <sub>i18n · Turkish Localization</sub>
+    </td>
+  </tr>
+</table>
+
+Want to see your name here? Check out our [Contributing](#-contributing) guide — PRs are always welcome!
+
 ---
 
 ## 🤝 Contributing
 
-We are building the open standard for diagramming. PRs for new Mermaid features, node types, or AI optimizations are welcome!
+We are building the open standard for diagramming. PRs for new Mermaid features, node types, AI optimizations, or new language translations are welcome!
 
 - **Found a bug?** Open an issue.
 - **Want a feature?** Start a discussion or open a PR.
+- **Want to add a language?** See the [Adding a New Language](#adding-a-new-language) section.
 - **Love the tool?** ⭐ **Star this repo!** It helps us reach more developers.
 
 ---

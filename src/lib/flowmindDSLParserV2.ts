@@ -221,7 +221,7 @@ export function parseFlowMindDSL(input: string): DSLResult {
     // 1. Process explicit nodes
     dslNodes.forEach((n) => {
         // Layout placeholder (will be handled by ELK layout)
-        finalNodes.push({
+        const node: Node & { parentId?: string } = {
             id: n.id,
             type: n.type,
             position: { x: 0, y: 0 },
@@ -230,8 +230,10 @@ export function parseFlowMindDSL(input: string): DSLResult {
                 ...n.attributes
             },
             parentNode: n.parentId,
-            extent: n.parentId ? 'parent' : undefined
-        });
+            extent: n.parentId ? 'parent' : undefined,
+        };
+        if (n.parentId) node.parentId = n.parentId;
+        finalNodes.push(node);
         createdNodeIds.add(n.id);
     });
 

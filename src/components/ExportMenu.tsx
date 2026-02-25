@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Download, Image, FileJson, GitBranch, FileCode, Wand2, X, Figma } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useFlowStore } from '../store';
 import { Tooltip } from './Tooltip';
 import { Button } from './ui/Button';
@@ -25,15 +26,17 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
+    const { t } = useTranslation();
+
     const exportOptions = useMemo(() => [
-        { key: 'png', label: 'Export PNG', hint: 'Transparent (4K)', Icon: Image },
-        { key: 'jpeg', label: 'Export JPG', hint: 'White Background (4K)', Icon: Image },
-        { key: 'json', label: 'JSON File', hint: 'Download', Icon: FileJson },
-        { key: 'openflow', label: `${brandConfig.appName} DSL`, hint: 'Copy to clipboard', Icon: Wand2 },
-        { key: 'mermaid', label: 'Mermaid', hint: 'Copy to clipboard', Icon: GitBranch },
-        { key: 'plantuml', label: 'PlantUML', hint: 'Copy to clipboard', Icon: FileCode },
-        { key: 'figma', label: 'Figma Editable', hint: 'Copy to clipboard', Icon: Figma },
-    ], [brandConfig.appName]);
+        { key: 'png', label: t('export.png', 'Export PNG'), hint: t('export.hintTransparent4K', 'Transparent (4K)'), Icon: Image },
+        { key: 'jpeg', label: t('export.jpeg', 'Export JPG'), hint: t('export.hintWhiteBg4K', 'White Background (4K)'), Icon: Image },
+        { key: 'json', label: t('export.jsonLabel', 'JSON File'), hint: t('export.hintDownload', 'Download'), Icon: FileJson },
+        { key: 'openflow', label: t('export.openflowdslLabel', { appName: brandConfig.appName, defaultValue: `${brandConfig.appName} DSL` }), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: Wand2 },
+        { key: 'mermaid', label: t('export.mermaid', 'Mermaid'), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: GitBranch },
+        { key: 'plantuml', label: t('export.plantuml', 'PlantUML'), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: FileCode },
+        { key: 'figma', label: t('export.figmaEditable', 'Figma Editable'), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: Figma },
+    ], [brandConfig.appName, t]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -64,20 +67,20 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
 
     return (
         <div className="relative" ref={menuRef}>
-            <Tooltip text="Export Diagram" side="bottom">
+            <Tooltip text={t('export.exportDiagram', 'Export Diagram')} side="bottom">
                 <Button
                     onClick={() => setIsOpen(!isOpen)}
                     className="h-9 px-4 text-sm"
                 >
                     <Download className="w-4 h-4 mr-2" />
-                    Export
+                    {t('export.title', 'Export')}
                 </Button>
             </Tooltip>
 
             {isOpen && (
                 <div className="absolute top-full right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-[var(--radius-lg)] shadow-xl border border-white/20 ring-1 ring-black/5 p-1.5 flex flex-col gap-0.5 animate-in fade-in zoom-in-95 duration-100 origin-top-right z-50">
                     <div className="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                        Export As
+                        {t('export.exportAs', 'Export As')}
                     </div>
                     {exportOptions.map(({ key, label, hint, Icon }) => (
                         <button
