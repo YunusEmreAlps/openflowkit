@@ -360,6 +360,12 @@ We are building the open standard for diagramming. PRs for new Mermaid features,
 
 ---
 
+## 🌍 Special Thanks
+
+OpenFlowKit is now global! A massive shout-out to **[Yunus Emre Alpuş](https://github.com/YunusEmreAlps)** for leading the internationalization (i18n) effort and providing the initial Turkish localization. His contributions paved the way for our expansion into Spanish, German, French, Japanese, and Chinese.
+
+---
+
 ## 📄 License
 
 MIT © [Varun](https://github.com/Vrun-design)
