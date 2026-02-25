@@ -11,9 +11,14 @@ interface Language {
   flag: string;
 }
 
-const languages: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: "https://purecatamphetamine.github.io/country-flag-icons/3x2/US.svg" },
-  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: "https://purecatamphetamine.github.io/country-flag-icons/3x2/TR.svg" },
+const LANGUAGES: Language[] = [
+  { code: 'en', name: 'English', nativeName: 'English', flag: '/flags/us.svg' },
+  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '/flags/tr.svg' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '/flags/de.svg' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '/flags/fr.svg' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '/flags/es.svg' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '/flags/cn.svg' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '/flags/jp.svg' },
 ];
 
 interface LanguageSelectorProps {
@@ -21,29 +26,86 @@ interface LanguageSelectorProps {
   placement?: 'top' | 'bottom';
 }
 
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'default', placement = 'bottom' }) => {
+// --- Shared dropdown list (rendered by all 3 variants) ---
+interface LanguageDropdownProps {
+  isOpen: boolean;
+  placement: 'top' | 'bottom';
+  currentCode: string;
+  onSelect: (code: string) => void;
+  onClose: () => void;
+  width?: string;
+}
+
+function LanguageDropdown({
+  isOpen,
+  placement,
+  currentCode,
+  onSelect,
+  onClose,
+  width = 'w-44',
+}: LanguageDropdownProps): React.JSX.Element | null {
+  if (!isOpen) return null;
+
+  const positionClass = placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
+  const originClass = placement === 'top' ? 'origin-bottom-right' : 'origin-top-right';
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div
+        className={`absolute right-0 ${positionClass} ${width} bg-white/95 backdrop-blur-xl rounded-lg shadow-xl border border-slate-200 ring-1 ring-black/5 p-1 z-50 animate-in fade-in zoom-in-95 duration-200 ${originClass}`}
+      >
+        {LANGUAGES.map((lang) => (
+          <button
+            key={lang.code}
+            onClick={() => onSelect(lang.code)}
+            className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium transition-all ${currentCode === lang.code
+                ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
+                : 'text-slate-600 hover:bg-slate-50'
+              }`}
+          >
+            <div className="flex items-center gap-2">
+              <img src={lang.flag} alt={lang.name} className="w-5 h-3.5 object-cover rounded-[2px]" />
+              <span>{lang.nativeName}</span>
+            </div>
+            {currentCode === lang.code && <Check className="w-4 h-4" />}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// --- Main component ---
+export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+  variant = 'default',
+  placement = 'bottom',
+}) => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = React.useState(false);
   const { setViewSettings } = useFlowStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const { lang, slug } = useParams();
+  const { slug } = useParams();
 
-  const changeLanguage = async (languageCode: string) => {
-    await i18n.changeLanguage(languageCode);
-    setViewSettings({ language: languageCode });
-    
-    // If in docs, update URL with new language
+  const currentLanguage = LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
+
+  async function changeLanguage(code: string): Promise<void> {
+    await i18n.changeLanguage(code);
+    setViewSettings({ language: code });
+
     if (location.pathname.startsWith('/docs') && slug) {
-      navigate(`/docs/${languageCode}/${slug}`, { replace: true });
+      navigate(`/docs/${code}/${slug}`, { replace: true });
     }
-    
+
     setIsOpen(false);
-  };
+  }
 
-  const currentLanguage = languages.find((lang) => lang.code === i18n.language) || languages[0];
+  const chevronClass = `transition-transform ${isOpen
+      ? placement === 'top' ? '' : 'rotate-180'
+      : placement === 'top' ? 'rotate-180' : ''
+    }`;
 
-  // Compact variant for sidebar
   if (variant === 'compact') {
     return (
       <div className="relative w-full">
@@ -52,41 +114,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'd
           className="flex items-center justify-between w-full px-3 py-2 rounded-lg border border-slate-200 transition-all text-sm font-medium bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300"
         >
           <div className="flex items-center gap-2">
-            <img src={currentLanguage.flag} alt={currentLanguage.name} className="w-6 h-4" />
+            <img src={currentLanguage.flag} alt={currentLanguage.name} className="w-5 h-3.5 object-cover rounded-[2px]" />
             <span>{currentLanguage.nativeName}</span>
           </div>
-          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? (placement === 'top' ? '' : 'rotate-180') : (placement === 'top' ? 'rotate-180' : '')}`} />
+          <ChevronDown className={`w-4 h-4 ${chevronClass}`} />
         </button>
-
-        {isOpen && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-            <div className={`absolute left-0 right-0 ${placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} bg-white/95 backdrop-blur-xl rounded-lg shadow-xl border border-slate-200 ring-1 ring-black/5 p-1 z-50 animate-in fade-in ${placement === 'top' ? 'slide-in-from-bottom-2' : 'slide-in-from-top-2'} duration-200`}>
-              {languages.map((language) => (
-                <button
-                  key={language.code}
-                  onClick={() => changeLanguage(language.code)}
-                  className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                    i18n.language === language.code
-                      ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
-                      : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <img src={language.flag} alt={language.name} className="w-6 h-4" />
-                    <span>{language.nativeName}</span>
-                  </div>
-                  {i18n.language === language.code && <Check className="w-4 h-4" />}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+        <LanguageDropdown
+          isOpen={isOpen}
+          placement={placement}
+          currentCode={i18n.language}
+          onSelect={changeLanguage}
+          onClose={() => setIsOpen(false)}
+          width="w-full"
+        />
       </div>
     );
   }
 
-  // Minimal variant - just icon and flag
   if (variant === 'minimal') {
     return (
       <div className="relative">
@@ -95,34 +139,17 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'd
           className="flex items-center gap-1.5 px-2 py-1.5 rounded-md transition-all text-sm font-medium bg-transparent text-slate-600 hover:bg-slate-100"
           title="Change Language"
         >
-          <img src={currentLanguage.flag} alt={currentLanguage.name} className="w-6 h-4" />
-          <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? (placement === 'top' ? '' : 'rotate-180') : (placement === 'top' ? 'rotate-180' : '')}`} />
+          <img src={currentLanguage.flag} alt={currentLanguage.name} className="w-5 h-3.5 object-cover rounded-[2px]" />
+          <ChevronDown className={`w-3 h-3 ${chevronClass}`} />
         </button>
-
-        {isOpen && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-            <div className={`absolute right-0 ${placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} w-40 bg-white/95 backdrop-blur-xl rounded-lg shadow-xl border border-slate-200 ring-1 ring-black/5 p-1 z-50 animate-in fade-in zoom-in-95 duration-200 ${placement === 'top' ? 'origin-bottom-right' : 'origin-top-right'}`}>
-              {languages.map((language) => (
-                <button
-                  key={language.code}
-                  onClick={() => changeLanguage(language.code)}
-                  className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                    i18n.language === language.code
-                      ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
-                      : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <img src={language.flag} alt={language.name} className="w-6 h-4" />
-                    <span>{language.nativeName}</span>
-                  </div>
-                  {i18n.language === language.code && <Check className="w-4 h-4" />}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
+        <LanguageDropdown
+          isOpen={isOpen}
+          placement={placement}
+          currentCode={i18n.language}
+          onSelect={changeLanguage}
+          onClose={() => setIsOpen(false)}
+          width="w-40"
+        />
       </div>
     );
   }
@@ -136,34 +163,20 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({ variant = 'd
         title="Change Language"
       >
         <Globe className="w-4 h-4" />
-        <span className="hidden sm:inline">{currentLanguage.flag} {currentLanguage.nativeName}</span>
-        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? (placement === 'top' ? '' : 'rotate-180') : (placement === 'top' ? 'rotate-180' : '')}`} />
+        <span className="hidden sm:inline">
+          <img src={currentLanguage.flag} alt={currentLanguage.name} className="inline w-5 h-3.5 object-cover rounded-[2px] mr-1.5" />
+          {currentLanguage.nativeName}
+        </span>
+        <ChevronDown className={`w-3.5 h-3.5 ${chevronClass}`} />
       </button>
-
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className={`absolute right-0 ${placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'} w-48 bg-white/95 backdrop-blur-xl rounded-[var(--radius-lg)] shadow-2xl border border-white/50 ring-1 ring-black/5 p-2 flex flex-col gap-1 z-50 animate-in fade-in zoom-in-95 duration-200 ${placement === 'top' ? 'origin-bottom-right' : 'origin-top-right'}`}>
-            {languages.map((language) => (
-              <button
-                key={language.code}
-                onClick={() => changeLanguage(language.code)}
-                className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-all ${
-                  i18n.language === language.code
-                    ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{language.flag}</span>
-                  <span>{language.nativeName}</span>
-                </div>
-                {i18n.language === language.code && <Check className="w-4 h-4" />}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+      <LanguageDropdown
+        isOpen={isOpen}
+        placement={placement}
+        currentCode={i18n.language}
+        onSelect={changeLanguage}
+        onClose={() => setIsOpen(false)}
+        width="w-48"
+      />
     </div>
   );
 };

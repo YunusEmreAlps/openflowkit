@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'reactflow/dist/style.css';
 import { ReactFlowProvider } from 'reactflow';
 import { Monitor, ArrowLeft } from 'lucide-react';
@@ -30,6 +30,12 @@ function FlowEditorWrapper({ onGoHome }: { onGoHome: () => void }): React.JSX.El
 function LandingPageRoute(): React.JSX.Element {
   const navigate = useNavigate();
   return <LandingPage onLaunch={() => navigate('/home', { replace: true })} />;
+}
+
+// Backwards-compatibility redirect: /docs/:slug → /docs/en/:slug
+function DocsSlugRedirect(): React.JSX.Element {
+  const { slug } = useParams<{ slug: string }>();
+  return <Navigate to={`/docs/en/${slug}`} replace />;
 }
 
 function FlowCanvasRoute(): React.JSX.Element {
@@ -161,6 +167,8 @@ function App(): React.JSX.Element {
           <Route path="/canvas" element={<MobileGate><FlowCanvasRoute /></MobileGate>} />
           <Route path="/flow/:flowId" element={<MobileGate><FlowCanvasRoute /></MobileGate>} />
           <Route path="/docs" element={<DocsLayout />}>
+            <Route index element={<Navigate to="en/introduction" replace />} />
+            <Route path=":slug" element={<DocsSlugRedirect />} />
             <Route path=":lang/:slug" element={<DocsPage />} />
           </Route>
         </Routes>

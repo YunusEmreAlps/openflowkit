@@ -28,6 +28,7 @@
     "html-to-image": "^1.11.13",
     "i18next": "^25.8.13",
     "i18next-browser-languagedetector": "^8.2.1",
+    "i18next-http-backend": "^3.0.2",
     "lucide-react": "^0.563.0",
     "posthog-js": "^1.347.2",
     "react": "^19.2.4",

@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { docsNavigation } from './docsData';
-import { Book, ChevronLeft, ArrowLeft } from 'lucide-react';
+import { Book, ArrowLeft } from 'lucide-react';
 import { LanguageSelector } from '../LanguageSelector';
 import { SidebarItem } from '../ui/SidebarItem';
 import { useFlowStore } from '../../store';
@@ -13,9 +13,8 @@ interface DocsSidebarProps {
 }
 
 export const DocsSidebar: React.FC<DocsSidebarProps> = ({ className = '', onClose }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { brandConfig } = useFlowStore();
-    const { i18n } = useTranslation();
     const { lang } = useParams();
     const currentLang = lang || i18n.language || 'en';
 
