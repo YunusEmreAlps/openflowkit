@@ -118,63 +118,63 @@
   },
   "landing": {
     "nav": {
-      "features": "Features",
+      "features": "Fonctionnalités",
       "figma": "Figma",
-      "useCases": "Use Cases",
-      "pricing": "Pricing",
-      "viewGithub": "View on GitHub"
+      "useCases": "Cas d'usage",
+      "pricing": "Tarifs",
+      "viewGithub": "Voir sur GitHub"
     },
     "hero": {
-      "title": "Beautiful Flowcharts,",
-      "subtitle": "Built for Developers",
-      "description": "Create stunning flowcharts with code or canvas. Export to any format. Open source and free forever.",
-      "livePreview": "Live Preview",
-      "publicBeta": "v1.0 Public Beta",
-      "description1": "The diagram engine",
-      "description2": "that",
-      "description3": "like you.",
-      "description4": "100% free, open-source diagram tool for builders. Write code or drag and drop — get beautiful results either way.",
-      "forkOnGithub": "Fork on GitHub",
-      "licence": "MIT Licensed",
-      "localFirst": "Local First",
-      "noAuth": "No Auth",
-      "thinks": "thinks",
-      "draws": "draws",
-      "builds": "builds",
-      "ships": "ships"
+      "title": "De beaux diagrammes,",
+      "subtitle": "Conçus pour les développeurs",
+      "description": "Créez des diagrammes avec du code ou un canvas.",
+      "livePreview": "Aperçu en direct",
+      "publicBeta": "v1.0 Bêta publique",
+      "description1": "Le moteur de diagrammes",
+      "description2": "qui",
+      "description3": "pense comme vous.",
+      "description4": "Outil de diagrammes 100% gratuit et open source.",
+      "forkOnGithub": "Forker sur GitHub",
+      "licence": "Licence MIT",
+      "localFirst": "Local d'abord",
+      "noAuth": "Sans authentification",
+      "thinks": "pense",
+      "draws": "dessine",
+      "builds": "construit",
+      "ships": "livre"
     },
     "problem": {
-      "title": "The Problem",
-      "description": "Traditional flowchart tools are either too complex or too limited."
+      "title": "Le problème",
+      "description": "Les outils de diagrammes traditionnels sont trop complexes ou trop limités."
     },
     "solution": {
-      "title": "The Solution",
-      "description": "OpenFlowKit combines the best of both worlds."
+      "title": "La solution",
+      "description": "OpenFlowKit combine le meilleur des deux mondes."
     },
     "demo": {
-      "title": "Simple for sketching.",
-      "subtitle": "Ready for production.",
-      "description": "Sketch your ideas fast. Export them production-ready."
+      "title": "Simple pour esquisser.",
+      "subtitle": "Prêt pour la production.",
+      "description": "Esquissez vos idées rapidement. Exportez-les prêtes pour la production."
     },
     "useCases": {
-      "title": "Use Cases"
+      "title": "Cas d'usage"
     },
     "pricing": {
-      "title": "Pricing",
-      "free": "Free Forever",
+      "title": "Tarifs",
+      "free": "Gratuit pour toujours",
       "openSource": "Open Source"
     },
     "testimonials": {
-      "title": "What People Say"
+      "title": "Ce que les gens disent"
     },
     "cta": {
-      "title": "Ready to Start?",
-      "subtitle": "Create your first flowchart in seconds.",
-      "button": "Launch App"
+      "title": "Prêt à commencer ?",
+      "subtitle": "Créez votre premier diagramme en quelques secondes.",
+      "button": "Lancer l'application"
     },
     "footer": {
-      "rights": "All rights reserved.",
-      "madeWith": "Made with ❤️ by the OpenFlowKit Team"
+      "rights": "Tous droits réservés.",
+      "madeWith": "Fait avec ❤️ par l'équipe OpenFlowKit"
     }
   },
   "home": {
@@ -210,33 +210,33 @@
     "help": "Aide"
   },
   "properties": {
-    "title": "Properties",
-    "nodeType": "Node Type",
-    "label": "Label",
+    "title": "Propriétés",
+    "nodeType": "Type de nœud",
+    "label": "Étiquette",
     "description": "Description",
-    "color": "Color",
-    "icon": "Icon",
-    "size": "Size"
+    "color": "Couleur",
+    "icon": "Icône",
+    "size": "Taille"
   },
   "ai": {
-    "generate": "Generate with AI",
-    "provider": "AI Provider",
-    "model": "Model",
-    "apiKey": "API Key",
-    "placeholder": "Describe your flowchart..."
+    "generate": "Générer avec l'IA",
+    "provider": "Fournisseur IA",
+    "model": "Modèle",
+    "apiKey": "Clé API",
+    "placeholder": "Décrivez votre diagramme..."
   },
   "playback": {
-    "title": "Playback",
-    "play": "Play",
+    "title": "Lecture",
+    "play": "Lire",
     "pause": "Pause",
-    "stop": "Stop",
-    "speed": "Speed"
+    "stop": "Arrêter",
+    "speed": "Vitesse"
   },
   "history": {
-    "title": "History",
-    "undo": "Undo",
-    "redo": "Redo",
-    "clear": "Clear History"
+    "title": "Historique",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "clear": "Effacer l'historique"
   },
   "errors": {
     "generic": "Quelque chose s'est mal passé",
@@ -260,129 +260,129 @@
     }
   },
   "footer": {
-    "mitLicensed": "MIT Licensed"
+    "mitLicensed": "Licence MIT"
   },
   "pricing": {
-    "title": "Premium features.",
-    "subtitle": "Zero dollar price tag.",
-    "description": "OpenFlowKit is 100% open source. There is no \"Enterprise Edition\" hidden behind a sales call.",
-    "mitLicense": "MIT License",
-    "freeForever": "Free Forever.",
-    "fullAccess": "Full access to the core engine.",
-    "hostAnywhere": "Host it anywhere. Modify it freely.",
-    "unlimitedUsage": "Unlimited Usage",
-    "noAccount": "No account or credit card required",
-    "everythingIncluded": "Everything Included",
+    "title": "Fonctionnalités premium.",
+    "subtitle": "Prix à zéro euro.",
+    "description": "OpenFlowKit est 100% open source. Pas d'édition Enterprise cachée.",
+    "mitLicense": "Licence MIT",
+    "freeForever": "Gratuit pour toujours.",
+    "fullAccess": "Accès complet au moteur principal.",
+    "hostAnywhere": "Hébergez n'importe où. Modifiez librement.",
+    "unlimitedUsage": "Utilisation illimitée",
+    "noAccount": "Aucun compte ni carte de crédit requis",
+    "everythingIncluded": "Tout inclus",
     "features": {
-      "unlimitedDiagrams": "Unlimited diagrams & projects",
-      "saveLocally": "Save locally, your data stays on your device",
-      "whiteLabelBranding": "White-Label Branding",
-      "oneClickLayout": "One-click auto-layout",
-      "exportFormats": "Export to SVG, PNG, JPG",
-      "figmaExport": "Figma Export",
-      "mermaidSupport": "Mermaid.js Support",
-      "aiGeneration": "AI diagram generation (bring your own API key)"
+      "unlimitedDiagrams": "Diagrammes & projets illimités",
+      "saveLocally": "Sauvegarde locale",
+      "whiteLabelBranding": "White-Label",
+      "oneClickLayout": "Mise en page automatique en un clic",
+      "exportFormats": "Export SVG, PNG, JPG",
+      "figmaExport": "Export Figma",
+      "mermaidSupport": "Support Mermaid.js",
+      "aiGeneration": "Génération IA (apportez votre clé API)"
     },
-    "supportDevelopment": "Support development on GitHub"
+    "supportDevelopment": "Soutenir le développement sur GitHub"
   },
   "cta": {
-    "readyToUse": "Ready to use",
-    "buildDiagrams": "Build diagrams that",
-    "dontLookGeneric": "don't look generic.",
-    "joinUs": "Join us in building the next generation of visual tools. Open source, local-first, and forever free.",
-    "getStartedNow": "Get Started Now",
-    "copied": "Copied",
-    "copy": "Copy",
+    "readyToUse": "Prêt à utiliser",
+    "buildDiagrams": "Créez des diagrammes qui",
+    "dontLookGeneric": "ne ressemblent pas à tous les autres.",
+    "joinUs": "Rejoignez-nous pour construire la prochaine génération d'outils visuels.",
+    "getStartedNow": "Commencer maintenant",
+    "copied": "Copié",
+    "copy": "Copier",
     "documentation": "Documentation",
     "github": "GitHub",
     "roadmap": "Roadmap"
   },
   "problem": {
-    "badge": "The Problem",
-    "title": "Why do diagrams",
-    "subtitle": "always feel like a chore?",
-    "description": "We're designing complex systems with tools built for arts and crafts.",
-    "pixelPurgatory": "Pixel Purgatory",
-    "pixelPurgatoryDesc": "Wasting hours aligning boxes by hand. One new service breaks your entire layout.",
-    "screenshotTrap": "The Screenshot Trap",
-    "screenshotTrapDesc": "Docs drift the moment you take the screenshot. Static assets are dead assets.",
-    "enterpriseBeige": "Enterprise Beige",
-    "enterpriseBeigeDesc": "Locked into rigid, generic templates. Your architecture is unique; your diagrams shouldn't look like clipart."
+    "badge": "Le problème",
+    "title": "Pourquoi les diagrammes",
+    "subtitle": "semblent toujours fastidieux ?",
+    "description": "Nous concevons des systèmes complexes avec des outils pour les arts et l'artisanat.",
+    "pixelPurgatory": "Purgatoire des pixels",
+    "pixelPurgatoryDesc": "Passer des heures à aligner des boîtes manuellement.",
+    "screenshotTrap": "Le piège de la capture",
+    "screenshotTrapDesc": "La documentation devient obsolète dès la capture.",
+    "enterpriseBeige": "Beige entreprise",
+    "enterpriseBeigeDesc": "Enfermé dans des modèles rigides et génériques."
   },
   "solution": {
-    "badge": "The Features",
-    "title": "Everything you need.",
-    "subtitle": "Nothing you don't.",
-    "description": "The ultimate white-label canvas. Fully customizable nodes, edges, and themes — powered by React Flow. It's your brand, given infinite space to breathe.",
-    "diagramAsCode": "Diagram as Code",
-    "diagramAsCodeDesc": "First-class support for Mermaid.js and our type-safe DSL. Define your architecture in code, export as JSON, and let the engine handle the layout.",
-    "flowpilotAI": "Flowpilot AI",
-    "aiAssistant": "AI Assistant",
-    "flowpilotAIDesc": "Chat with your diagram. \"Make the corners rounder\", \"Add a load balancer\".",
-    "addRedisCache": "Add a Redis cache in front of the DB.",
-    "localPrivate": "Local & Private",
-    "localPrivateDesc": "We don't want your data. Everything stays on your machine. No cloud saves, no tracking, no \"syncing\" to our servers. You have full freedom.",
-    "offlineReady": "Offline Ready",
-    "localFileSystem": "Local File System",
-    "amazingAesthetics": "Amazing Aesthetics",
-    "amazingAestheticsDesc": "Break free from \"Enterprise Beige\". Fully customizable fonts, colors, and shapes. Create diagrams that look like art, not documentation.",
-    "sunsetRed": "Sunset Red",
-    "amberWarning": "Amber Warning",
-    "successGreen": "Success Green"
+    "badge": "Les fonctionnalités",
+    "title": "Tout ce dont vous avez besoin.",
+    "subtitle": "Rien de superflu.",
+    "description": "Le canvas white-label ultime.",
+    "diagramAsCode": "Diagramme en code",
+    "diagramAsCodeDesc": "Support de Mermaid.js et DSL typé.",
+    "flowpilotAI": "Flowpilot IA",
+    "aiAssistant": "Assistant IA",
+    "flowpilotAIDesc": "Discutez avec votre diagramme.",
+    "addRedisCache": "Ajouter un cache Redis devant la DB.",
+    "localPrivate": "Local & Privé",
+    "localPrivateDesc": "Tout reste sur votre machine.",
+    "offlineReady": "Hors ligne",
+    "localFileSystem": "Système de fichiers local",
+    "amazingAesthetics": "Esthétique remarquable",
+    "amazingAestheticsDesc": "Polices, couleurs et formes entièrement personnalisables.",
+    "sunsetRed": "Rouge coucher de soleil",
+    "amberWarning": "Avertissement ambre",
+    "successGreen": "Vert succès"
   },
   "workflows": {
-    "badge": "Workflows",
-    "title": "One engine.",
-    "subtitle": "Three native workflows.",
-    "description": "OpenFlowKit adapts to the tool you are already using. No new tabs to open. No context switching.",
-    "engineering": "Engineering",
-    "diagramAsCode": "DIAGRAM AS CODE",
-    "engineeringDesc": "Write diagrams in our DSL or Mermaid.js syntax. Paste code, get a fully laid-out diagram. Export as JSON to version control.",
+    "badge": "Flux de travail",
+    "title": "Un moteur.",
+    "subtitle": "Trois flux natifs.",
+    "description": "OpenFlowKit s'adapte à votre outil.",
+    "engineering": "Ingénierie",
+    "diagramAsCode": "DIAGRAMME EN CODE",
+    "engineeringDesc": "Écrire des diagrammes en DSL ou Mermaid.js.",
     "design": "Design",
-    "theVisualLayer": "THE VISUAL LAYER",
-    "designDesc": "Stop rebuilding screens. Copy from the canvas and paste into Figma as editable SVG and text layers.",
-    "exportShare": "Export & Share",
-    "pixelPerfectOutput": "PIXEL-PERFECT OUTPUT",
-    "exportShareDesc": "Export diagrams as SVG, PNG, or PDF. Copy to clipboard and paste into Figma with editable layers. Save as JSON to share or version control.",
-    "vectorEditable": "Vector • Editable in Figma",
-    "rasterHighRes": "Raster • High-res export",
-    "dataSaveRestore": "Data • Save & restore flows"
+    "theVisualLayer": "LA COUCHE VISUELLE",
+    "designDesc": "Copier depuis le canvas et coller dans Figma.",
+    "exportShare": "Exporter & Partager",
+    "pixelPerfectOutput": "SORTIE PIXEL PERFECT",
+    "exportShareDesc": "Exporter en SVG, PNG ou PDF.",
+    "vectorEditable": "Vecteur • Éditable dans Figma",
+    "rasterHighRes": "Raster • Haute résolution",
+    "dataSaveRestore": "Données • Sauvegarder & restaurer"
   },
   "figma": {
-    "badge": "Zero Plugins Required",
-    "title": "Copy the code.",
-    "subtitle": "Paste the design.",
-    "description": "Copy a diagram from OpenFlowKit and paste it straight into Figma — you'll get editable text and clean vector shapes, not a flat image. No plugins needed.",
-    "editableText": "Editable Text",
-    "vectorFidelity": "Vector Fidelity",
-    "selected": "Selected",
-    "vectorText": "Vector + Text",
-    "untitled": "Untitled"
+    "badge": "Aucun plugin requis",
+    "title": "Copier le code.",
+    "subtitle": "Coller le design.",
+    "description": "Copiez un diagramme et collez-le dans Figma — texte éditable et vecteurs propres.",
+    "editableText": "Texte éditable",
+    "vectorFidelity": "Fidélité vectorielle",
+    "selected": "Sélectionné",
+    "vectorText": "Vecteur + Texte",
+    "untitled": "Sans titre"
   },
   "testimonials": {
-    "badge": "Under Construction",
-    "title": "Build in public.",
-    "subtitle": "Shape the engine.",
-    "description": "OpenFlowKit is just getting started. We are building the core engine in the open. Join us on Day 1.",
-    "starTheRepo": "Star the Repo",
+    "badge": "En construction",
+    "title": "Construire en public.",
+    "subtitle": "Façonner le moteur.",
+    "description": "OpenFlowKit fait ses premiers pas. Rejoignez-nous dès le premier jour.",
+    "starTheRepo": "Mettre une étoile au dépôt",
     "openSource": "Open Source",
-    "openSourceDesc": "The core engine is MIT licensed. Read the source, submit PRs, or fork it for your internal tools.",
-    "prsWelcome": "PRs Welcome",
-    "community": "Community",
-    "communityDesc": "Join developers building on OpenFlowKit.",
-    "roadmap": "Roadmap",
-    "coreRenderer": "Core Renderer",
-    "flowpilotAI": "Flowpilot AI",
-    "pdfExport": "PDF Export"
+    "openSourceDesc": "Licence MIT. Lire le code, soumettre des PR.",
+    "prsWelcome": "PRs bienvenus",
+    "community": "Communauté",
+    "communityDesc": "Rejoindre les développeurs qui construisent avec OpenFlowKit.",
+    "roadmap": "Feuille de route",
+    "coreRenderer": "Moteur principal",
+    "flowpilotAI": "Flowpilot IA",
+    "pdfExport": "Export PDF"
   },
   "demo": {
-    "livePreview": "Live Preview",
-    "title": "Simple for sketching.",
-    "subtitle": "Ready for production.",
-    "description1": "Sketch your ideas fast.",
-    "description2": "Export them production-ready.",
-    "liveSync": "Live Sync",
-    "liveSyncDesc": "Edit code ↔ See changes instantly"
+    "livePreview": "Aperçu en direct",
+    "title": "Simple pour esquisser.",
+    "subtitle": "Prêt pour la production.",
+    "description1": "Esquissez vos idées rapidement.",
+    "description2": "Exportez-les prêtes pour la production.",
+    "liveSync": "Sync en direct",
+    "liveSyncDesc": "Modifier le code ↔ Voir les changements instantanément"
   },
   "docs": {
     "documentation": "Documentation",
@@ -390,227 +390,228 @@
     "onThisPage": "Sur cette page"
   },
   "chatbot": {
-    "greeting": "Hello, how can I help you?",
-    "tagline": "Your intelligent guide to understanding and using",
+    "greeting": "Bonjour, comment puis-je vous aider ?",
+    "tagline": "Votre guide intelligent pour",
     "messagePlaceholder": "Message",
-    "aiSuffix": "AI...",
-    "sendMessage": "Send message",
-    "newChat": "New Chat",
+    "aiSuffix": "IA...",
+    "sendMessage": "Envoyer le message",
+    "newChat": "Nouveau chat",
     "docsTitle": "Docs",
-    "aiAssistant": "AI Assistant",
-    "aiName": "AI",
-    "you": "You",
-    "searchingDocs": "Searching docs...",
-    "aiDisclaimer": "AI can make mistakes. Verify important information.",
-    "welcomeMessage": "Hi! I'm the {appName} AI assistant. I have access to the complete documentation. How can I help you today?",
+    "aiAssistant": "Assistant IA",
+    "aiName": "IA",
+    "you": "Vous",
+    "searchingDocs": "Recherche dans la documentation...",
+    "aiDisclaimer": "L'IA peut faire des erreurs. Vérifiez les informations importantes.",
+    "welcomeMessage": "Bonjour ! Je suis l'assistant IA {appName}. Comment puis-je vous aider ?",
     "prompts": {
       "keyboardShortcuts": {
-        "title": "Keyboard Shortcuts",
-        "description": "What are the essential keyboard shortcuts?",
+        "title": "Raccourcis clavier",
+        "description": "Quels sont les raccourcis essentiels ?",
         "icon": "⌘"
       },
       "nodeTypes": {
-        "title": "Node Types",
-        "description": "How do I create a decision node?",
+        "title": "Types de nœuds",
+        "description": "Comment créer un nœud de décision ?",
         "icon": "❖"
       },
       "dslSyntax": {
-        "title": "DSL Syntax",
-        "description": "Show me an example of the FlowMind DSL.",
+        "title": "Syntaxe DSL",
+        "description": "Montrez un exemple du DSL FlowMind.",
         "icon": "{}"
       }
     }
   },
   "footerBanner": {
-    "shipping": "We are shipping daily.",
-    "checkChangelog": "Check the Changelog."
+    "shipping": "Nous livrons quotidiennement.",
+    "checkChangelog": "Voir le changelog."
   },
   "commandBar": {
     "ai": {
-      "title": "Ask Flowpilot",
-      "clearChat": "Clear Chat History",
-      "placeholder": "Describe what you want to create...",
+      "title": "Demander à Flowpilot",
+      "clearChat": "Effacer l'historique",
+      "placeholder": "Décrivez ce que vous voulez créer...",
       "examples": {
-        "userRegistration": "User Registration",
-        "userRegistrationPrompt": "User registration flow with email verification",
-        "ecommerceCheckout": "E-Commerce Checkout",
-        "ecommerceCheckoutPrompt": "E-commerce checkout process with payment gateway failure handling",
-        "cicdPipeline": "CI/CD Pipeline",
-        "cicdPipelinePrompt": "CI/CD pipeline architecture",
-        "oauth2Login": "OAuth2 Login",
-        "oauth2LoginPrompt": "Oauth2 login flow"
+        "userRegistration": "Inscription utilisateur",
+        "userRegistrationPrompt": "Flux d'inscription avec vérification email",
+        "ecommerceCheckout": "Paiement e-commerce",
+        "ecommerceCheckoutPrompt": "Processus de paiement avec gestion des erreurs",
+        "cicdPipeline": "Pipeline CI/CD",
+        "cicdPipelinePrompt": "Architecture pipeline CI/CD",
+        "oauth2Login": "Connexion OAuth2",
+        "oauth2LoginPrompt": "Flux de connexion OAuth2"
       }
     },
     "search": {
-      "title": "Search Nodes",
-      "placeholder": "Search by label or ID...",
-      "noResults": "No nodes found",
-      "untitled": "Untitled Node",
+      "title": "Rechercher des nœuds",
+      "placeholder": "Rechercher par étiquette ou ID...",
+      "noResults": "Aucun nœud trouvé",
+      "untitled": "Nœud sans titre",
       "type": "Type"
     },
     "templates": {
-      "title": "Templates",
-      "placeholder": "Search templates...",
-      "noResults": "No templates found"
+      "title": "Modèles",
+      "placeholder": "Rechercher des modèles...",
+      "noResults": "Aucun modèle trouvé"
     },
     "code": {
-      "mermaidTitle": "Import Mermaid",
-      "dslTitle": "Import {appName} DSL",
-      "mermaidPlaceholder": "Paste Mermaid code here...",
-      "dslPlaceholder": "Paste {appName} DSL code here...",
-      "applyShortcut": "⌘+Enter to apply",
-      "syntaxGuide": "Syntax Guide",
-      "apply": "Apply"
+      "mermaidTitle": "Importer Mermaid",
+      "dslTitle": "Importer {appName} DSL",
+      "mermaidPlaceholder": "Collez le code Mermaid ici...",
+      "dslPlaceholder": "Collez le code DSL ici...",
+      "applyShortcut": "⌘+Entrée pour appliquer",
+      "syntaxGuide": "Guide de syntaxe",
+      "apply": "Appliquer"
     },
     "layout": {
-      "title": "Layout Studio",
-      "algorithm": "Algorithm",
-      "layered": "Layered",
-      "layeredDesc": "Hierarchical, good for flows",
-      "tree": "Tree",
-      "treeDesc": "Strict parent-child structure",
+      "title": "Studio de mise en page",
+      "algorithm": "Algorithme",
+      "layered": "Couches",
+      "layeredDesc": "Hiérarchique, bon pour les flux",
+      "tree": "Arbre",
+      "treeDesc": "Structure parent-enfant stricte",
       "force": "Force",
-      "forceDesc": "Organic, physics-based",
+      "forceDesc": "Organique, basé sur la physique",
       "radial": "Radial",
-      "radialDesc": "Circular arrangement",
+      "radialDesc": "Disposition circulaire",
       "direction": "Direction",
-      "down": "Down",
-      "up": "Up",
-      "right": "Right",
-      "left": "Left",
-      "spacing": "Spacing",
+      "down": "Bas",
+      "up": "Haut",
+      "right": "Droite",
+      "left": "Gauche",
+      "spacing": "Espacement",
       "compact": "Compact",
       "normal": "Normal",
-      "loose": "Loose",
-      "applyLayout": "Apply Layout"
+      "loose": "Espacé",
+      "applyLayout": "Appliquer la mise en page"
     },
     "designSystem": {
-      "title": "Design Systems",
-      "createNew": "Create New System",
-      "import": "Import",
-      "exportActive": "Export Active"
+      "title": "Systèmes de design",
+      "createNew": "Créer un nouveau système",
+      "import": "Importer",
+      "exportActive": "Exporter l'actif"
     },
     "visuals": {
-      "title": "Connection Styles",
-      "edgeStyle": "Edge Style",
+      "title": "Styles de connexion",
+      "edgeStyle": "Style de liaison",
       "bezier": "Bezier",
-      "bezierDesc": "Smooth curves",
-      "straight": "Straight",
-      "straightDesc": "Direct lines",
-      "smoothStep": "Smooth Step",
-      "smoothStepDesc": "Rounded corners",
-      "step": "Step",
-      "stepDesc": "Right angles",
-      "defaultIcons": "Default Icons",
-      "defaultIconsDesc": "Show standard node icons",
-      "intelligentRouting": "Intelligent Routing",
-      "intelligentRoutingDesc": "Auto-snap connections on drag",
-      "animatedEdges": "Animated Edges",
-      "animatedEdgesDesc": "Flowing particles",
-      "strokeWidth": "Stroke Width"
+      "bezierDesc": "Courbes douces",
+      "straight": "Droit",
+      "straightDesc": "Lignes directes",
+      "smoothStep": "Pas smooth",
+      "smoothStepDesc": "Coins arrondis",
+      "step": "Pas",
+      "stepDesc": "Angles droits",
+      "defaultIcons": "Icônes par défaut",
+      "defaultIconsDesc": "Afficher les icônes standard",
+      "intelligentRouting": "Routage intelligent",
+      "intelligentRoutingDesc": "Connexions auto au glisser",
+      "animatedEdges": "Liaisons animées",
+      "animatedEdgesDesc": "Particules fluides",
+      "strokeWidth": "Épaisseur du trait"
     }
   },
   "settingsModal": {
-    "title": "Settings",
-    "general": "General",
-    "flowpilotAI": "Flowpilot AI",
-    "shortcuts": "Shortcuts",
-    "running": "Running {appName}",
-    "generalSettings": "General Settings",
-    "flowpilotConfigurations": "Flowpilot Configurations",
-    "keyboardShortcuts": "Keyboard Shortcuts",
+    "title": "Paramètres",
+    "general": "Général",
+    "flowpilotAI": "Flowpilot IA",
+    "shortcuts": "Raccourcis",
+    "running": "{appName} en cours",
+    "generalSettings": "Paramètres généraux",
+    "flowpilotConfigurations": "Configurations Flowpilot",
+    "keyboardShortcuts": "Raccourcis clavier",
     "canvas": {
-      "title": "Canvas",
-      "showGrid": "Show Grid",
-      "showGridDesc": "Display a dot grid on the canvas",
-      "snapToGrid": "Snap to Grid",
-      "snapToGridDesc": "Snap nodes to the grid when moving",
-      "miniMap": "Mini Map",
-      "miniMapDesc": "Show mini-map in bottom right"
+      "title": "Canevas",
+      "showGrid": "Afficher la grille",
+      "showGridDesc": "Afficher une grille de points",
+      "snapToGrid": "Aligner sur la grille",
+      "snapToGridDesc": "Aligner les nœuds sur la grille",
+      "miniMap": "Mini carte",
+      "miniMapDesc": "Afficher la mini carte en bas à droite"
     },
     "ai": {
-      "provider": "Provider",
-      "model": "Model",
-      "apiKey": "API Key",
-      "customBaseUrl": "Custom Base URL",
-      "optional": "Optional",
-      "testConnection": "Test Connection",
-      "testing": "Testing...",
-      "success": "Success! Connected to {provider}",
-      "failed": "Failed: {error}",
-      "getApiKey": "Get {provider} API Key",
-      "openConsole": "Open {console}",
-      "keySetupNote": "Key Setup Note",
-      "enterApiKey": "Enter your API key",
-      "selectModel": "Select a model",
-      "customEndpoint": "Custom Base URL (e.g., https://api.example.com)",
+      "provider": "Fournisseur",
+      "model": "Modèle",
+      "apiKey": "Clé API",
+      "customBaseUrl": "URL de base personnalisée",
+      "optional": "Optionnel",
+      "testConnection": "Tester la connexion",
+      "testing": "Test en cours...",
+      "success": "Succès ! Connecté à {provider}",
+      "failed": "Échec : {error}",
+      "getApiKey": "Obtenir la clé API {provider}",
+      "openConsole": "Ouvrir {console}",
+      "keySetupNote": "Note de configuration",
+      "enterApiKey": "Entrez votre clé API",
+      "selectModel": "Sélectionner un modèle",
+      "customEndpoint": "URL de base personnalisée",
       "providers": {
         "gemini": {
-          "hint": "Google · Best free tier · Multimodal",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "Google · Meilleur niveau gratuit",
+          "keySetupNote": "Niveau gratuit — sans carte de crédit"
         },
         "openai": {
-          "hint": "GPT-5 family · Industry standard",
-          "keySetupNote": "Requires a paid account and billing setup"
+          "hint": "Famille GPT-5 · Standard industriel",
+          "keySetupNote": "Compte payant requis"
         },
         "claude": {
-          "hint": "Anthropic · Leading reasoning model",
-          "keySetupNote": "Requires a paid account ($5 min credit top-up)"
+          "hint": "Anthropic · Modèle de raisonnement",
+          "keySetupNote": "Compte payant requis (5$ min)"
         },
         "groq": {
-          "hint": "Blazing fast · Generous free tier · Llama 4",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "Ultra rapide · Llama 4",
+          "keySetupNote": "Niveau gratuit — sans carte de crédit"
         },
         "nvidia": {
-          "hint": "NIM · Kimi-V2.5 · Frontier models",
-          "keySetupNote": "Free credits included with a new account"
+          "hint": "NIM · Modèles frontier",
+          "keySetupNote": "Crédits gratuits avec nouveau compte"
         },
         "cerebras": {
-          "hint": "2,400 tok/s · Qwen 3 235B · WSE-3 speed",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "2 400 tok/s · Qwen 3 235B",
+          "keySetupNote": "Niveau gratuit — sans carte de crédit"
         },
         "mistral": {
-          "hint": "Le Chat · Codestral · European AI leader",
-          "keySetupNote": "Free tier with generous limits — no credit card needed"
+          "hint": "Le Chat · Leader IA européen",
+          "keySetupNote": "Niveau gratuit — sans carte de crédit"
         },
         "custom": {
-          "hint": "Any OpenAI-compatible endpoint"
+          "hint": "Tout endpoint compatible OpenAI"
         }
       }
     },
     "brand": {
-      "title": "Brand Kits",
-      "subtitle": "Manage your brand identities",
-      "active": "Active",
-      "editKit": "Edit Kit",
-      "deleteConfirm": "Delete this kit?",
-      "createNewKit": "Create New Kit",
-      "newIdentity": "New Identity",
-      "activeKit": "Active Kit",
-      "inactive": "Inactive",
-      "setActive": "Set Active",
-      "resetToDefaults": "Reset to Defaults"
+      "title": "Kits de marque",
+      "subtitle": "Gérer vos identités de marque",
+      "active": "Actif",
+      "editKit": "Modifier le kit",
+      "deleteConfirm": "Supprimer ce kit ?",
+      "createNewKit": "Créer un nouveau kit",
+      "newIdentity": "Nouvelle identité",
+      "activeKit": "Kit actif",
+      "inactive": "Inactif",
+      "setActive": "Définir comme actif",
+      "resetToDefaults": "Réinitialiser"
     },
-    "shortcutsHint": "You can also press ? to view these anytime.",
+    "shortcutsHint": "Vous pouvez aussi appuyer sur ? pour les afficher.",
     "privacy": {
-      "manifesto": "Our Privacy Manifesto",
-      "manifestoText": "We believe in privacy by design and user autonomy. We don't collect your email, we don't have a login system, and we don't store your data on our servers.",
-      "localFirst": "Local-First Storage",
-      "noAccounts": "No User Accounts",
-      "ownData": "Own Your Data",
-      "anonymous": "Anonymous Usage Only",
-      "telemetry": "Telemetry & Feedback",
-      "anonymousStats": "Anonymous Stats",
-      "anonymousStatsDesc": "We only track visits and limited anonymous feature usage (like exports) to improve the tool. We do not track your names, IP addresses, inputs, or diagram content.",
-      "quote": "We rely on you to tell us what works, rather than tracking your every move.",
-      "helpImprove": "Help Us Improve",
-      "shareFeedback": "Share Feedback",
-      "shareFeedbackDesc": "Give feedback, report bugs, and ask for features"
-    }
+      "manifesto": "Notre manifeste de confidentialité",
+      "manifestoText": "Nous croyons en la protection des données et l'autonomie.",
+      "localFirst": "Stockage local",
+      "noAccounts": "Aucun compte utilisateur",
+      "ownData": "Vos données vous appartiennent",
+      "anonymous": "Usage anonyme uniquement",
+      "telemetry": "Télémétrie & Retours",
+      "anonymousStats": "Statistiques anonymes",
+      "anonymousStatsDesc": "Nous suivons uniquement les visites et l'usage anonyme.",
+      "quote": "Nous comptons sur vous pour nous dire ce qui marche.",
+      "helpImprove": "Aidez-nous à nous améliorer",
+      "shareFeedback": "Partager des retours",
+      "shareFeedbackDesc": "Donner des retours, signaler des bugs, demander des fonctionnalités"
+    },
+    "settings": "Paramètres"
   },
   "customNodes": {
-    "browserContent": "Browser Content",
-    "mobileContent": "Mobile Content"
+    "browserContent": "Contenu du navigateur",
+    "mobileContent": "Contenu mobile"
   },
   "keyboardShortcutsModal": {
     "title": "Raccourcis clavier",

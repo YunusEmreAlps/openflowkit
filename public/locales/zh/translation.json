@@ -118,63 +118,63 @@
   },
   "landing": {
     "nav": {
-      "features": "Features",
+      "features": "功能",
       "figma": "Figma",
-      "useCases": "Use Cases",
-      "pricing": "Pricing",
-      "viewGithub": "View on GitHub"
+      "useCases": "应用场景",
+      "pricing": "价格",
+      "viewGithub": "在 GitHub 上查看"
     },
     "hero": {
-      "title": "Beautiful Flowcharts,",
-      "subtitle": "Built for Developers",
-      "description": "Create stunning flowcharts with code or canvas. Export to any format. Open source and free forever.",
-      "livePreview": "Live Preview",
-      "publicBeta": "v1.0 Public Beta",
-      "description1": "The diagram engine",
-      "description2": "that",
-      "description3": "like you.",
-      "description4": "100% free, open-source diagram tool for builders. Write code or drag and drop — get beautiful results either way.",
-      "forkOnGithub": "Fork on GitHub",
-      "licence": "MIT Licensed",
-      "localFirst": "Local First",
-      "noAuth": "No Auth",
-      "thinks": "thinks",
-      "draws": "draws",
-      "builds": "builds",
-      "ships": "ships"
+      "title": "精美的流程图，",
+      "subtitle": "为开发者打造",
+      "description": "使用代码或画布创建令人惊叹的图表。导出为任何格式。开源且永久免费。",
+      "livePreview": "实时预览",
+      "publicBeta": "v1.0 公测版",
+      "description1": "图表引擎",
+      "description2": "让它",
+      "description3": "像你一样思考。",
+      "description4": "100% 免费的开源开发者绘图工具。编写代码或拖拽 — 无论哪种方式都能获得精美结果。",
+      "forkOnGithub": "在 GitHub 上 Fork",
+      "licence": "MIT 开源协议",
+      "localFirst": "本地优先",
+      "noAuth": "无需登录",
+      "thinks": "思考",
+      "draws": "绘制",
+      "builds": "构建",
+      "ships": "发布"
     },
     "problem": {
-      "title": "The Problem",
-      "description": "Traditional flowchart tools are either too complex or too limited."
+      "title": "面临的问题",
+      "description": "传统的绘图工具要么太复杂，要么太受限。"
     },
     "solution": {
-      "title": "The Solution",
-      "description": "OpenFlowKit combines the best of both worlds."
+      "title": "解决方案",
+      "description": "OpenFlowKit 结合了两者的优点。"
     },
     "demo": {
-      "title": "Simple for sketching.",
-      "subtitle": "Ready for production.",
-      "description": "Sketch your ideas fast. Export them production-ready."
+      "title": "轻松绘制草图。",
+      "subtitle": "随时投入生产。",
+      "description": "快速勾勒创意。导出生产可用图表。"
     },
     "useCases": {
-      "title": "Use Cases"
+      "title": "应用场景"
     },
     "pricing": {
-      "title": "Pricing",
-      "free": "Free Forever",
-      "openSource": "Open Source"
+      "title": "价格",
+      "free": "永久免费",
+      "openSource": "开源"
     },
     "testimonials": {
-      "title": "What People Say"
+      "title": "用户评价"
     },
     "cta": {
-      "title": "Ready to Start?",
-      "subtitle": "Create your first flowchart in seconds.",
-      "button": "Launch App"
+      "title": "准备好开始了吗？",
+      "subtitle": "在几秒钟内创建你的第一个流程图。",
+      "button": "启动应用"
     },
     "footer": {
-      "rights": "All rights reserved.",
-      "madeWith": "Made with ❤️ by the OpenFlowKit Team"
+      "rights": "保留所有权利。",
+      "madeWith": "由 OpenFlowKit 团队用心制作 ❤️"
     }
   },
   "home": {
@@ -210,33 +210,33 @@
     "help": "帮助"
   },
   "properties": {
-    "title": "Properties",
-    "nodeType": "Node Type",
-    "label": "Label",
-    "description": "Description",
-    "color": "Color",
-    "icon": "Icon",
-    "size": "Size"
+    "title": "属性",
+    "nodeType": "节点类型",
+    "label": "标签",
+    "description": "描述",
+    "color": "颜色",
+    "icon": "图标",
+    "size": "大小"
   },
   "ai": {
-    "generate": "Generate with AI",
-    "provider": "AI Provider",
-    "model": "Model",
-    "apiKey": "API Key",
-    "placeholder": "Describe your flowchart..."
+    "generate": "使用 AI 生成",
+    "provider": "AI 提供商",
+    "model": "模型",
+    "apiKey": "API 密钥",
+    "placeholder": "描述你的流程图..."
   },
   "playback": {
-    "title": "Playback",
-    "play": "Play",
-    "pause": "Pause",
-    "stop": "Stop",
-    "speed": "Speed"
+    "title": "回放",
+    "play": "播放",
+    "pause": "暂停",
+    "stop": "停止",
+    "speed": "速度"
   },
   "history": {
-    "title": "History",
-    "undo": "Undo",
-    "redo": "Redo",
-    "clear": "Clear History"
+    "title": "历史记录",
+    "undo": "撤销",
+    "redo": "重做",
+    "clear": "清除历史记录"
   },
   "errors": {
     "generic": "出现了错误",
@@ -260,129 +260,129 @@
     }
   },
   "footer": {
-    "mitLicensed": "MIT Licensed"
+    "mitLicensed": "MIT 开源协议"
   },
   "pricing": {
-    "title": "Premium features.",
-    "subtitle": "Zero dollar price tag.",
-    "description": "OpenFlowKit is 100% open source. There is no \"Enterprise Edition\" hidden behind a sales call.",
-    "mitLicense": "MIT License",
-    "freeForever": "Free Forever.",
-    "fullAccess": "Full access to the core engine.",
-    "hostAnywhere": "Host it anywhere. Modify it freely.",
-    "unlimitedUsage": "Unlimited Usage",
-    "noAccount": "No account or credit card required",
-    "everythingIncluded": "Everything Included",
+    "title": "高级功能。",
+    "subtitle": "零成本。",
+    "description": "OpenFlowKit 100% 开源。没有隐藏在销售电话背后的企业版。",
+    "mitLicense": "MIT 协议",
+    "freeForever": "永久免费。",
+    "fullAccess": "完全访问核心引擎。",
+    "hostAnywhere": "在任何地方托管。自由修改。",
+    "unlimitedUsage": "无限使用",
+    "noAccount": "无需账号或信用卡",
+    "everythingIncluded": "包含所有功能",
     "features": {
-      "unlimitedDiagrams": "Unlimited diagrams & projects",
-      "saveLocally": "Save locally, your data stays on your device",
-      "whiteLabelBranding": "White-Label Branding",
-      "oneClickLayout": "One-click auto-layout",
-      "exportFormats": "Export to SVG, PNG, JPG",
-      "figmaExport": "Figma Export",
-      "mermaidSupport": "Mermaid.js Support",
-      "aiGeneration": "AI diagram generation (bring your own API key)"
+      "unlimitedDiagrams": "无限的图表和项目",
+      "saveLocally": "本地保存，数据留在设备上",
+      "whiteLabelBranding": "白标定制体验",
+      "oneClickLayout": "一键自动布局",
+      "exportFormats": "导出 SVG, PNG, JPG",
+      "figmaExport": "Figma 导出",
+      "mermaidSupport": "Mermaid.js 支持",
+      "aiGeneration": "AI 图表生成"
     },
-    "supportDevelopment": "Support development on GitHub"
+    "supportDevelopment": "在 GitHub 上支持开发"
   },
   "cta": {
-    "readyToUse": "Ready to use",
-    "buildDiagrams": "Build diagrams that",
-    "dontLookGeneric": "don't look generic.",
-    "joinUs": "Join us in building the next generation of visual tools. Open source, local-first, and forever free.",
-    "getStartedNow": "Get Started Now",
-    "copied": "Copied",
-    "copy": "Copy",
-    "documentation": "Documentation",
+    "readyToUse": "准备就绪",
+    "buildDiagrams": "制作不落俗套的图表。",
+    "dontLookGeneric": "告别千篇一律。",
+    "joinUs": "加入我们，共同打造下一代可视化工具。开源、本地优先、永久免费。",
+    "getStartedNow": "立即开始",
+    "copied": "已复制",
+    "copy": "复制",
+    "documentation": "文档",
     "github": "GitHub",
-    "roadmap": "Roadmap"
+    "roadmap": "路线图"
   },
   "problem": {
-    "badge": "The Problem",
-    "title": "Why do diagrams",
-    "subtitle": "always feel like a chore?",
-    "description": "We're designing complex systems with tools built for arts and crafts.",
-    "pixelPurgatory": "Pixel Purgatory",
-    "pixelPurgatoryDesc": "Wasting hours aligning boxes by hand. One new service breaks your entire layout.",
-    "screenshotTrap": "The Screenshot Trap",
-    "screenshotTrapDesc": "Docs drift the moment you take the screenshot. Static assets are dead assets.",
-    "enterpriseBeige": "Enterprise Beige",
-    "enterpriseBeigeDesc": "Locked into rigid, generic templates. Your architecture is unique; your diagrams shouldn't look like clipart."
+    "badge": "面临的问题",
+    "title": "为什么画图",
+    "subtitle": "总感觉像是一件苦差事？",
+    "description": "我们正在用专为艺术设计打造的工具来设计复杂的系统。",
+    "pixelPurgatory": "像素地狱",
+    "pixelPurgatoryDesc": "浪费数小时手动对齐方块。一个新服务加入会打破整个布局。",
+    "screenshotTrap": "截图陷阱",
+    "screenshotTrapDesc": "截图的那一刻，文档就已经过时了。静态资产就是死资产。",
+    "enterpriseBeige": "企业风的沉闷",
+    "enterpriseBeigeDesc": "被死板、通用的模板锁死。你的架构是独一无二的；你的图表不应该看起来像剪贴画。"
   },
   "solution": {
-    "badge": "The Features",
-    "title": "Everything you need.",
-    "subtitle": "Nothing you don't.",
-    "description": "The ultimate white-label canvas. Fully customizable nodes, edges, and themes — powered by React Flow. It's your brand, given infinite space to breathe.",
-    "diagramAsCode": "Diagram as Code",
-    "diagramAsCodeDesc": "First-class support for Mermaid.js and our type-safe DSL. Define your architecture in code, export as JSON, and let the engine handle the layout.",
+    "badge": "功能特性",
+    "title": "你需要的一切。",
+    "subtitle": "没有多余的废话。",
+    "description": "终极白标画布。",
+    "diagramAsCode": "代码即图表",
+    "diagramAsCodeDesc": "支持 Mermaid.js 和 DSL。",
     "flowpilotAI": "Flowpilot AI",
-    "aiAssistant": "AI Assistant",
-    "flowpilotAIDesc": "Chat with your diagram. \"Make the corners rounder\", \"Add a load balancer\".",
-    "addRedisCache": "Add a Redis cache in front of the DB.",
-    "localPrivate": "Local & Private",
-    "localPrivateDesc": "We don't want your data. Everything stays on your machine. No cloud saves, no tracking, no \"syncing\" to our servers. You have full freedom.",
-    "offlineReady": "Offline Ready",
-    "localFileSystem": "Local File System",
-    "amazingAesthetics": "Amazing Aesthetics",
-    "amazingAestheticsDesc": "Break free from \"Enterprise Beige\". Fully customizable fonts, colors, and shapes. Create diagrams that look like art, not documentation.",
-    "sunsetRed": "Sunset Red",
-    "amberWarning": "Amber Warning",
-    "successGreen": "Success Green"
+    "aiAssistant": "AI 助手",
+    "flowpilotAIDesc": "与你的图表对话。",
+    "addRedisCache": "在数据库前添加一个 Redis 缓存。",
+    "localPrivate": "本地且私密",
+    "localPrivateDesc": "一切都留在你的机器上。",
+    "offlineReady": "支持离线",
+    "localFileSystem": "本地文件系统",
+    "amazingAesthetics": "惊艳的美学设计",
+    "amazingAestheticsDesc": "完全可定制的字体、颜色和形状。",
+    "sunsetRed": "日落红",
+    "amberWarning": "琥珀警告",
+    "successGreen": "成功绿"
   },
   "workflows": {
-    "badge": "Workflows",
-    "title": "One engine.",
-    "subtitle": "Three native workflows.",
-    "description": "OpenFlowKit adapts to the tool you are already using. No new tabs to open. No context switching.",
-    "engineering": "Engineering",
-    "diagramAsCode": "DIAGRAM AS CODE",
-    "engineeringDesc": "Write diagrams in our DSL or Mermaid.js syntax. Paste code, get a fully laid-out diagram. Export as JSON to version control.",
-    "design": "Design",
-    "theVisualLayer": "THE VISUAL LAYER",
-    "designDesc": "Stop rebuilding screens. Copy from the canvas and paste into Figma as editable SVG and text layers.",
-    "exportShare": "Export & Share",
-    "pixelPerfectOutput": "PIXEL-PERFECT OUTPUT",
-    "exportShareDesc": "Export diagrams as SVG, PNG, or PDF. Copy to clipboard and paste into Figma with editable layers. Save as JSON to share or version control.",
-    "vectorEditable": "Vector • Editable in Figma",
-    "rasterHighRes": "Raster • High-res export",
-    "dataSaveRestore": "Data • Save & restore flows"
+    "badge": "工作流",
+    "title": "一个引擎。",
+    "subtitle": "三种原生工作流。",
+    "description": "OpenFlowKit 适应你已经在使用的工具。",
+    "engineering": "工程",
+    "diagramAsCode": "代码即图表",
+    "engineeringDesc": "使用 DSL 或 Mermaid.js 语法编写图表。",
+    "design": "设计",
+    "theVisualLayer": "视觉层",
+    "designDesc": "从画布复制并作为可编辑的 SVG 粘贴到 Figma 中。",
+    "exportShare": "导出与分享",
+    "pixelPerfectOutput": "像素级完美输出",
+    "exportShareDesc": "将图表导出为 SVG、PNG 或 PDF。",
+    "vectorEditable": "矢量 • 在 Figma 中可编辑",
+    "rasterHighRes": "光栅 • 高分辨率导出",
+    "dataSaveRestore": "数据 • 保存与恢复流程"
   },
   "figma": {
-    "badge": "Zero Plugins Required",
-    "title": "Copy the code.",
-    "subtitle": "Paste the design.",
-    "description": "Copy a diagram from OpenFlowKit and paste it straight into Figma — you'll get editable text and clean vector shapes, not a flat image. No plugins needed.",
-    "editableText": "Editable Text",
-    "vectorFidelity": "Vector Fidelity",
-    "selected": "Selected",
-    "vectorText": "Vector + Text",
-    "untitled": "Untitled"
+    "badge": "无需插件",
+    "title": "复制代码。",
+    "subtitle": "粘贴设计。",
+    "description": "从 OpenFlowKit 复制直贴到 Figma — 你将获得可编辑文本和矢量形状。",
+    "editableText": "可编辑文本",
+    "vectorFidelity": "矢量保真度",
+    "selected": "已选择",
+    "vectorText": "矢量 + 文本",
+    "untitled": "未命名"
   },
   "testimonials": {
-    "badge": "Under Construction",
-    "title": "Build in public.",
-    "subtitle": "Shape the engine.",
-    "description": "OpenFlowKit is just getting started. We are building the core engine in the open. Join us on Day 1.",
-    "starTheRepo": "Star the Repo",
-    "openSource": "Open Source",
-    "openSourceDesc": "The core engine is MIT licensed. Read the source, submit PRs, or fork it for your internal tools.",
-    "prsWelcome": "PRs Welcome",
-    "community": "Community",
-    "communityDesc": "Join developers building on OpenFlowKit.",
-    "roadmap": "Roadmap",
-    "coreRenderer": "Core Renderer",
+    "badge": "建设中",
+    "title": "公开构建。",
+    "subtitle": "塑造引擎。",
+    "description": "OpenFlowKit 才刚刚起步。从第一天起就加入我们。",
+    "starTheRepo": "给仓库点赞",
+    "openSource": "开源",
+    "openSourceDesc": "MIT 协议。阅读源码，提交 PR。",
+    "prsWelcome": "欢迎提交 PR",
+    "community": "社区",
+    "communityDesc": "加入构建者行列。",
+    "roadmap": "路线图",
+    "coreRenderer": "核心渲染器",
     "flowpilotAI": "Flowpilot AI",
-    "pdfExport": "PDF Export"
+    "pdfExport": "PDF 导出"
   },
   "demo": {
-    "livePreview": "Live Preview",
-    "title": "Simple for sketching.",
-    "subtitle": "Ready for production.",
-    "description1": "Sketch your ideas fast.",
-    "description2": "Export them production-ready.",
-    "liveSync": "Live Sync",
-    "liveSyncDesc": "Edit code ↔ See changes instantly"
+    "livePreview": "实时预览",
+    "title": "轻松绘制草图。",
+    "subtitle": "随时投入生产。",
+    "description1": "快速勾勒创意。",
+    "description2": "导出生产图表。",
+    "liveSync": "实时同步",
+    "liveSyncDesc": "编辑代码 ↔ 立即看到改变"
   },
   "docs": {
     "documentation": "文档",
@@ -390,227 +390,228 @@
     "onThisPage": "本页内容"
   },
   "chatbot": {
-    "greeting": "Hello, how can I help you?",
-    "tagline": "Your intelligent guide to understanding and using",
-    "messagePlaceholder": "Message",
+    "greeting": "你好，我能帮你什么？",
+    "tagline": "智能指南",
+    "messagePlaceholder": "消息",
     "aiSuffix": "AI...",
-    "sendMessage": "Send message",
-    "newChat": "New Chat",
-    "docsTitle": "Docs",
-    "aiAssistant": "AI Assistant",
+    "sendMessage": "发送消息",
+    "newChat": "新对话",
+    "docsTitle": "文档",
+    "aiAssistant": "AI 助手",
     "aiName": "AI",
-    "you": "You",
-    "searchingDocs": "Searching docs...",
-    "aiDisclaimer": "AI can make mistakes. Verify important information.",
-    "welcomeMessage": "Hi! I'm the {appName} AI assistant. I have access to the complete documentation. How can I help you today?",
+    "you": "你",
+    "searchingDocs": "正在搜索文档...",
+    "aiDisclaimer": "AI 可能会犯错。请核实重要信息。",
+    "welcomeMessage": "你好！我是 {appName} AI 助手。今天能帮你什么？",
     "prompts": {
       "keyboardShortcuts": {
-        "title": "Keyboard Shortcuts",
-        "description": "What are the essential keyboard shortcuts?",
+        "title": "快捷键",
+        "description": "有哪些快捷键？",
         "icon": "⌘"
       },
       "nodeTypes": {
-        "title": "Node Types",
-        "description": "How do I create a decision node?",
+        "title": "节点类型",
+        "description": "如何创建决策节点？",
         "icon": "❖"
       },
       "dslSyntax": {
-        "title": "DSL Syntax",
-        "description": "Show me an example of the FlowMind DSL.",
+        "title": "DSL 语法",
+        "description": "给我看一个例子。",
         "icon": "{}"
       }
     }
   },
   "footerBanner": {
-    "shipping": "We are shipping daily.",
-    "checkChangelog": "Check the Changelog."
+    "shipping": "我们每天都在发布新功能。",
+    "checkChangelog": "查看更新日志。"
   },
   "commandBar": {
     "ai": {
-      "title": "Ask Flowpilot",
-      "clearChat": "Clear Chat History",
-      "placeholder": "Describe what you want to create...",
+      "title": "询问 Flowpilot",
+      "clearChat": "清除聊天记录",
+      "placeholder": "描述你想创建的内容...",
       "examples": {
-        "userRegistration": "User Registration",
-        "userRegistrationPrompt": "User registration flow with email verification",
-        "ecommerceCheckout": "E-Commerce Checkout",
-        "ecommerceCheckoutPrompt": "E-commerce checkout process with payment gateway failure handling",
-        "cicdPipeline": "CI/CD Pipeline",
-        "cicdPipelinePrompt": "CI/CD pipeline architecture",
-        "oauth2Login": "OAuth2 Login",
-        "oauth2LoginPrompt": "Oauth2 login flow"
+        "userRegistration": "用户注册",
+        "userRegistrationPrompt": "用户注册流程",
+        "ecommerceCheckout": "电商结账",
+        "ecommerceCheckoutPrompt": "电商结账流程",
+        "cicdPipeline": "CI/CD 流水线",
+        "cicdPipelinePrompt": "CI/CD 流水线架构",
+        "oauth2Login": "OAuth2 登录",
+        "oauth2LoginPrompt": "Oauth2 登录流程"
       }
     },
     "search": {
-      "title": "Search Nodes",
-      "placeholder": "Search by label or ID...",
-      "noResults": "No nodes found",
-      "untitled": "Untitled Node",
-      "type": "Type"
+      "title": "搜索节点",
+      "placeholder": "通过标签或 ID 搜索...",
+      "noResults": "未找到节点",
+      "untitled": "未命名节点",
+      "type": "类型"
     },
     "templates": {
-      "title": "Templates",
-      "placeholder": "Search templates...",
-      "noResults": "No templates found"
+      "title": "模板",
+      "placeholder": "搜索模板...",
+      "noResults": "未找到模板"
     },
     "code": {
-      "mermaidTitle": "Import Mermaid",
-      "dslTitle": "Import {appName} DSL",
-      "mermaidPlaceholder": "Paste Mermaid code here...",
-      "dslPlaceholder": "Paste {appName} DSL code here...",
-      "applyShortcut": "⌘+Enter to apply",
-      "syntaxGuide": "Syntax Guide",
-      "apply": "Apply"
+      "mermaidTitle": "导入 Mermaid",
+      "dslTitle": "导入 {appName} DSL",
+      "mermaidPlaceholder": "粘贴 Mermaid 代码...",
+      "dslPlaceholder": "粘贴 DSL 代码...",
+      "applyShortcut": "按 ⌘+Enter 应用",
+      "syntaxGuide": "语法指南",
+      "apply": "应用"
     },
     "layout": {
-      "title": "Layout Studio",
-      "algorithm": "Algorithm",
-      "layered": "Layered",
-      "layeredDesc": "Hierarchical, good for flows",
-      "tree": "Tree",
-      "treeDesc": "Strict parent-child structure",
-      "force": "Force",
-      "forceDesc": "Organic, physics-based",
-      "radial": "Radial",
-      "radialDesc": "Circular arrangement",
-      "direction": "Direction",
-      "down": "Down",
-      "up": "Up",
-      "right": "Right",
-      "left": "Left",
-      "spacing": "Spacing",
-      "compact": "Compact",
-      "normal": "Normal",
-      "loose": "Loose",
-      "applyLayout": "Apply Layout"
+      "title": "布局工作室",
+      "algorithm": "算法",
+      "layered": "分层",
+      "layeredDesc": "层级结构",
+      "tree": "树状",
+      "treeDesc": "严格父子结构",
+      "force": "力导向",
+      "forceDesc": "有机物理结构",
+      "radial": "放射状",
+      "radialDesc": "圆形排列",
+      "direction": "方向",
+      "down": "向下",
+      "up": "向上",
+      "right": "向右",
+      "left": "向左",
+      "spacing": "间距",
+      "compact": "紧凑",
+      "normal": "正常",
+      "loose": "宽松",
+      "applyLayout": "应用布局"
     },
     "designSystem": {
-      "title": "Design Systems",
-      "createNew": "Create New System",
-      "import": "Import",
-      "exportActive": "Export Active"
+      "title": "设计系统",
+      "createNew": "创建新系统",
+      "import": "导入",
+      "exportActive": "导出当前"
     },
     "visuals": {
-      "title": "Connection Styles",
-      "edgeStyle": "Edge Style",
-      "bezier": "Bezier",
-      "bezierDesc": "Smooth curves",
-      "straight": "Straight",
-      "straightDesc": "Direct lines",
-      "smoothStep": "Smooth Step",
-      "smoothStepDesc": "Rounded corners",
-      "step": "Step",
-      "stepDesc": "Right angles",
-      "defaultIcons": "Default Icons",
-      "defaultIconsDesc": "Show standard node icons",
-      "intelligentRouting": "Intelligent Routing",
-      "intelligentRoutingDesc": "Auto-snap connections on drag",
-      "animatedEdges": "Animated Edges",
-      "animatedEdgesDesc": "Flowing particles",
-      "strokeWidth": "Stroke Width"
+      "title": "连接线样式",
+      "edgeStyle": "连线样式",
+      "bezier": "贝塞尔曲线",
+      "bezierDesc": "平滑的曲线",
+      "straight": "直线",
+      "straightDesc": "直接相连",
+      "smoothStep": "平滑阶梯",
+      "smoothStepDesc": "圆角折线",
+      "step": "阶梯",
+      "stepDesc": "直角折线",
+      "defaultIcons": "默认图标",
+      "defaultIconsDesc": "显示标准节点图标",
+      "intelligentRouting": "智能路由",
+      "intelligentRoutingDesc": "拖动时自动吸附",
+      "animatedEdges": "动画连线",
+      "animatedEdgesDesc": "流动的粒子",
+      "strokeWidth": "线宽"
     }
   },
   "settingsModal": {
-    "title": "Settings",
-    "general": "General",
+    "title": "设置",
+    "general": "通用",
     "flowpilotAI": "Flowpilot AI",
-    "shortcuts": "Shortcuts",
-    "running": "Running {appName}",
-    "generalSettings": "General Settings",
-    "flowpilotConfigurations": "Flowpilot Configurations",
-    "keyboardShortcuts": "Keyboard Shortcuts",
+    "shortcuts": "快捷键",
+    "running": "正在运行 {appName}",
+    "generalSettings": "通用设置",
+    "flowpilotConfigurations": "Flowpilot 配置",
+    "keyboardShortcuts": "键盘快捷键",
     "canvas": {
-      "title": "Canvas",
-      "showGrid": "Show Grid",
-      "showGridDesc": "Display a dot grid on the canvas",
-      "snapToGrid": "Snap to Grid",
-      "snapToGridDesc": "Snap nodes to the grid when moving",
-      "miniMap": "Mini Map",
-      "miniMapDesc": "Show mini-map in bottom right"
+      "title": "画布",
+      "showGrid": "显示网格",
+      "showGridDesc": "在画布上显示点状网格",
+      "snapToGrid": "对齐网格",
+      "snapToGridDesc": "移动时自动对齐",
+      "miniMap": "小地图",
+      "miniMapDesc": "右下角显示小地图"
     },
     "ai": {
-      "provider": "Provider",
-      "model": "Model",
-      "apiKey": "API Key",
-      "customBaseUrl": "Custom Base URL",
-      "optional": "Optional",
-      "testConnection": "Test Connection",
-      "testing": "Testing...",
-      "success": "Success! Connected to {provider}",
-      "failed": "Failed: {error}",
-      "getApiKey": "Get {provider} API Key",
-      "openConsole": "Open {console}",
-      "keySetupNote": "Key Setup Note",
-      "enterApiKey": "Enter your API key",
-      "selectModel": "Select a model",
-      "customEndpoint": "Custom Base URL (e.g., https://api.example.com)",
+      "provider": "提供商",
+      "model": "模型",
+      "apiKey": "API 密钥",
+      "customBaseUrl": "自定义 URL",
+      "optional": "可选",
+      "testConnection": "测试连接",
+      "testing": "测试中...",
+      "success": "成功！",
+      "failed": "失败：{error}",
+      "getApiKey": "获取 API 密钥",
+      "openConsole": "打开控制台",
+      "keySetupNote": "设置说明",
+      "enterApiKey": "输入 API 密钥",
+      "selectModel": "选择模型",
+      "customEndpoint": "自定义 URL",
       "providers": {
         "gemini": {
-          "hint": "Google · Best free tier · Multimodal",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "Google",
+          "keySetupNote": "免费额度"
         },
         "openai": {
-          "hint": "GPT-5 family · Industry standard",
-          "keySetupNote": "Requires a paid account and billing setup"
+          "hint": "GPT-5",
+          "keySetupNote": "需付费账户"
         },
         "claude": {
-          "hint": "Anthropic · Leading reasoning model",
-          "keySetupNote": "Requires a paid account ($5 min credit top-up)"
+          "hint": "Anthropic",
+          "keySetupNote": "需付费账户"
         },
         "groq": {
-          "hint": "Blazing fast · Generous free tier · Llama 4",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "极快",
+          "keySetupNote": "免费额度"
         },
         "nvidia": {
-          "hint": "NIM · Kimi-V2.5 · Frontier models",
-          "keySetupNote": "Free credits included with a new account"
+          "hint": "NIM",
+          "keySetupNote": "免费积分"
         },
         "cerebras": {
-          "hint": "2,400 tok/s · Qwen 3 235B · WSE-3 speed",
-          "keySetupNote": "Free tier available — no credit card needed"
+          "hint": "2,400 tok/s",
+          "keySetupNote": "免费额度"
         },
         "mistral": {
-          "hint": "Le Chat · Codestral · European AI leader",
-          "keySetupNote": "Free tier with generous limits — no credit card needed"
+          "hint": "Le Chat",
+          "keySetupNote": "免费额度"
         },
         "custom": {
-          "hint": "Any OpenAI-compatible endpoint"
+          "hint": "OpenAI 兼容"
         }
       }
     },
     "brand": {
-      "title": "Brand Kits",
-      "subtitle": "Manage your brand identities",
-      "active": "Active",
-      "editKit": "Edit Kit",
-      "deleteConfirm": "Delete this kit?",
-      "createNewKit": "Create New Kit",
-      "newIdentity": "New Identity",
-      "activeKit": "Active Kit",
-      "inactive": "Inactive",
-      "setActive": "Set Active",
-      "resetToDefaults": "Reset to Defaults"
+      "title": "品牌套件",
+      "subtitle": "管理品牌标识",
+      "active": "使用中",
+      "editKit": "编辑套件",
+      "deleteConfirm": "确认删除此套件？",
+      "createNewKit": "创建新套件",
+      "newIdentity": "新标识",
+      "activeKit": "当前套件",
+      "inactive": "未激活",
+      "setActive": "设为当前使用",
+      "resetToDefaults": "重置为默认"
     },
-    "shortcutsHint": "You can also press ? to view these anytime.",
+    "shortcutsHint": "你也可以随时按下 ? 键来查看这些快捷键。",
     "privacy": {
-      "manifesto": "Our Privacy Manifesto",
-      "manifestoText": "We believe in privacy by design and user autonomy. We don't collect your email, we don't have a login system, and we don't store your data on our servers.",
-      "localFirst": "Local-First Storage",
-      "noAccounts": "No User Accounts",
-      "ownData": "Own Your Data",
-      "anonymous": "Anonymous Usage Only",
-      "telemetry": "Telemetry & Feedback",
-      "anonymousStats": "Anonymous Stats",
-      "anonymousStatsDesc": "We only track visits and limited anonymous feature usage (like exports) to improve the tool. We do not track your names, IP addresses, inputs, or diagram content.",
-      "quote": "We rely on you to tell us what works, rather than tracking your every move.",
-      "helpImprove": "Help Us Improve",
-      "shareFeedback": "Share Feedback",
-      "shareFeedbackDesc": "Give feedback, report bugs, and ask for features"
-    }
+      "manifesto": "我们的隐私宣言",
+      "manifestoText": "我们坚信基于设计的隐私保护。",
+      "localFirst": "本地优先存储",
+      "noAccounts": "没有用户账户",
+      "ownData": "你的数据你做主",
+      "anonymous": "仅限匿名使用",
+      "telemetry": "遥测与反馈",
+      "anonymousStats": "匿名统计",
+      "anonymousStatsDesc": "我们只跟踪访问量。",
+      "quote": "我们依靠您来告诉我们什么有效。",
+      "helpImprove": "帮助我们改进",
+      "shareFeedback": "分享反馈",
+      "shareFeedbackDesc": "提供反馈、报告错误"
+    },
+    "settings": "设置"
   },
   "customNodes": {
-    "browserContent": "Browser Content",
-    "mobileContent": "Mobile Content"
+    "browserContent": "浏览器内容",
+    "mobileContent": "移动端内容"
   },
   "keyboardShortcutsModal": {
     "title": "键盘快捷键",

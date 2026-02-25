@@ -9,16 +9,17 @@ interface Language {
   name: string;
   nativeName: string;
   flag: string;
+  scope: 'full' | 'ui';
 }
 
 const LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '/flags/us.svg' },
-  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '/flags/tr.svg' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '/flags/de.svg' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '/flags/fr.svg' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '/flags/es.svg' },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '/flags/cn.svg' },
-  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '/flags/jp.svg' },
+  { code: 'en', name: 'English', nativeName: 'English', flag: '/flags/us.svg', scope: 'full' },
+  { code: 'tr', name: 'Turkish', nativeName: 'Türkçe', flag: '/flags/tr.svg', scope: 'full' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '/flags/de.svg', scope: 'ui' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '/flags/fr.svg', scope: 'ui' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '/flags/es.svg', scope: 'ui' },
+  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '/flags/cn.svg', scope: 'ui' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '/flags/jp.svg', scope: 'ui' },
 ];
 
 interface LanguageSelectorProps {
@@ -42,8 +43,9 @@ function LanguageDropdown({
   currentCode,
   onSelect,
   onClose,
-  width = 'w-44',
+  width = 'w-60', // Widened to accommodate badges
 }: LanguageDropdownProps): React.JSX.Element | null {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const positionClass = placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2';
@@ -59,14 +61,21 @@ function LanguageDropdown({
           <button
             key={lang.code}
             onClick={() => onSelect(lang.code)}
-            className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium transition-all ${currentCode === lang.code
-                ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
-                : 'text-slate-600 hover:bg-slate-50'
+            className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm font-medium transition-all ${currentCode === lang.code
+              ? 'bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
+              : 'text-slate-600 hover:bg-slate-50'
               }`}
           >
             <div className="flex items-center gap-2">
               <img src={lang.flag} alt={lang.name} className="w-5 h-3.5 object-cover rounded-[2px]" />
-              <span>{lang.nativeName}</span>
+              <span className="flex items-center gap-2">
+                {lang.nativeName}
+                {lang.scope === 'ui' && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500 uppercase tracking-wider">
+                    UI Only
+                  </span>
+                )}
+              </span>
             </div>
             {currentCode === lang.code && <Check className="w-4 h-4" />}
           </button>
@@ -102,8 +111,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   }
 
   const chevronClass = `transition-transform ${isOpen
-      ? placement === 'top' ? '' : 'rotate-180'
-      : placement === 'top' ? 'rotate-180' : ''
+    ? placement === 'top' ? '' : 'rotate-180'
+    : placement === 'top' ? 'rotate-180' : ''
     }`;
 
   if (variant === 'compact') {
@@ -148,7 +157,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
           currentCode={i18n.language}
           onSelect={changeLanguage}
           onClose={() => setIsOpen(false)}
-          width="w-40"
+          width="w-56"
         />
       </div>
     );
