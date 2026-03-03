@@ -98,6 +98,17 @@ const PROVIDERS: ProviderMeta[] = [
         defaultModel: 'mistral-medium-latest',
     },
     {
+        id: 'openrouter',
+        name: 'OpenRouter',
+        icon: '↔',
+        color: '#111827',
+        logoPath: '/logos/custom.svg',
+        keyPlaceholder: 'sk-or-v1-...',
+        keyLink: 'https://openrouter.ai/settings/keys',
+        consoleName: 'OpenRouter Dashboard',
+        defaultModel: 'google/gemini-2.5-flash',
+    },
+    {
         id: 'custom',
         name: 'Custom',
         icon: '⚙',
@@ -156,6 +167,11 @@ const PROVIDER_MODELS: Record<AIProvider, { id: string; translateKey: string }[]
         { id: 'mistral-large-latest', translateKey: 'mistral-large-latest' },
         { id: 'codestral-latest', translateKey: 'codestral-latest' },
         { id: 'pixtral-large-latest', translateKey: 'pixtral-large-latest' },
+    ],
+    openrouter: [
+        { id: 'google/gemini-2.5-flash', translateKey: 'google/gemini-2.5-flash' },
+        { id: 'openai/gpt-5-mini', translateKey: 'openai/gpt-5-mini' },
+        { id: 'anthropic/claude-sonnet-4', translateKey: 'anthropic/claude-sonnet-4' },
     ],
     custom: [
         { id: 'custom', translateKey: 'custom' },

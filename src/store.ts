@@ -70,13 +70,20 @@ interface ViewSettings {
 }
 
 
-export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'nvidia' | 'cerebras' | 'mistral' | 'custom';
+export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'nvidia' | 'cerebras' | 'mistral' | 'openrouter' | 'custom';
+
+export interface CustomHeaderConfig {
+    key: string;
+    value: string;
+    enabled?: boolean;
+}
 
 export interface AISettings {
     provider: AIProvider;
     apiKey?: string;
     model?: string;
     customBaseUrl?: string;
+    customHeaders?: CustomHeaderConfig[];
 }
 
 export const DEFAULT_AI_SETTINGS: AISettings = {
@@ -84,6 +91,7 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
     apiKey: undefined,
     model: undefined,
     customBaseUrl: undefined,
+    customHeaders: [],
 };
 
 export interface BrandConfig {

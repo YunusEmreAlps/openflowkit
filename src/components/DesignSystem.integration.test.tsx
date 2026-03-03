@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import type { CSSProperties } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Position } from 'reactflow';
 import type { DesignSystem } from '@/lib/types';
 import { DEFAULT_DESIGN_SYSTEM, useFlowStore } from '@/store';
 import CustomNode from './CustomNode';
@@ -77,16 +78,12 @@ describe('Design System integration', () => {
         const altSystem = createSystem({
             id: 'alt',
             name: 'Alt',
-            colors: {
-                nodeBackground: '#101820',
-                nodeBorder: '#00d1ff',
-                nodeText: '#f6f7f9',
-                edge: '#ff0055',
-            },
-            components: {
-                edge: { strokeWidth: 6 },
-            },
         });
+        altSystem.colors.nodeBackground = '#101820';
+        altSystem.colors.nodeBorder = '#00d1ff';
+        altSystem.colors.nodeText = '#f6f7f9';
+        altSystem.colors.edge = '#ff0055';
+        altSystem.components.edge.strokeWidth = 6;
 
         useFlowStore.setState({
             designSystems: [defaultSystem, altSystem],
@@ -103,30 +100,24 @@ describe('Design System integration', () => {
                 dragging={false}
                 zIndex={1}
                 data={{ label: 'Node A' }}
-                positionAbsoluteX={0}
-                positionAbsoluteY={0}
                 isConnectable={true}
                 xPos={0}
                 yPos={0}
-                sourcePosition="right"
-                targetPosition="left"
+                sourcePosition={Position.Right}
+                targetPosition={Position.Left}
             />
         );
 
         const nodeContainer = screen.getByTestId('custom-node-container');
-        expect(nodeContainer).toHaveStyle({
-            backgroundColor: '#ffffff',
-            borderColor: '#e2e8f0',
-        });
+        expect(nodeContainer.style.backgroundColor).toBe('rgb(255, 255, 255)');
+        expect(nodeContainer.style.borderColor).toBe('rgb(226, 232, 240)');
 
         act(() => {
             useFlowStore.getState().setActiveDesignSystem('alt');
         });
 
-        expect(nodeContainer).toHaveStyle({
-            backgroundColor: '#101820',
-            borderColor: '#00d1ff',
-        });
+        expect(nodeContainer.style.backgroundColor).toBe('rgb(16, 24, 32)');
+        expect(nodeContainer.style.borderColor).toBe('rgb(0, 209, 255)');
     });
 
     it('updates edge visual tokens when active design system changes', () => {
@@ -139,8 +130,8 @@ describe('Design System integration', () => {
                 sourceY={0}
                 targetX={100}
                 targetY={100}
-                sourcePosition="right"
-                targetPosition="left"
+                sourcePosition={Position.Right}
+                targetPosition={Position.Left}
                 selected={false}
                 style={{}}
             />
@@ -163,8 +154,8 @@ describe('Design System integration', () => {
                 sourceY={0}
                 targetX={100}
                 targetY={100}
-                sourcePosition="right"
-                targetPosition="left"
+                sourcePosition={Position.Right}
+                targetPosition={Position.Left}
                 selected={false}
                 style={{}}
             />

@@ -29,6 +29,10 @@ function createTab(id: string, name: string, nodes: FlowNode[], edges: FlowEdge[
     };
 }
 
+function noop(): void {
+    // noop for legacy useAutoSave setup callbacks
+}
+
 describe('useAutoSave', () => {
     beforeEach(() => {
         localStorage.clear();
@@ -45,7 +49,12 @@ describe('useAutoSave', () => {
                 'tab-missing',
                 [createNode('n1', 'Node 1')],
                 [createEdge('e1', 'n1', 'n1')],
-                setTabs
+                setTabs,
+                noop,
+                noop,
+                noop,
+                noop,
+                noop
             )
         );
 
@@ -70,7 +79,12 @@ describe('useAutoSave', () => {
                 'tab-1',
                 newNodes,
                 newEdges,
-                setTabs
+                setTabs,
+                noop,
+                noop,
+                noop,
+                noop,
+                noop
             )
         );
 

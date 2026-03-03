@@ -69,8 +69,8 @@ describe('HomePage integration flows', () => {
         renderHomePage();
 
         fireEvent.click(screen.getByText('Settings'));
-        expect(screen.getByRole('heading', { name: 'Settings' })).toBeInTheDocument();
-        expect(screen.getByText('Flowpilot AI')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Settings' })).toBeTruthy();
+        expect(screen.getByText('Flowpilot AI')).toBeTruthy();
     });
 
     it('restores a snapshot and launches editor when a snapshot card is clicked', () => {

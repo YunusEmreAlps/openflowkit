@@ -1,6 +1,6 @@
 import { getSystemInstruction, ChatMessage, generateDiagramFromChat as generateDiagramFromChatGemini, chatWithDocsGemini } from './geminiService';
 
-export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'nvidia' | 'cerebras' | 'mistral' | 'custom';
+export type AIProvider = 'gemini' | 'openai' | 'claude' | 'groq' | 'nvidia' | 'cerebras' | 'mistral' | 'openrouter' | 'custom';
 
 const PROVIDER_BASE_URLS: Record<string, string> = {
     openai: 'https://api.openai.com/v1',
@@ -8,6 +8,7 @@ const PROVIDER_BASE_URLS: Record<string, string> = {
     nvidia: 'https://integrate.api.nvidia.com/v1',
     cerebras: 'https://api.cerebras.ai/v1',
     mistral: 'https://api.mistral.ai/v1',
+    openrouter: 'https://openrouter.ai/api/v1',
 };
 
 const DEFAULT_MODELS: Record<string, string> = {
@@ -18,6 +19,7 @@ const DEFAULT_MODELS: Record<string, string> = {
     nvidia: 'meta/llama-4-scout-17b-16e-instruct',
     cerebras: 'gpt-oss-120b',
     mistral: 'mistral-medium-latest',
+    openrouter: 'google/gemini-2.5-flash',
     custom: 'gpt-4o',
 };
 
@@ -31,6 +33,7 @@ function getEnvApiKey(provider: AIProvider): string | undefined {
         case 'nvidia': return import.meta.env.VITE_NVIDIA_API_KEY;
         case 'cerebras': return import.meta.env.VITE_CEREBRAS_API_KEY;
         case 'mistral': return import.meta.env.VITE_MISTRAL_API_KEY;
+        case 'openrouter': return import.meta.env.VITE_OPENROUTER_API_KEY;
         case 'custom': return import.meta.env.VITE_CUSTOM_AI_API_KEY;
         default: return undefined;
     }

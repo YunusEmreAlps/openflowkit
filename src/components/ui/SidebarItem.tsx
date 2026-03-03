@@ -9,6 +9,7 @@ interface SidebarItemProps {
     isActive?: boolean;
     className?: string;
     end?: boolean;
+    testId?: string;
 }
 
 /**
@@ -22,7 +23,8 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     onClick,
     isActive: manualIsActive,
     className = '',
-    end = false
+    end = false,
+    testId
 }) => {
     const baseStyles = "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors w-full text-left group";
     const activeStyles = "bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] font-medium";
@@ -44,6 +46,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                     target={to.startsWith('http') ? "_blank" : undefined}
                     rel={to.startsWith('http') ? "noopener noreferrer" : undefined}
                     onClick={onClick}
+                    data-testid={testId}
                     className={`
                         ${baseStyles}
                         ${manualIsActive ? activeStyles : inactiveStyles}
@@ -65,6 +68,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
                     ${className}
                 `}
                 onClick={onClick}
+                data-testid={testId}
             >
                 {content}
             </NavLink>
@@ -74,6 +78,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     return (
         <button
             onClick={onClick}
+            data-testid={testId}
             className={`
                 ${baseStyles}
                 ${manualIsActive ? activeStyles : inactiveStyles}
