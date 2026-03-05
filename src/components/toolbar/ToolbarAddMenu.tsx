@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import {
     AppWindow,
+    Footprints,
     Group,
     Image as ImageIcon,
     Plus,
@@ -18,6 +19,7 @@ interface ToolbarAddMenuProps {
     onToggleMenu: () => void;
     onCloseMenu: () => void;
     onAddNode: (position: { x: number; y: number }) => void;
+    onAddJourneyNode: (position: { x: number; y: number }) => void;
     onAddAnnotation: (position: { x: number; y: number }) => void;
     onAddSection: (position: { x: number; y: number }) => void;
     onAddText: (position: { x: number; y: number }) => void;
@@ -32,6 +34,7 @@ export function ToolbarAddMenu({
     onToggleMenu,
     onCloseMenu,
     onAddNode,
+    onAddJourneyNode,
     onAddAnnotation,
     onAddSection,
     onAddText,
@@ -95,6 +98,17 @@ export function ToolbarAddMenu({
                         icon={<Square className="w-4 h-4 mr-2" />}
                     >
                         <span>{t('toolbar.node')}</span>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            onAddJourneyNode(getCenter());
+                            onCloseMenu();
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start h-9 px-3 text-sm rounded-[var(--radius-sm)] hover:bg-violet-50 hover:text-violet-700 transition-colors"
+                        icon={<Footprints className="w-4 h-4 mr-2" />}
+                    >
+                        {t('toolbar.userJourney', 'User Journey')}
                     </Button>
                     <Button onClick={() => { onAddAnnotation(getCenter()); onCloseMenu(); }} variant="ghost" className="w-full justify-start h-9 px-3 text-sm rounded-[var(--radius-sm)] hover:bg-yellow-50 hover:text-yellow-600 transition-colors" icon={<StickyNote className="w-4 h-4 mr-2" />}>
                         {t('toolbar.stickyNote')}

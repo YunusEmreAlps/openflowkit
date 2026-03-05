@@ -25,6 +25,7 @@ interface ToolbarProps {
   onDesignSystemPanel: () => void;
   isDesignSystemPanelOpen: boolean;
   onAddNode: (position: { x: number, y: number }) => void;
+  onAddJourneyNode: (position: { x: number, y: number }) => void;
   onAddAnnotation: (position: { x: number, y: number }) => void;
   onAddSection: (position: { x: number, y: number }) => void;
   onAddText: (position: { x: number, y: number }) => void;
@@ -50,6 +51,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onDesignSystemPanel,
   isDesignSystemPanelOpen,
   onAddNode,
+  onAddJourneyNode,
   onAddAnnotation,
   onAddSection,
   onAddText,
@@ -125,6 +127,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onToggleMenu={() => setShowAddMenu(!showAddMenu)}
             onCloseMenu={() => setShowAddMenu(false)}
             onAddNode={onAddNode}
+            onAddJourneyNode={onAddJourneyNode}
             onAddAnnotation={onAddAnnotation}
             onAddSection={onAddSection}
             onAddText={onAddText}

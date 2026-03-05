@@ -15,7 +15,11 @@ export interface ViewSettings {
     isShortcutsHelpOpen: boolean;
     defaultIconsEnabled: boolean;
     smartRoutingEnabled: boolean;
+    smartRoutingProfile: 'standard' | 'infrastructure';
+    smartRoutingBundlingEnabled: boolean;
+    architectureStrictMode: boolean;
     largeGraphSafetyMode: 'auto' | 'on' | 'off';
+    largeGraphSafetyProfile: 'performance' | 'balanced' | 'quality';
     exportSerializationMode: ExportSerializationMode;
     historyModelV2Enabled: boolean;
     analyticsEnabled: boolean;
@@ -79,6 +83,13 @@ export interface BrandKit extends BrandConfig {
     isDefault: boolean;
 }
 
+export interface Layer {
+    id: string;
+    name: string;
+    visible: boolean;
+    locked: boolean;
+}
+
 export interface FlowState {
     nodes: FlowNode[];
     edges: FlowEdge[];
@@ -92,6 +103,8 @@ export interface FlowState {
     brandConfig: BrandConfig;
     brandKits: BrandKit[];
     activeBrandKitId: string;
+    layers: Layer[];
+    activeLayerId: string;
     selectedNodeId: string | null;
     selectedEdgeId: string | null;
     onNodesChange: OnNodesChange;
@@ -102,8 +115,11 @@ export interface FlowState {
     setActiveTabId: (id: string) => void;
     setTabs: (tabs: FlowTab[]) => void;
     addTab: () => string;
+    duplicateActiveTab: () => string | null;
     closeTab: (id: string) => void;
     updateTab: (id: string, updates: Partial<FlowTab>) => void;
+    copySelectedToTab: (targetTabId: string) => number;
+    moveSelectedToTab: (targetTabId: string) => number;
     setActiveDesignSystem: (id: string) => void;
     addDesignSystem: (ds: DesignSystem) => void;
     updateDesignSystem: (id: string, updates: Partial<DesignSystem>) => void;
@@ -117,7 +133,10 @@ export interface FlowState {
     setGlobalEdgeOptions: (options: Partial<GlobalEdgeOptions>) => void;
     setDefaultIconsEnabled: (enabled: boolean) => void;
     setSmartRoutingEnabled: (enabled: boolean) => void;
+    setSmartRoutingProfile: (profile: ViewSettings['smartRoutingProfile']) => void;
+    setSmartRoutingBundlingEnabled: (enabled: boolean) => void;
     setLargeGraphSafetyMode: (mode: ViewSettings['largeGraphSafetyMode']) => void;
+    setLargeGraphSafetyProfile: (profile: ViewSettings['largeGraphSafetyProfile']) => void;
     toggleAnalytics: (enabled: boolean) => void;
     setAISettings: (settings: Partial<AISettings>) => void;
     setBrandConfig: (config: Partial<BrandConfig>) => void;
@@ -126,6 +145,15 @@ export interface FlowState {
     updateBrandKitName: (id: string, name: string) => void;
     deleteBrandKit: (id: string) => void;
     setActiveBrandKitId: (id: string) => void;
+    addLayer: (name?: string) => string;
+    renameLayer: (id: string, name: string) => void;
+    deleteLayer: (id: string) => void;
+    setActiveLayerId: (id: string) => void;
+    toggleLayerVisibility: (id: string) => void;
+    toggleLayerLock: (id: string) => void;
+    moveLayer: (id: string, direction: 'up' | 'down') => void;
+    moveSelectedNodesToLayer: (layerId: string) => void;
+    selectNodesInLayer: (layerId: string) => void;
     setSelectedNodeId: (id: string | null) => void;
     setSelectedEdgeId: (id: string | null) => void;
     recordHistoryV2: () => void;

@@ -113,12 +113,28 @@ export function CustomEdgeWrapper({
         window.addEventListener('pointerup', onPointerUp);
     };
 
+    const hasArchitectureMeta = typeof data?.archProtocol === 'string' && data.archProtocol.length > 0;
+    const direction = typeof data?.archDirection === 'string' ? data.archDirection : '-->';
+    const directionGlyph = direction === '<--' ? '<-' : direction === '<-->' ? '<->' : '->';
+    const sourceSide = typeof data?.archSourceSide === 'string' ? data.archSourceSide : '';
+    const targetSide = typeof data?.archTargetSide === 'string' ? data.archTargetSide : '';
+    const sideHint = sourceSide || targetSide ? `${sourceSide || '?'}${directionGlyph}${targetSide || '?'}` : '';
+    const renderedLabel = hasArchitectureMeta
+        ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 border border-blue-200">
+                {sideHint && <span className="text-blue-500">{sideHint}</span>}
+                <span>{data?.archProtocol}</span>
+                {data?.archPort && <span className="text-blue-500">:{data.archPort}</span>}
+            </span>
+        )
+        : label;
+
     return (
         <>
             <BaseEdge path={path} markerEnd={markerEnd} markerStart={markerStart} style={resolvedStyle} />
             <path ref={pathRef} d={path} style={{ display: 'none' }} fill="none" stroke="none" aria-hidden="true" />
 
-            {label && (
+            {renderedLabel && (
                 <EdgeLabelRenderer>
                     <div
                         ref={labelRef}
@@ -134,7 +150,7 @@ export function CustomEdgeWrapper({
                             onPointerDown={onLabelPointerDown}
                             className="bg-white px-2 py-1 rounded border border-slate-200 shadow-sm text-xs font-medium text-slate-600 cursor-move hover:ring-2 hover:ring-indigo-500/20 active:ring-indigo-500 select-none flow-lod-secondary flow-lod-shadow"
                         >
-                            {label}
+                            {renderedLabel}
                         </div>
                     </div>
                 </EdgeLabelRenderer>

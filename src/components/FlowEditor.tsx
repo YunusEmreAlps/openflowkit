@@ -70,11 +70,16 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
 
     // --- Core Operations ---
     const {
-        updateNodeData, updateNodeType, updateNodeZIndex, updateEdge,
+        updateNodeData, applyBulkNodeData, updateNodeType, updateNodeZIndex, updateEdge,
         deleteNode, deleteEdge, duplicateNode,
-        handleAddNode, handleAddAnnotation, handleAddSection, handleAddTextNode, handleAddImage,
+        handleAddNode, handleAddJourneyNode, handleAddAnnotation, handleAddSection, handleAddTextNode, handleAddImage, handleAddMindmapChild, handleAddArchitectureService, handleCreateArchitectureBoundary,
         handleClear
     } = useFlowOperations(recordHistory);
+
+    const selectedNodeType = useMemo(
+        () => nodes.find((node) => node.id === selectedNodeId)?.type ?? null,
+        [nodes, selectedNodeId]
+    );
 
     const {
         getCenter,
@@ -104,6 +109,12 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
     useKeyboardShortcuts({
         selectedNodeId, selectedEdgeId,
         deleteNode, deleteEdge, undo, redo, duplicateNode, selectAll,
+        selectedNodeType,
+        onAddMindmapChildShortcut: () => {
+            if (selectedNodeId) {
+                handleAddMindmapChild(selectedNodeId);
+            }
+        },
         onCommandBar: () => openCommandBar('root'),
         onSearch: () => openCommandBar('search'),
         onShortcutsHelp: () => setShortcutsHelpOpen(true)
@@ -165,6 +176,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
 
     // --- Derived State ---
     const selectedNode = useMemo(() => nodes.find((n) => n.id === selectedNodeId) || null, [nodes, selectedNodeId]);
+    const selectedNodes = useMemo(() => nodes.filter((node) => node.selected), [nodes]);
     const selectedEdge = useMemo(() => edges.find((e) => e.id === selectedEdgeId) || null, [edges, selectedEdgeId]);
 
     return (
@@ -210,6 +222,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                     onClear={handleClear}
 
                     onAddNode={handleAddNode}
+                    onAddJourneyNode={handleAddJourneyNode}
                     onAddAnnotation={handleAddAnnotation}
                     onAddSection={handleAddSection}
                     onAddText={handleAddTextNode}
@@ -271,14 +284,19 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                 onRestoreSnapshot={handleRestoreSnapshot}
                 onDeleteSnapshot={deleteSnapshot}
                 selectedNode={selectedNode}
+                selectedNodes={selectedNodes}
                 selectedEdge={selectedEdge}
                 onChangeNode={updateNodeData}
+                onBulkChangeNodes={applyBulkNodeData}
                 onChangeNodeType={updateNodeType}
                 onChangeEdge={updateEdge}
                 onDeleteNode={deleteNode}
                 onDuplicateNode={duplicateNode}
                 onDeleteEdge={deleteEdge}
                 onUpdateZIndex={updateNodeZIndex}
+                onAddMindmapChild={handleAddMindmapChild}
+                onAddArchitectureService={handleAddArchitectureService}
+                onCreateArchitectureBoundary={handleCreateArchitectureBoundary}
                 onCloseProperties={() => {
                     setSelectedNodeId(null);
                     setSelectedEdgeId(null);

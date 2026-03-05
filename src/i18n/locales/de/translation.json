@@ -473,7 +473,17 @@
       "dslPlaceholder": "{appName} DSL-Code hier einfügen...",
       "applyShortcut": "⌘+Enter zum Anwenden",
       "syntaxGuide": "Syntaxleitfaden",
-      "apply": "Anwenden"
+      "apply": "Anwenden",
+      "quickFixes": "Schnelle Korrekturen",
+      "linePrefix": "Zeile {{line}}: ",
+      "hintPrefix": "Hinweis:",
+      "strictModeGuidance": {
+        "defineEndpoints": "Definieren Sie jeden Kantenendpunkt als expliziten Architekturknoten, bevor Sie Kanten verbinden.",
+        "uniqueIds": "Verwenden Sie eindeutige IDs für jeden Service-/Gruppen-/Junction-Knoten (keine doppelten Architektur-IDs).",
+        "edgeSyntax": "Verwenden Sie Architektur-Kantenpfeile `-->`, `<--` oder `<-->` sowie Seitenqualifikatoren wie `api:R --> L:db`.",
+        "nodeSyntax": "Verwenden Sie gültige Knotendeklarationen: `service id(icon)[Label]`, `group id[Label]`, `junction id[Label]`.",
+        "fallback": "Deaktivieren Sie den Architektur-Strict-Mode, um automatische Wiederherstellung zuzulassen, oder beheben Sie die Diagnosen und versuchen Sie es erneut."
+      }
     },
     "layout": {
       "title": "Layout-Studio",
@@ -539,7 +549,9 @@
       "snapToGrid": "Am Raster ausrichten",
       "snapToGridDesc": "Knoten beim Bewegen einrasten",
       "miniMap": "Minimap",
-      "miniMapDesc": "Minimap unten rechts"
+      "miniMapDesc": "Minimap unten rechts",
+      "architectureStrictMode": "Architektur-Strict-Mode",
+      "architectureStrictModeDesc": "Blockiert den Mermaid-Import, wenn Architekturdiagnosen Wiederherstellungs-/Validierungsprobleme enthalten"
     },
     "ai": {
       "provider": "Anbieter",
@@ -740,6 +752,9 @@
     "stickyNote": "Haftnotiz",
     "nodeSettings": "Knoteneinstellungen",
     "connection": "Verbindung"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "Der Architektur-Strict-Mode hat das Mermaid-Einfügen blockiert. Öffnen Sie die Code-Ansicht, beheben Sie die Diagnosen und versuchen Sie es erneut."
   },
   "flowTabs": {
     "closeTab": "Tab schließen",

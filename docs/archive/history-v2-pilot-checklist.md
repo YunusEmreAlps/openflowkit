@@ -10,9 +10,9 @@ Use this checklist for controlled pilot rollout of store-level history V2.
 
 ## Preconditions
 
-1. `P1-01` through `P1-11` are completed in `docs/q1_execution_tracker.md`.
+1. `P1-01` through `P1-11` are completed in `docs/archive/q1_execution_tracker.md`.
 2. Latest targeted tests pass in both history and store suites.
-3. Release gate checklist is available: `docs/release-gate-checklist.md`.
+3. Release gate checklist is available: `docs/archive/release-gate-checklist.md`.
 
 ## Pilot Enablement
 
@@ -53,7 +53,7 @@ If any pilot check fails:
 npm run test -- --run src/hooks/useFlowHistory.test.ts src/store.test.ts
 ```
 
-3. Record failure details and rollback confirmation in `docs/q1_execution_tracker.md`.
+3. Record failure details and rollback confirmation in `docs/archive/q1_execution_tracker.md`.
 
 ## Signoff
 

@@ -30,6 +30,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
     const isAnnotation = selectedNode.type === 'annotation';
     const isText = selectedNode.type === 'text';
     const isImage = selectedNode.type === 'image';
+    const isSection = selectedNode.type === 'section';
     const isWireframeApp = selectedNode.type === 'browser' || selectedNode.type === 'mobile';
     const isWireframeIcon = selectedNode.type === 'wireframe_icon';
     const isWireframeImage = selectedNode.type === 'wireframe_image';
@@ -40,6 +41,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
     function getDefaultSection(): string {
         if (isWireframeApp) return 'variant';
         if (isWireframeIcon) return 'icon';
+        if (isSection) return 'content';
         if (isText || isAnnotation) return 'content';
         return 'appearance';
     }
@@ -101,7 +103,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
             )}
 
             {/* Appearance Section */}
-            {!isWireframeApp && !isWireframeMisc && !isAnnotation && !isText && !isImage && (
+            {!isWireframeApp && !isWireframeMisc && !isAnnotation && !isText && !isImage && !isSection && (
                 <CollapsibleSection
                     title="Appearance"
                     icon={<Box className="w-3.5 h-3.5" />}

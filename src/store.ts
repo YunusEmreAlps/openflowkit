@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { INITIAL_EDGES, INITIAL_NODES } from './constants';
-import type { FlowTab } from '@/lib/types';
+import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
+import { isDiagramType, type FlowTab } from '@/lib/types';
 import { createAIAndSelectionActions } from './store/actions/createAIAndSelectionActions';
 import { createBrandActions } from './store/actions/createBrandActions';
 import { createCanvasActions } from './store/actions/createCanvasActions';
 import { createDesignSystemActions } from './store/actions/createDesignSystemActions';
 import { createHistoryActions } from './store/actions/createHistoryActions';
+import { createLayerActions } from './store/actions/createLayerActions';
 import { createTabActions } from './store/actions/createTabActions';
 import { createViewActions } from './store/actions/createViewActions';
 import {
@@ -15,6 +17,7 @@ import {
     DEFAULT_BRAND_KIT,
     DEFAULT_DESIGN_SYSTEM,
     INITIAL_GLOBAL_EDGE_OPTIONS,
+    INITIAL_LAYERS,
     INITIAL_VIEW_SETTINGS,
 } from './store/defaults';
 import type { FlowState } from './store/types';
@@ -50,6 +53,9 @@ function normalizePersistedTab(rawTab: unknown): FlowTab | null {
     return {
         id: tab.id,
         name: tab.name,
+        diagramType: isDiagramType((tab as { diagramType?: unknown }).diagramType)
+            ? (tab as { diagramType: FlowTab['diagramType'] }).diagramType
+            : DEFAULT_DIAGRAM_TYPE,
         nodes: Array.isArray(tab.nodes) ? tab.nodes : [],
         edges: Array.isArray(tab.edges) ? tab.edges : [],
         history: {
@@ -71,6 +77,7 @@ function migratePersistedState(persistedState: unknown): unknown {
     const fallbackTab: FlowTab = {
         id: 'tab-1',
         name: 'Untitled Flow',
+        diagramType: DEFAULT_DIAGRAM_TYPE,
         nodes: INITIAL_NODES,
         edges: INITIAL_EDGES,
         history: { past: [], future: [] },
@@ -85,11 +92,36 @@ function migratePersistedState(persistedState: unknown): unknown {
         state.viewSettings && typeof state.viewSettings === 'object'
             ? (state.viewSettings as Record<string, unknown>)
             : {};
+    const persistedLayers = Array.isArray(state.layers)
+        ? state.layers
+            .filter((layer) => layer && typeof layer === 'object')
+            .map((layer) => layer as Record<string, unknown>)
+            .filter((layer) =>
+                typeof layer.id === 'string'
+                && typeof layer.name === 'string'
+                && typeof layer.visible === 'boolean'
+                && typeof layer.locked === 'boolean'
+            )
+            .map((layer) => ({
+                id: layer.id as string,
+                name: layer.name as string,
+                visible: layer.visible as boolean,
+                locked: layer.locked as boolean,
+            }))
+        : [];
+    const hasDefaultLayer = persistedLayers.some((layer) => layer.id === 'default');
+    const layers = hasDefaultLayer ? persistedLayers : [...INITIAL_LAYERS, ...persistedLayers];
+    const activeLayerId =
+        typeof state.activeLayerId === 'string' && layers.some((layer) => layer.id === state.activeLayerId)
+            ? state.activeLayerId
+            : 'default';
 
     return {
         ...state,
         tabs,
         activeTabId,
+        layers,
+        activeLayerId,
         viewSettings: {
             ...INITIAL_VIEW_SETTINGS,
             ...persistedViewSettings,
@@ -106,6 +138,7 @@ export const useFlowStore = create<FlowState>()(
                 {
                     id: 'tab-1',
                     name: 'Untitled Flow',
+                    diagramType: DEFAULT_DIAGRAM_TYPE,
                     nodes: INITIAL_NODES,
                     edges: INITIAL_EDGES,
                     history: { past: [], future: [] },
@@ -120,6 +153,8 @@ export const useFlowStore = create<FlowState>()(
             brandConfig: DEFAULT_BRAND_CONFIG,
             brandKits: [DEFAULT_BRAND_KIT],
             activeBrandKitId: 'default',
+            layers: INITIAL_LAYERS,
+            activeLayerId: 'default',
             selectedNodeId: null,
             selectedEdgeId: null,
             ...createCanvasActions(set, get),
@@ -127,6 +162,7 @@ export const useFlowStore = create<FlowState>()(
             ...createTabActions(set, get),
             ...createDesignSystemActions(set),
             ...createViewActions(set),
+            ...createLayerActions(set, get),
             ...createAIAndSelectionActions(set),
             ...createBrandActions(set),
         }),
@@ -145,6 +181,8 @@ export const useFlowStore = create<FlowState>()(
                 brandConfig: state.brandConfig,
                 brandKits: state.brandKits,
                 activeBrandKitId: state.activeBrandKitId,
+                layers: state.layers,
+                activeLayerId: state.activeLayerId,
             }),
         }
     )

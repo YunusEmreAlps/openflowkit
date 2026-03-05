@@ -473,7 +473,17 @@
       "dslPlaceholder": "Pega código DSL aquí...",
       "applyShortcut": "⌘+Enter para aplicar",
       "syntaxGuide": "Guía de sintaxis",
-      "apply": "Aplicar"
+      "apply": "Aplicar",
+      "quickFixes": "Correcciones rápidas",
+      "linePrefix": "Línea {{line}}: ",
+      "hintPrefix": "Pista:",
+      "strictModeGuidance": {
+        "defineEndpoints": "Define cada extremo de conexión como un nodo de arquitectura explícito antes de conectar aristas.",
+        "uniqueIds": "Usa IDs únicos para cada nodo de servicio/grupo/junción (sin IDs de arquitectura duplicados).",
+        "edgeSyntax": "Usa flechas de arista de arquitectura `-->`, `<--` o `<-->` y calificadores de lado como `api:R --> L:db`.",
+        "nodeSyntax": "Usa declaraciones de nodo válidas: `service id(icon)[Label]`, `group id[Label]`, `junction id[Label]`.",
+        "fallback": "Desactiva el modo estricto de arquitectura para permitir la recuperación automática, o corrige los diagnósticos y vuelve a intentarlo."
+      }
     },
     "layout": {
       "title": "Estudio de diseño",
@@ -539,7 +549,9 @@
       "snapToGrid": "Ajustar a cuadrícula",
       "snapToGridDesc": "Alinear nodos al mover",
       "miniMap": "Mini mapa",
-      "miniMapDesc": "Mostrar mini mapa abajo a la derecha"
+      "miniMapDesc": "Mostrar mini mapa abajo a la derecha",
+      "architectureStrictMode": "Modo estricto de arquitectura",
+      "architectureStrictModeDesc": "Bloquea la importación Mermaid cuando los diagnósticos de arquitectura incluyen problemas de recuperación/validación"
     },
     "ai": {
       "provider": "Proveedor",
@@ -740,6 +752,9 @@
     "stickyNote": "Nota adhesiva",
     "nodeSettings": "Configuración del nodo",
     "connection": "Conexión"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "El modo estricto de arquitectura bloqueó el pegado de Mermaid. Abre la vista de código, corrige los diagnósticos y vuelve a intentarlo."
   },
   "flowTabs": {
     "closeTab": "Cerrar pestaña",

@@ -4,6 +4,11 @@ import { MarkerType } from 'reactflow';
 import { Activity, ArrowRightLeft, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Switch } from '@/components/ui/Switch';
+import {
+    applyArchitectureDirection,
+    getDirectionFromMarkers,
+    reverseArchitectureDirection,
+} from './architectureSemantics';
 
 const EDGE_COLORS = ['#94a3b8', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -48,10 +53,13 @@ export function EdgeStyleSection({ selectedEdge, onChange }: EdgeStyleSectionPro
             <Button
                 onClick={() => {
                     const isBidirectional = Boolean(selectedEdge.markerStart);
+                    const nextDirection = isBidirectional ? '-->' : '<-->';
+                    const architectureUpdates = applyArchitectureDirection(selectedEdge, nextDirection);
                     onChange(selectedEdge.id, {
                         markerStart: isBidirectional
                             ? undefined
                             : { type: MarkerType.ArrowClosed, color: selectedEdge.style?.stroke || '#94a3b8' },
+                        ...architectureUpdates,
                     });
                 }}
                 variant={selectedEdge.markerStart ? 'primary' : 'secondary'}
@@ -62,11 +70,26 @@ export function EdgeStyleSection({ selectedEdge, onChange }: EdgeStyleSectionPro
 
             <Button
                 onClick={() => {
+                    const currentDirection = selectedEdge.data?.archDirection || getDirectionFromMarkers(selectedEdge);
+                    const reversedDirection = reverseArchitectureDirection(currentDirection);
+                    const edgeWithSwappedArchitecture = selectedEdge.data?.archDirection
+                        ? {
+                            ...selectedEdge,
+                            data: {
+                                ...selectedEdge.data,
+                                archDirection: reversedDirection,
+                                archSourceSide: selectedEdge.data?.archTargetSide,
+                                archTargetSide: selectedEdge.data?.archSourceSide,
+                            },
+                        }
+                        : selectedEdge;
+                    const architectureDirectionUpdates = applyArchitectureDirection(edgeWithSwappedArchitecture, reversedDirection);
                     onChange(selectedEdge.id, {
                         source: selectedEdge.target,
                         target: selectedEdge.source,
                         sourceHandle: selectedEdge.targetHandle,
                         targetHandle: selectedEdge.sourceHandle,
+                        ...architectureDirectionUpdates,
                     });
                 }}
                 variant="secondary"

@@ -4,6 +4,13 @@ import { toPng, toJpeg } from 'html-to-image';
 import { useFlowStore } from '../store';
 import { orderGraphForSerialization } from '@/services/canonicalSerialization';
 import { createDiagramDocument, parseDiagramDocumentImport } from '@/services/diagramDocument';
+import {
+  buildImportFidelityReport,
+  mapErrorToIssue,
+  mapWarningToIssue,
+  persistLatestImportReport,
+  summarizeImportReport,
+} from '@/services/importFidelity';
 
 import { useToast } from '../components/ui/ToastContext';
 
@@ -11,7 +18,7 @@ export const useFlowExport = (
   recordHistory: () => void,
   reactFlowWrapper: React.RefObject<HTMLDivElement>
 ) => {
-  const { nodes, edges, setNodes, setEdges, viewSettings } = useFlowStore();
+  const { nodes, edges, setNodes, setEdges, viewSettings, activeTabId, updateTab } = useFlowStore();
   const { fitView } = useReactFlow();
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -105,24 +112,44 @@ export const useFlowExport = (
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
+        const importStart = performance.now();
         try {
           const raw = JSON.parse(ev.target?.result as string);
           const parsed = parseDiagramDocumentImport(raw);
           recordHistory();
           setNodes(parsed.nodes);
           setEdges(parsed.edges);
+          updateTab(activeTabId, { diagramType: parsed.diagramType });
           parsed.warnings.forEach((message) => addToast(message, 'warning'));
+          const report = buildImportFidelityReport({
+            source: 'json',
+            nodeCount: parsed.nodes.length,
+            edgeCount: parsed.edges.length,
+            elapsedMs: Math.round(performance.now() - importStart),
+            issues: parsed.warnings.map((warning) => mapWarningToIssue(warning)),
+          });
+          persistLatestImportReport(report);
+          addToast(summarizeImportReport(report), report.summary.warningCount > 0 ? 'warning' : 'success');
           addToast('Diagram loaded successfully!', 'success');
           setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 100);
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Failed to parse JSON file. Please check the format.';
+          const report = buildImportFidelityReport({
+            source: 'json',
+            nodeCount: 0,
+            edgeCount: 0,
+            elapsedMs: Math.round(performance.now() - importStart),
+            issues: [mapErrorToIssue(message)],
+          });
+          persistLatestImportReport(report);
+          addToast(summarizeImportReport(report), 'error');
           addToast(message, 'error');
         }
       };
       reader.readAsText(file);
       e.target.value = '';
     },
-    [recordHistory, setNodes, setEdges, fitView, addToast]
+    [recordHistory, setNodes, setEdges, fitView, addToast, activeTabId, updateTab]
   );
 
   return { fileInputRef, handleExport, handleExportJSON, handleImportJSON, onFileImport };

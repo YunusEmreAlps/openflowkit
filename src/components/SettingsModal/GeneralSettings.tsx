@@ -16,7 +16,11 @@ export const GeneralSettings = () => {
         setGlobalEdgeOptions,
         setDefaultIconsEnabled,
         setSmartRoutingEnabled,
+        setSmartRoutingProfile,
+        setSmartRoutingBundlingEnabled,
+        setViewSettings,
         setLargeGraphSafetyMode,
+        setLargeGraphSafetyProfile,
     } = useFlowStore();
 
     return (
@@ -87,6 +91,39 @@ export const GeneralSettings = () => {
                         checked={viewSettings.smartRoutingEnabled}
                         onChange={(checked) => setSmartRoutingEnabled(checked)}
                     />
+                    <div className="rounded-xl border border-[var(--color-brand-border)] bg-[var(--brand-surface)] p-3">
+                        <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-secondary)]">
+                            {t('settingsModal.canvas.routingProfile', 'Routing Profile')}
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {[
+                                { profile: 'standard', label: t('settingsModal.canvas.routingProfileStandard', 'Standard') },
+                                { profile: 'infrastructure', label: t('settingsModal.canvas.routingProfileInfrastructure', 'Infrastructure') },
+                            ].map((option) => (
+                                <button
+                                    key={option.profile}
+                                    onClick={() => setSmartRoutingProfile(option.profile as 'standard' | 'infrastructure')}
+                                    className={`h-9 rounded-lg border text-xs font-semibold transition-colors ${
+                                        viewSettings.smartRoutingProfile === option.profile
+                                            ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-50)] text-[var(--brand-primary-700)]'
+                                            : 'border-[var(--color-brand-border)] text-[var(--brand-text)] hover:border-[var(--brand-primary)]'
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="mt-2 text-[11px] text-[var(--brand-secondary)]">
+                            {t('settingsModal.canvas.routingProfileHint', 'Infrastructure mode biases orthogonal routes for service maps.')}
+                        </p>
+                    </div>
+                    <SettingRow
+                        icon={<Network className="w-4 h-4" />}
+                        label={t('settingsModal.canvas.edgeBundling', 'Bundle Sibling Edges')}
+                        description={t('settingsModal.canvas.edgeBundlingDesc', 'Keep parallel connections on shared lanes')}
+                        checked={viewSettings.smartRoutingBundlingEnabled}
+                        onChange={(checked) => setSmartRoutingBundlingEnabled(checked)}
+                    />
                     <SettingRow
                         icon={<Zap className="w-4 h-4" />}
                         label={t('commandBar.visuals.animatedEdges')}
@@ -100,6 +137,13 @@ export const GeneralSettings = () => {
                         description={t('commandBar.visuals.defaultIconsDesc')}
                         checked={viewSettings.defaultIconsEnabled}
                         onChange={(checked) => setDefaultIconsEnabled(checked)}
+                    />
+                    <SettingRow
+                        icon={<Network className="w-4 h-4" />}
+                        label={t('settingsModal.canvas.architectureStrictMode', 'Architecture Strict Mode')}
+                        description={t('settingsModal.canvas.architectureStrictModeDesc', 'Block Mermaid import when architecture diagnostics include recovery/validation issues')}
+                        checked={viewSettings.architectureStrictMode}
+                        onChange={(checked) => setViewSettings({ architectureStrictMode: checked })}
                     />
 
                     <div className="rounded-xl border border-[var(--color-brand-border)] bg-[var(--brand-surface)] p-3">
@@ -146,6 +190,31 @@ export const GeneralSettings = () => {
                                 </button>
                             ))}
                         </div>
+                        <label className="mb-2 mt-3 block text-[11px] font-semibold uppercase tracking-wider text-[var(--brand-secondary)]">
+                            Safety Profile (100 / 300 / 500)
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { profile: 'performance', label: 'Performance' },
+                                { profile: 'balanced', label: 'Balanced' },
+                                { profile: 'quality', label: 'Quality' },
+                            ].map((option) => (
+                                <button
+                                    key={option.profile}
+                                    onClick={() => setLargeGraphSafetyProfile(option.profile as 'performance' | 'balanced' | 'quality')}
+                                    className={`h-9 rounded-lg border text-xs font-semibold transition-colors ${
+                                        viewSettings.largeGraphSafetyProfile === option.profile
+                                            ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-50)] text-[var(--brand-primary-700)]'
+                                            : 'border-[var(--color-brand-border)] text-[var(--brand-text)] hover:border-[var(--brand-primary)]'
+                                    }`}
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                        <p className="mt-2 text-[11px] text-[var(--brand-secondary)]">
+                            Performance starts safety at 100 nodes, Balanced at 300, Quality at 500.
+                        </p>
                     </div>
                 </div>
             </div>

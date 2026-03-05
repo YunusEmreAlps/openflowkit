@@ -1,0 +1,5 @@
+interface:
+  display_name: "Mermaid Fidelity QA"
+  short_description: "Corpus-based Mermaid round-trip and diagnostics validation."
+  default_prompt: "Use $mermaid-fidelity-qa to validate Mermaid import/export changes and report fidelity drift and diagnostics coverage."
+

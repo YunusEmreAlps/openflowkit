@@ -61,6 +61,8 @@ export const MINIMAP_NODE_COLORS: Record<string, string> = {
   decision: '#f59e0b', // amber-500
   end: '#ef4444', // red-500
   custom: '#6366f1', // indigo-500
+  journey: '#a855f7', // purple-500
+  architecture: '#475569', // slate-600
   annotation: '#e2e8f0', // slate-200
   section: 'rgba(241, 245, 249, 0.5)', // slate-100/50
   text: 'transparent'

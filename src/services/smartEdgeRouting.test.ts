@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Edge, Node } from 'reactflow';
-import { assignSmartHandles } from './smartEdgeRouting';
+import { assignSmartHandles, assignSmartHandlesWithOptions } from './smartEdgeRouting';
 
 function createNode(id: string, x: number, y: number): Node {
   return {
@@ -104,5 +104,64 @@ describe('assignSmartHandles', () => {
     expect(routed[0].data?.labelPosition).toBe(0.72);
     expect(routed[0].data?.labelOffsetX).toBe(6);
     expect(routed[0].data?.labelOffsetY).toBe(-4);
+  });
+
+  it('supports infrastructure profile bias for diagonal layouts', () => {
+    const nodes = [createNode('a', 0, 0), createNode('b', 220, 260)];
+    const edge = createEdge('e-diag', 'a', 'b');
+
+    const standard = assignSmartHandles(nodes, [edge]);
+    const infra = assignSmartHandlesWithOptions(nodes, [edge], {
+      profile: 'infrastructure',
+      bundlingEnabled: false,
+    });
+
+    expect(standard[0].sourceHandle).toBe('bottom');
+    expect(standard[0].targetHandle).toBe('top');
+    expect(infra[0].sourceHandle).toBe('right');
+    expect(infra[0].targetHandle).toBe('left');
+  });
+
+  it('supports sibling edge bundling option', () => {
+    const nodes = [createNode('a', 0, 0), createNode('b', 300, 0)];
+    const edges = [createEdge('e1', 'a', 'b'), createEdge('e2', 'a', 'b')];
+
+    const spread = assignSmartHandlesWithOptions(nodes, edges, {
+      profile: 'standard',
+      bundlingEnabled: false,
+    });
+    const bundled = assignSmartHandlesWithOptions(nodes, edges, {
+      profile: 'standard',
+      bundlingEnabled: true,
+    });
+
+    expect(spread[0].sourceHandle).toBe('right');
+    expect(spread[0].targetHandle).toBe('left');
+    expect(spread[1].sourceHandle).toBe('bottom');
+    expect(spread[1].targetHandle).toBe('bottom');
+
+    expect(bundled[0].sourceHandle).toBe('right');
+    expect(bundled[0].targetHandle).toBe('left');
+    expect(bundled[1].sourceHandle).toBe('right');
+    expect(bundled[1].targetHandle).toBe('left');
+  });
+
+  it('preserves explicit architecture side semantics over auto-routing', () => {
+    const nodes = [createNode('a', 0, 0), createNode('b', 300, 0)];
+    const edge = {
+      ...createEdge('e-arch', 'a', 'b'),
+      data: {
+        archSourceSide: 'T',
+        archTargetSide: 'B',
+      },
+    } as Edge;
+
+    const routed = assignSmartHandlesWithOptions(nodes, [edge], {
+      profile: 'infrastructure',
+      bundlingEnabled: false,
+    });
+
+    expect(routed[0].sourceHandle).toBe('top');
+    expect(routed[0].targetHandle).toBe('bottom');
   });
 });

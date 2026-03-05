@@ -501,7 +501,24 @@
       "dslPlaceholder": "Paste {appName} DSL code here...",
       "applyShortcut": "⌘+Enter to apply",
       "syntaxGuide": "Syntax Guide",
-      "apply": "Apply"
+      "apply": "Apply",
+      "quickFixes": "Quick fixes",
+      "linePrefix": "Line {{line}}: ",
+      "hintPrefix": "Hint:",
+      "jumpToLine": "Jump to line {{line}}",
+      "diagnosticsGroup": {
+        "syntax": "Syntax issues",
+        "identity": "Identifier issues",
+        "recovery": "Recovery warnings",
+        "general": "Diagnostics"
+      },
+      "strictModeGuidance": {
+        "defineEndpoints": "Define every edge endpoint as an explicit architecture node before connecting edges.",
+        "uniqueIds": "Use unique ids for each service/group/junction node (no duplicate architecture ids).",
+        "edgeSyntax": "Use architecture edge arrows `-->`, `<--`, or `<-->` and side qualifiers like `api:R --> L:db`.",
+        "nodeSyntax": "Use valid node declarations: `service id(icon)[Label]`, `group id[Label]`, `junction id[Label]`.",
+        "fallback": "Switch off Architecture Strict Mode to allow auto-recovery, or fix diagnostics and retry."
+      }
     },
     "layout": {
       "title": "Layout Studio",
@@ -567,7 +584,9 @@
       "snapToGrid": "Snap to Grid",
       "snapToGridDesc": "Snap nodes to the grid when moving",
       "miniMap": "Mini Map",
-      "miniMapDesc": "Show mini-map in bottom right"
+      "miniMapDesc": "Show mini-map in bottom right",
+      "architectureStrictMode": "Architecture Strict Mode",
+      "architectureStrictModeDesc": "Block Mermaid import when architecture diagnostics include recovery/validation issues"
     },
     "ai": {
       "provider": "Provider",
@@ -991,6 +1010,9 @@
     "stickyNote": "Sticky Note",
     "nodeSettings": "Node Settings",
     "connection": "Connection"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "Architecture strict mode blocked Mermaid paste. Open Code view, fix diagnostics, then retry."
   },
   "flowTabs": {
     "closeTab": "Close Tab",

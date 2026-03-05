@@ -8,6 +8,9 @@ import { CodeView } from './command-bar/CodeView';
 import { TemplatesView } from './command-bar/TemplatesView';
 import { SearchView } from './command-bar/SearchView';
 import { LayoutView } from './command-bar/LayoutView';
+import { LayersView } from './command-bar/LayersView';
+import { PagesView } from './command-bar/PagesView';
+import { LibrariesView } from './command-bar/LibrariesView';
 
 import { DesignSystemView } from './command-bar/DesignSystemView';
 import { WireframesView } from './command-bar/WireframesView';
@@ -137,6 +140,24 @@ function OpenCommandBarContent({
                 )}
                 {view === 'wireframes' && (
                     <WireframesView
+                        onClose={onClose}
+                        handleBack={handleBack}
+                    />
+                )}
+                {view === 'layers' && (
+                    <LayersView
+                        onClose={onClose}
+                        handleBack={handleBack}
+                    />
+                )}
+                {view === 'pages' && (
+                    <PagesView
+                        onClose={onClose}
+                        handleBack={handleBack}
+                    />
+                )}
+                {view === 'libraries' && (
+                    <LibrariesView
                         onClose={onClose}
                         handleBack={handleBack}
                     />

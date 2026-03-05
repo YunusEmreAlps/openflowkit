@@ -3,12 +3,14 @@ import { useEffect, useState } from 'react';
 interface ShortcutHandlers {
   selectedNodeId: string | null;
   selectedEdgeId: string | null;
+  selectedNodeType?: string | null;
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
   undo: () => void;
   redo: () => void;
   duplicateNode: (id: string) => void;
   selectAll: () => void;
+  onAddMindmapChildShortcut?: () => void;
   onCommandBar: () => void;
   onSearch: () => void;
   onShortcutsHelp: () => void;
@@ -17,12 +19,14 @@ interface ShortcutHandlers {
 export const useKeyboardShortcuts = ({
   selectedNodeId,
   selectedEdgeId,
+  selectedNodeType,
   deleteNode,
   deleteEdge,
   undo,
   redo,
   duplicateNode,
   selectAll,
+  onAddMindmapChildShortcut,
   onCommandBar,
   onSearch,
   onShortcutsHelp,
@@ -92,6 +96,17 @@ export const useKeyboardShortcuts = ({
         if (selectedNodeId) duplicateNode(selectedNodeId);
       }
 
+      // Mindmap quick-add child (Shift + Enter)
+      if (isShift && e.key === 'Enter') {
+        const tag = (document.activeElement as HTMLElement)?.tagName;
+        const isEditable = tag === 'INPUT' || tag === 'TEXTAREA' || (document.activeElement as HTMLElement)?.isContentEditable;
+        if (isEditable) return;
+        if (selectedNodeId && selectedNodeType === 'mindmap' && onAddMindmapChildShortcut) {
+          e.preventDefault();
+          onAddMindmapChildShortcut();
+        }
+      }
+
       // Select All
       if (isCmdOrCtrl && e.key === 'a') {
         e.preventDefault();
@@ -108,5 +123,5 @@ export const useKeyboardShortcuts = ({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedNodeId, selectedEdgeId, deleteNode, deleteEdge, undo, redo, duplicateNode, selectAll, onCommandBar, onSearch, onShortcutsHelp]);
+  }, [selectedNodeId, selectedEdgeId, selectedNodeType, deleteNode, deleteEdge, undo, redo, duplicateNode, selectAll, onAddMindmapChildShortcut, onCommandBar, onSearch, onShortcutsHelp]);
 };

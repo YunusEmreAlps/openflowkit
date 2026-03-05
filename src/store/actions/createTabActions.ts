@@ -1,5 +1,6 @@
 import type { FlowTab } from '@/lib/types';
 import { createId } from '@/lib/id';
+import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
 import type { FlowState } from '../types';
 
 type SetFlowState = (partial: Partial<FlowState> | ((state: FlowState) => Partial<FlowState>)) => void;
@@ -7,8 +8,35 @@ type GetFlowState = () => FlowState;
 
 export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
     FlowState,
-    'setActiveTabId' | 'setTabs' | 'addTab' | 'closeTab' | 'updateTab'
+    'setActiveTabId' | 'setTabs' | 'addTab' | 'duplicateActiveTab' | 'closeTab' | 'updateTab' | 'copySelectedToTab' | 'moveSelectedToTab'
 > {
+    function syncActiveTabContent(tabs: FlowTab[]): FlowTab[] {
+        const { activeTabId, nodes, edges } = get();
+        return tabs.map((tab) =>
+            tab.id === activeTabId ? { ...tab, nodes, edges } : tab
+        );
+    }
+
+    function cloneTabContent(tab: FlowTab): FlowTab {
+        return {
+            ...tab,
+            nodes: tab.nodes.map((node) => ({
+                ...node,
+                selected: false,
+                data: { ...node.data },
+                position: { ...node.position },
+                style: node.style ? { ...node.style } : node.style,
+            })),
+            edges: tab.edges.map((edge) => ({
+                ...edge,
+                selected: false,
+                data: edge.data ? { ...edge.data } : edge.data,
+                style: edge.style ? { ...edge.style } : edge.style,
+            })),
+            history: { past: [], future: [] },
+        };
+    }
+
     return {
         setActiveTabId: (id) => {
             const { tabs, nodes, edges } = get();
@@ -45,6 +73,7 @@ export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
             const newTab: FlowTab = {
                 id: newTabId,
                 name: 'New Flow',
+                diagramType: DEFAULT_DIAGRAM_TYPE,
                 nodes: [],
                 edges: [],
                 history: { past: [], future: [] },
@@ -52,6 +81,29 @@ export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
 
             set({
                 tabs: [...updatedTabs, newTab],
+                activeTabId: newTabId,
+                nodes: newTab.nodes,
+                edges: newTab.edges,
+            });
+            return newTabId;
+        },
+
+        duplicateActiveTab: () => {
+            const { tabs, activeTabId } = get();
+            const syncedTabs = syncActiveTabContent(tabs);
+            const sourceTab = syncedTabs.find((tab) => tab.id === activeTabId);
+            if (!sourceTab) return null;
+
+            const newTabId = createId('tab');
+            const duplicated = cloneTabContent(sourceTab);
+            const newTab: FlowTab = {
+                ...duplicated,
+                id: newTabId,
+                name: `${sourceTab.name} Copy`,
+            };
+
+            set({
+                tabs: [...syncedTabs, newTab],
                 activeTabId: newTabId,
                 nodes: newTab.nodes,
                 edges: newTab.edges,
@@ -88,6 +140,99 @@ export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
             set((state) => ({
                 tabs: state.tabs.map((tab) => (tab.id === id ? { ...tab, ...updates } : tab)),
             }));
+        },
+
+        copySelectedToTab: (targetTabId) => {
+            const { tabs, activeTabId, nodes, edges } = get();
+            if (targetTabId === activeTabId) return 0;
+            const syncedTabs = syncActiveTabContent(tabs);
+            const targetTab = syncedTabs.find((tab) => tab.id === targetTabId);
+            if (!targetTab) return 0;
+
+            const selectedNodes = nodes.filter((node) => node.selected);
+            if (selectedNodes.length === 0) return 0;
+
+            const selectedNodeIds = new Set(selectedNodes.map((node) => node.id));
+            const selectedEdges = edges.filter((edge) => selectedNodeIds.has(edge.source) && selectedNodeIds.has(edge.target));
+            const targetNodeIds = new Set(targetTab.nodes.map((node) => node.id));
+            const idMap = new Map<string, string>();
+
+            const copiedNodes = selectedNodes.map((node) => {
+                let nextId = createId();
+                while (targetNodeIds.has(nextId)) {
+                    nextId = createId();
+                }
+                targetNodeIds.add(nextId);
+                idMap.set(node.id, nextId);
+                return {
+                    ...node,
+                    id: nextId,
+                    selected: false,
+                    data: { ...node.data },
+                    position: { ...node.position },
+                    style: node.style ? { ...node.style } : node.style,
+                };
+            });
+
+            const copiedEdges = selectedEdges.map((edge) => ({
+                ...edge,
+                id: createId('e'),
+                source: idMap.get(edge.source)!,
+                target: idMap.get(edge.target)!,
+                selected: false,
+                data: edge.data ? { ...edge.data } : edge.data,
+                style: edge.style ? { ...edge.style } : edge.style,
+            }));
+
+            set({
+                tabs: syncedTabs.map((tab) => (
+                    tab.id === targetTabId
+                        ? { ...tab, nodes: tab.nodes.concat(copiedNodes), edges: tab.edges.concat(copiedEdges) }
+                        : tab
+                )),
+            });
+            return copiedNodes.length;
+        },
+
+        moveSelectedToTab: (targetTabId) => {
+            const { tabs, activeTabId, nodes, edges } = get();
+            if (targetTabId === activeTabId) return 0;
+            const syncedTabs = syncActiveTabContent(tabs);
+            const targetTab = syncedTabs.find((tab) => tab.id === targetTabId);
+            if (!targetTab) return 0;
+
+            const selectedNodes = nodes.filter((node) => node.selected);
+            if (selectedNodes.length === 0) return 0;
+
+            const selectedNodeIds = new Set(selectedNodes.map((node) => node.id));
+            const selectedEdges = edges.filter((edge) => selectedNodeIds.has(edge.source) && selectedNodeIds.has(edge.target));
+            const remainingNodes = nodes.filter((node) => !selectedNodeIds.has(node.id));
+            const remainingEdges = edges.filter((edge) => !selectedNodeIds.has(edge.source) && !selectedNodeIds.has(edge.target));
+            const targetNodeIds = new Set(targetTab.nodes.map((node) => node.id));
+            const movedNodes = selectedNodes
+                .filter((node) => !targetNodeIds.has(node.id))
+                .map((node) => ({ ...node, selected: false }));
+            const movedNodeIds = new Set(movedNodes.map((node) => node.id));
+            const movedEdges = selectedEdges
+                .filter((edge) => movedNodeIds.has(edge.source) && movedNodeIds.has(edge.target))
+                .map((edge) => ({ ...edge, selected: false }));
+
+            const updatedTabs = syncedTabs.map((tab) => {
+                if (tab.id === targetTabId) {
+                    return { ...tab, nodes: tab.nodes.concat(movedNodes), edges: tab.edges.concat(movedEdges) };
+                }
+                if (tab.id === activeTabId) {
+                    return { ...tab, nodes: remainingNodes, edges: remainingEdges };
+                }
+                return tab;
+            });
+
+            set({
+                tabs: updatedTabs,
+                nodes: remainingNodes,
+                edges: remainingEdges,
+            });
+            return movedNodes.length;
         },
     };
 }

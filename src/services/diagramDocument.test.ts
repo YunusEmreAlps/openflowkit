@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import type { Edge, Node } from 'reactflow';
 import {
   createDiagramDocument,
+  DEFAULT_DIAGRAM_TYPE,
   DIAGRAM_DOCUMENT_VERSION,
   parseDiagramDocumentImport,
 } from './diagramDocument';
+import { buildImportFidelityReport, mapWarningToIssue } from './importFidelity';
 
 function createNode(id: string): Node {
   return {
@@ -24,6 +26,7 @@ describe('diagramDocument', () => {
     const doc = createDiagramDocument([createNode('n1')], [createEdge('e1', 'n1', 'n1')]);
     expect(doc.version).toBe(DIAGRAM_DOCUMENT_VERSION);
     expect(doc.name).toBe('FlowMind Diagram');
+    expect(doc.diagramType).toBe(DEFAULT_DIAGRAM_TYPE);
     expect(typeof doc.createdAt).toBe('string');
   });
 
@@ -34,6 +37,7 @@ describe('diagramDocument', () => {
       edges: [createEdge('e1', 'n1', 'n1')],
     });
     expect(parsed.warnings).toEqual([]);
+    expect(parsed.diagramType).toBe(DEFAULT_DIAGRAM_TYPE);
     expect(parsed.nodes).toHaveLength(1);
     expect(parsed.edges).toHaveLength(1);
   });
@@ -45,6 +49,16 @@ describe('diagramDocument', () => {
     });
     expect(parsed.warnings).toHaveLength(1);
     expect(parsed.warnings[0]).toContain('legacy JSON');
+    expect(parsed.diagramType).toBe(DEFAULT_DIAGRAM_TYPE);
+
+    const report = buildImportFidelityReport({
+      source: 'json',
+      nodeCount: parsed.nodes.length,
+      edgeCount: parsed.edges.length,
+      elapsedMs: 5,
+      issues: parsed.warnings.map((warning) => mapWarningToIssue(warning)),
+    });
+    expect(report.status).toBe('success_with_warnings');
   });
 
   it('rejects unsupported future major versions', () => {
@@ -61,5 +75,17 @@ describe('diagramDocument', () => {
     expect(() => parseDiagramDocumentImport({ version: '1.0', nodes: [] })).toThrow(
       /missing nodes or edges arrays/
     );
+  });
+
+  it('imports diagramType when present', () => {
+    const parsed = parseDiagramDocumentImport({
+      version: '1.0',
+      diagramType: 'erDiagram',
+      nodes: [createNode('n1')],
+      edges: [],
+    });
+
+    expect(parsed.diagramType).toBe('erDiagram');
+    expect(parsed.warnings).toEqual([]);
   });
 });

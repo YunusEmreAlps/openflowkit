@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, WandSparkles, StickyNote, X, Database, ArrowRightLeft, Circle } from 'lucide-react';
+import { Settings, WandSparkles, StickyNote, X, Database, ArrowRightLeft, Footprints } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ConnectMenuProps {
@@ -84,6 +84,19 @@ export const ConnectMenu = ({ position, onSelect, onClose }: ConnectMenuProps) =
                         <div className="flex flex-col items-start translate-y-[1px]">
                             <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.note')}</span>
                             <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.noteDesc')}</span>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => { onSelect('journey'); onClose(); }}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-slate-700 hover:bg-slate-50 active:bg-slate-100 rounded-xl transition-all group"
+                    >
+                        <div className="w-9 h-9 bg-violet-50 text-violet-600 rounded-lg flex items-center justify-center border border-violet-100 group-hover:scale-110 transition-transform">
+                            <Footprints className="w-4.5 h-4.5" />
+                        </div>
+                        <div className="flex flex-col items-start translate-y-[1px]">
+                            <span className="font-bold text-slate-700 leading-none mb-1">{t('connectMenu.userJourney', 'User Journey')}</span>
+                            <span className="text-[10px] text-slate-400 font-medium">{t('connectMenu.userJourneyDesc', 'Experience step')}</span>
                         </div>
                     </button>
                 </div>

@@ -473,7 +473,17 @@
       "dslPlaceholder": "粘贴 DSL 代码...",
       "applyShortcut": "按 ⌘+Enter 应用",
       "syntaxGuide": "语法指南",
-      "apply": "应用"
+      "apply": "应用",
+      "quickFixes": "快速修复",
+      "linePrefix": "第 {{line}} 行：",
+      "hintPrefix": "提示：",
+      "strictModeGuidance": {
+        "defineEndpoints": "在连接边之前，将每个边端点都定义为显式的架构节点。",
+        "uniqueIds": "为每个 service/group/junction 节点使用唯一 ID（不要出现重复的架构 ID）。",
+        "edgeSyntax": "使用架构边箭头 `-->`、`<--` 或 `<-->`，以及类似 `api:R --> L:db` 的侧向限定符。",
+        "nodeSyntax": "使用有效的节点声明：`service id(icon)[Label]`、`group id[Label]`、`junction id[Label]`。",
+        "fallback": "关闭架构严格模式以允许自动恢复，或修复诊断后重试。"
+      }
     },
     "layout": {
       "title": "布局工作室",
@@ -539,7 +549,9 @@
       "snapToGrid": "对齐网格",
       "snapToGridDesc": "移动时自动对齐",
       "miniMap": "小地图",
-      "miniMapDesc": "右下角显示小地图"
+      "miniMapDesc": "右下角显示小地图",
+      "architectureStrictMode": "架构严格模式",
+      "architectureStrictModeDesc": "当架构诊断包含恢复/校验问题时，阻止 Mermaid 导入"
     },
     "ai": {
       "provider": "提供商",
@@ -740,6 +752,9 @@
     "stickyNote": "便利贴",
     "nodeSettings": "节点设置",
     "connection": "连接"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "架构严格模式已阻止 Mermaid 粘贴。请打开代码视图，修复诊断后重试。"
   },
   "flowTabs": {
     "closeTab": "关闭标签页",

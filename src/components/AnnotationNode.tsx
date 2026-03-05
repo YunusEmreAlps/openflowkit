@@ -4,9 +4,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { NodeData } from '@/lib/types';
 import { useTranslation } from 'react-i18next';
+import { useInlineNodeTextEdit } from '@/hooks/useInlineNodeTextEdit';
 
-const AnnotationNode = ({ data, selected }: NodeProps<NodeData>) => {
+const AnnotationNode = ({ id, data, selected }: NodeProps<NodeData>) => {
   const { t } = useTranslation();
+  const labelEdit = useInlineNodeTextEdit(id, 'label', data.label || '');
+  const subLabelEdit = useInlineNodeTextEdit(id, 'subLabel', data.subLabel || '');
   return (
     <>
       <NodeResizer 
@@ -25,14 +28,50 @@ const AnnotationNode = ({ data, selected }: NodeProps<NodeData>) => {
       >
         <div className="p-4 flex flex-col h-full">
             {data.label && (
-                <div className="text-sm font-bold text-yellow-900 border-b border-yellow-200 pb-2 mb-2">
-                    {data.label}
+                <div
+                    className="text-sm font-bold text-yellow-900 border-b border-yellow-200 pb-2 mb-2"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        labelEdit.beginEdit();
+                    }}
+                >
+                    {labelEdit.isEditing ? (
+                        <input
+                            autoFocus
+                            value={labelEdit.draft}
+                            onChange={(event) => labelEdit.setDraft(event.target.value)}
+                            onBlur={labelEdit.commit}
+                            onKeyDown={labelEdit.handleKeyDown}
+                            onMouseDown={(event) => event.stopPropagation()}
+                            className="w-full rounded border border-yellow-400 bg-yellow-50 px-1 py-0.5 outline-none"
+                        />
+                    ) : (
+                        data.label
+                    )}
                 </div>
             )}
-            <div className="text-xs text-yellow-800 font-medium leading-relaxed markdown-content flex-1 overflow-hidden flow-lod-secondary">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {data.subLabel || t('annotationNode.placeholder')}
-                </ReactMarkdown>
+            <div
+                className="text-xs text-yellow-800 font-medium leading-relaxed markdown-content flex-1 overflow-hidden flow-lod-secondary"
+                onClick={(event) => {
+                    event.stopPropagation();
+                    subLabelEdit.beginEdit();
+                }}
+            >
+                {subLabelEdit.isEditing ? (
+                    <input
+                        autoFocus
+                        value={subLabelEdit.draft}
+                        onChange={(event) => subLabelEdit.setDraft(event.target.value)}
+                        onBlur={subLabelEdit.commit}
+                        onKeyDown={subLabelEdit.handleKeyDown}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        className="w-full rounded border border-yellow-400 bg-yellow-50 px-1 py-0.5 outline-none"
+                    />
+                ) : (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {data.subLabel || t('annotationNode.placeholder')}
+                    </ReactMarkdown>
+                )}
             </div>
         </div>
         

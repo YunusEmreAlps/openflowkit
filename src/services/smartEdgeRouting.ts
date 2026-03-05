@@ -1,5 +1,6 @@
 import { Node, Edge } from 'reactflow';
 import { NODE_WIDTH, NODE_HEIGHT } from '../constants';
+import type { ViewSettings } from '@/store/types';
 
 /**
  * Assign intelligent `sourceHandle` and `targetHandle` to each edge
@@ -71,6 +72,11 @@ type RoutingContext = {
     nodeCenterMap: Map<string, { x: number; y: number }>;
     pairMetaByKey: Map<string, PairMeta>;
 };
+
+export interface SmartRoutingOptions {
+    profile?: 'standard' | 'infrastructure';
+    bundlingEnabled?: boolean;
+}
 
 const routingContextCache = new WeakMap<Node[], WeakMap<Edge[], RoutingContext>>();
 
@@ -163,7 +169,27 @@ function getRoutingContext(nodes: Node[], edges: Edge[]): RoutingContext {
 }
 
 export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
+    return assignSmartHandlesWithOptions(nodes, edges, {
+        profile: 'standard',
+        bundlingEnabled: false,
+    });
+}
+
+export function getSmartRoutingOptionsFromViewSettings(viewSettings: ViewSettings): SmartRoutingOptions {
+    return {
+        profile: viewSettings.smartRoutingProfile,
+        bundlingEnabled: viewSettings.smartRoutingBundlingEnabled,
+    };
+}
+
+export function assignSmartHandlesWithOptions(
+    nodes: Node[],
+    edges: Edge[],
+    options: SmartRoutingOptions
+): Edge[] {
     const { nodeMap, nodeCenterMap, pairMetaByKey } = getRoutingContext(nodes, edges);
+    const profile = options.profile ?? 'standard';
+    const bundlingEnabled = options.bundlingEnabled ?? false;
 
     return edges.map((edge) => {
         const sourceNode = nodeMap.get(edge.source);
@@ -189,12 +215,53 @@ export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
         let sourceHandle: string;
         let targetHandle: string;
 
+        const explicitSourceSide = typeof edge.data?.archSourceSide === 'string'
+            ? edge.data.archSourceSide.toUpperCase()
+            : '';
+        const explicitTargetSide = typeof edge.data?.archTargetSide === 'string'
+            ? edge.data.archTargetSide.toUpperCase()
+            : '';
+        const sourceFromSemanticSide = explicitSourceSide === 'L'
+            ? 'left'
+            : explicitSourceSide === 'R'
+                ? 'right'
+                : explicitSourceSide === 'T'
+                    ? 'top'
+                    : explicitSourceSide === 'B'
+                        ? 'bottom'
+                        : undefined;
+        const targetFromSemanticSide = explicitTargetSide === 'L'
+            ? 'left'
+            : explicitTargetSide === 'R'
+                ? 'right'
+                : explicitTargetSide === 'T'
+                    ? 'top'
+                    : explicitTargetSide === 'B'
+                        ? 'bottom'
+                        : undefined;
+
+        if (sourceFromSemanticSide && targetFromSemanticSide) {
+            if (edge.sourceHandle === sourceFromSemanticSide && edge.targetHandle === targetFromSemanticSide) {
+                return edge;
+            }
+            const semanticEdge = {
+                ...edge,
+                sourceHandle: sourceFromSemanticSide,
+                targetHandle: targetFromSemanticSide,
+            };
+            return preserveEdgeLabelPlacement(edge, semanticEdge);
+        }
+
         const pairKey = [edge.source, edge.target].sort().join('::');
         const pairMeta = pairMetaByKey.get(pairKey);
         const isReverse = pairMeta?.hasReverseDirection ?? false;
         const siblingIndex = pairMeta?.siblingIndexByEdge.get(edge) ?? 0;
 
-        if (Math.abs(dy) >= Math.abs(dx)) {
+        const verticalDominance = profile === 'infrastructure'
+            ? Math.abs(dy) > Math.abs(dx) * 1.25
+            : Math.abs(dy) >= Math.abs(dx);
+
+        if (verticalDominance) {
             // Vertical dominance
             if (dy >= 0) {
                 // Target is below - primary: bottom→top
@@ -202,7 +269,7 @@ export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
                     // Reverse direction of bidirectional pair
                     sourceHandle = 'left';
                     targetHandle = 'left';
-                } else if (siblingIndex > 0) {
+                } else if (siblingIndex > 0 && !bundlingEnabled) {
                     // Multiple same-direction edges: alternate sides
                     sourceHandle = siblingIndex % 2 === 1 ? 'right' : 'bottom';
                     targetHandle = siblingIndex % 2 === 1 ? 'right' : 'top';
@@ -215,7 +282,7 @@ export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
                 if (isReverse && edge.source > edge.target) {
                     sourceHandle = 'right';
                     targetHandle = 'right';
-                } else if (siblingIndex > 0) {
+                } else if (siblingIndex > 0 && !bundlingEnabled) {
                     sourceHandle = siblingIndex % 2 === 1 ? 'left' : 'top';
                     targetHandle = siblingIndex % 2 === 1 ? 'left' : 'bottom';
                 } else {
@@ -230,7 +297,7 @@ export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
                 if (isReverse && edge.source > edge.target) {
                     sourceHandle = 'bottom';
                     targetHandle = 'bottom';
-                } else if (siblingIndex > 0) {
+                } else if (siblingIndex > 0 && !bundlingEnabled) {
                     sourceHandle = siblingIndex % 2 === 1 ? 'bottom' : 'right';
                     targetHandle = siblingIndex % 2 === 1 ? 'bottom' : 'left';
                 } else {
@@ -242,7 +309,7 @@ export function assignSmartHandles(nodes: Node[], edges: Edge[]): Edge[] {
                 if (isReverse && edge.source > edge.target) {
                     sourceHandle = 'top';
                     targetHandle = 'top';
-                } else if (siblingIndex > 0) {
+                } else if (siblingIndex > 0 && !bundlingEnabled) {
                     sourceHandle = siblingIndex % 2 === 1 ? 'top' : 'left';
                     targetHandle = siblingIndex % 2 === 1 ? 'top' : 'right';
                 } else {

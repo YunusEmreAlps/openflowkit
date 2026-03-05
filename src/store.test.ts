@@ -103,6 +103,82 @@ describe('flow store tab actions', () => {
         expect(state.edges[0].id).toBe('e3-edit');
     });
 
+    it('duplicates active tab with cloned nodes and edges', () => {
+        useFlowStore.setState({
+            nodes: [createNode('n-active', 'Active')],
+            edges: [createEdge('e-active', 'n-active', 'n-active')],
+        });
+
+        const newTabId = useFlowStore.getState().duplicateActiveTab();
+        const state = useFlowStore.getState();
+        const duplicated = state.tabs.find((tab) => tab.id === newTabId);
+
+        expect(newTabId).toBeTruthy();
+        expect(state.activeTabId).toBe(newTabId);
+        expect(duplicated?.name).toContain('Copy');
+        expect(duplicated?.nodes).toHaveLength(1);
+        expect(duplicated?.edges).toHaveLength(1);
+        expect(duplicated?.nodes[0].id).toBe('n-active');
+        expect(duplicated?.nodes[0].selected).toBe(false);
+    });
+
+    it('copies selected nodes and connected edges to another tab', () => {
+        const tab2 = createTab('tab-2', 'Tab 2', [], []);
+        useFlowStore.setState((state) => ({
+            tabs: [...state.tabs, tab2],
+            nodes: [
+                { ...createNode('n1', 'Node A'), selected: true },
+                { ...createNode('n2', 'Node B'), selected: true },
+                { ...createNode('n3', 'Node C'), selected: false },
+            ],
+            edges: [
+                { ...createEdge('e1', 'n1', 'n2'), selected: true },
+                { ...createEdge('e2', 'n2', 'n3'), selected: false },
+            ],
+            activeTabId: 'tab-1',
+        }));
+
+        const copiedCount = useFlowStore.getState().copySelectedToTab('tab-2');
+        const state = useFlowStore.getState();
+        const target = state.tabs.find((tab) => tab.id === 'tab-2');
+
+        expect(copiedCount).toBe(2);
+        expect(target?.nodes).toHaveLength(2);
+        expect(target?.edges).toHaveLength(1);
+        expect(target?.nodes.every((node) => node.selected === false)).toBe(true);
+        expect(target?.edges[0].source).not.toBe('n1');
+        expect(target?.edges[0].target).not.toBe('n2');
+    });
+
+    it('moves selected nodes and connected edges to another tab', () => {
+        const tab2 = createTab('tab-2', 'Tab 2', [], []);
+        useFlowStore.setState((state) => ({
+            tabs: [...state.tabs, tab2],
+            nodes: [
+                { ...createNode('n1', 'Node A'), selected: true },
+                { ...createNode('n2', 'Node B'), selected: true },
+                { ...createNode('n3', 'Node C'), selected: false },
+            ],
+            edges: [
+                { ...createEdge('e1', 'n1', 'n2'), selected: true },
+                { ...createEdge('e2', 'n2', 'n3'), selected: false },
+            ],
+            activeTabId: 'tab-1',
+        }));
+
+        const movedCount = useFlowStore.getState().moveSelectedToTab('tab-2');
+        const state = useFlowStore.getState();
+        const source = state.tabs.find((tab) => tab.id === 'tab-1');
+        const target = state.tabs.find((tab) => tab.id === 'tab-2');
+
+        expect(movedCount).toBe(2);
+        expect(source?.nodes.map((node) => node.id)).toEqual(['n3']);
+        expect(source?.edges).toHaveLength(0);
+        expect(target?.nodes.map((node) => node.id).sort()).toEqual(['n1', 'n2']);
+        expect(target?.edges).toHaveLength(1);
+        expect(state.nodes.map((node) => node.id)).toEqual(['n3']);
+    });
+
     it('setActiveTabId is a no-op when switching to the already active tab', () => {
         const tab2 = createTab('tab-2', 'Tab 2', [createNode('n2', 'Second')], []);
         useFlowStore.setState((state) => ({
@@ -244,5 +320,67 @@ describe('flow store tab actions', () => {
         expect(state.tabs[0].history.past).toEqual([]);
         expect(state.tabs[0].history.future).toEqual([]);
         expect(state.activeTabId).toBe('tab-1');
+    });
+});
+
+describe('flow store layer actions', () => {
+    beforeEach(() => {
+        const nodes = [
+            createNode('n1', 'Node 1'),
+            createNode('n2', 'Node 2'),
+        ];
+        nodes[0].selected = true;
+        nodes[1].selected = false;
+        nodes[0].data.layerId = 'default';
+        nodes[1].data.layerId = 'default';
+
+        useFlowStore.setState({
+            nodes,
+            edges: [],
+            selectedNodeId: null,
+            selectedEdgeId: null,
+            layers: [
+                { id: 'default', name: 'Default', visible: true, locked: false },
+            ],
+            activeLayerId: 'default',
+        });
+    });
+
+    it('moves selected nodes to a target layer and selects nodes in that layer', () => {
+        const layerId = useFlowStore.getState().addLayer('Infra');
+        useFlowStore.getState().moveSelectedNodesToLayer(layerId);
+
+        let state = useFlowStore.getState();
+        const moved = state.nodes.find((node) => node.id === 'n1');
+        const untouched = state.nodes.find((node) => node.id === 'n2');
+
+        expect(moved?.data.layerId).toBe(layerId);
+        expect(untouched?.data.layerId).toBe('default');
+
+        useFlowStore.getState().selectNodesInLayer(layerId);
+        state = useFlowStore.getState();
+
+        expect(state.nodes.find((node) => node.id === 'n1')?.selected).toBe(true);
+        expect(state.nodes.find((node) => node.id === 'n2')?.selected).toBe(false);
+        expect(state.selectedNodeId).toBe('n1');
+    });
+
+    it('toggles layer visibility/lock and reassigns nodes to default on delete', () => {
+        const layerId = useFlowStore.getState().addLayer('Ops');
+        useFlowStore.getState().moveSelectedNodesToLayer(layerId);
+        useFlowStore.getState().toggleLayerVisibility(layerId);
+        useFlowStore.getState().toggleLayerLock(layerId);
+
+        let state = useFlowStore.getState();
+        const toggledLayer = state.layers.find((layer) => layer.id === layerId);
+        expect(toggledLayer?.visible).toBe(false);
+        expect(toggledLayer?.locked).toBe(true);
+
+        useFlowStore.getState().deleteLayer(layerId);
+        state = useFlowStore.getState();
+
+        expect(state.layers.some((layer) => layer.id === layerId)).toBe(false);
+        expect(state.nodes.find((node) => node.id === 'n1')?.data.layerId).toBe('default');
+        expect(state.activeLayerId).toBe('default');
     });
 });

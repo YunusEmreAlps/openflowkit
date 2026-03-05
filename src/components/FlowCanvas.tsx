@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReactFlow, {
     Background,
     Controls,
@@ -26,14 +27,21 @@ import { useFlowCanvasDragDrop } from './flow-canvas/useFlowCanvasDragDrop';
 import { useFlowCanvasConnectionState } from './flow-canvas/useFlowCanvasConnectionState';
 import { useFlowCanvasContextActions } from './flow-canvas/useFlowCanvasContextActions';
 import {
-    INTERACTION_LOD_COOLDOWN_MS,
+    getInteractionLodCooldownMs,
     getSafetyAdjustedEdges,
-    isFarZoomReductionActive,
+    isFarZoomReductionActiveForProfile,
     isInteractionLowDetailModeActive,
     isLargeGraphSafetyActive,
-    isLowDetailModeActive,
+    isLowDetailModeActiveForProfile,
     shouldEnableViewportCulling,
 } from './flow-canvas/largeGraphSafetyMode';
+import { detectMermaidDiagramType } from '@/services/mermaid/detectDiagramType';
+import { parseMermaidByType } from '@/services/mermaid/parseMermaidByType';
+import { getElkLayout } from '@/services/elkLayout';
+import { assignSmartHandles } from '@/services/smartEdgeRouting';
+import { createTextNode } from '@/hooks/node-operations/utils';
+import { createId } from '@/lib/id';
+import { useToast } from './ui/ToastContext';
 
 interface FlowCanvasProps {
     recordHistory: () => void;
@@ -44,23 +52,55 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     recordHistory,
     isSelectMode
 }) => {
+    const { t } = useTranslation();
     const {
         nodes, edges,
         onNodesChange, onEdgesChange,
-        viewSettings: { showGrid, snapToGrid, showMiniMap, largeGraphSafetyMode },
+        layers,
+        activeTabId,
+        updateTab,
+        setNodes,
+        setEdges,
+        setSelectedNodeId,
+        viewSettings: { showGrid, snapToGrid, showMiniMap, largeGraphSafetyMode, largeGraphSafetyProfile, architectureStrictMode },
     } = useFlowStore();
-    const safetyModeActive = isLargeGraphSafetyActive(nodes.length, edges.length, largeGraphSafetyMode);
+    const { addToast } = useToast();
+    const safetyModeActive = isLargeGraphSafetyActive(nodes.length, edges.length, largeGraphSafetyMode, largeGraphSafetyProfile);
     const viewportCullingEnabled = shouldEnableViewportCulling(safetyModeActive);
     const effectiveShowGrid = showGrid && !safetyModeActive;
     const effectiveShowMiniMap = showMiniMap;
-    const effectiveEdges = useMemo(() => getSafetyAdjustedEdges(edges, safetyModeActive), [edges, safetyModeActive]);
+    const layerById = useMemo(
+        () => new Map(layers.map((layer) => [layer.id, layer])),
+        [layers]
+    );
+    const layerAdjustedNodes = useMemo(() => nodes.map((node) => {
+        const layerId = node.data?.layerId ?? 'default';
+        const layer = layerById.get(layerId);
+        const isVisible = layer?.visible ?? true;
+        const isLocked = layer?.locked ?? false;
+        return {
+            ...node,
+            hidden: !isVisible,
+            selected: isVisible ? node.selected : false,
+            draggable: !isLocked,
+        };
+    }), [nodes, layerById]);
+    const visibleNodeIds = useMemo(
+        () => new Set(layerAdjustedNodes.filter((node) => !node.hidden).map((node) => node.id)),
+        [layerAdjustedNodes]
+    );
+    const visibleEdges = useMemo(
+        () => edges.filter((edge) => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)),
+        [edges, visibleNodeIds]
+    );
+    const effectiveEdges = useMemo(() => getSafetyAdjustedEdges(visibleEdges, safetyModeActive), [visibleEdges, safetyModeActive]);
     const [isInteracting, setIsInteracting] = useState(false);
     const [isInteractionCooldown, setIsInteractionCooldown] = useState(false);
     const interactionCooldownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
 
-    const { screenToFlowPosition } = useReactFlow();
+    const { screenToFlowPosition, fitView } = useReactFlow();
     const { zoom } = useViewport();
     const {
         connectMenu,
@@ -127,16 +167,16 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         interactionCooldownTimeoutRef.current = setTimeout(() => {
             setIsInteractionCooldown(false);
             interactionCooldownTimeoutRef.current = null;
-        }, INTERACTION_LOD_COOLDOWN_MS);
+        }, getInteractionLodCooldownMs(largeGraphSafetyProfile));
     };
 
     const isEffectiveSelectMode = isSelectMode || isSelectionModifierPressed;
-    const lowDetailModeActive = isLowDetailModeActive(safetyModeActive, zoom);
+    const lowDetailModeActive = isLowDetailModeActiveForProfile(safetyModeActive, zoom, largeGraphSafetyProfile);
     const interactionLowDetailModeActive = isInteractionLowDetailModeActive(
         safetyModeActive,
         isInteracting || isInteractionCooldown
     );
-    const farZoomReductionActive = isFarZoomReductionActive(safetyModeActive, zoom);
+    const farZoomReductionActive = isFarZoomReductionActiveForProfile(safetyModeActive, zoom, largeGraphSafetyProfile);
     const { isConnecting, onConnectStartWrapper, onConnectEndWrapper } = useFlowCanvasConnectionState({
         onConnectStart: (event, params) => {
             onConnectStart(event as Parameters<typeof onConnectStart>[0], params as Parameters<typeof onConnectStart>[1]);
@@ -161,13 +201,116 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         nodes,
     });
 
+    const getCanvasCenterFlowPosition = (): { x: number; y: number } => {
+        if (!reactFlowWrapper.current) {
+            return screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+        }
+        const rect = reactFlowWrapper.current.getBoundingClientRect();
+        return screenToFlowPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+        });
+    };
+
+    const isEditablePasteTarget = (target: EventTarget | null): boolean => {
+        const element = target instanceof HTMLElement ? target : null;
+        if (!element) return false;
+        const tagName = element.tagName.toLowerCase();
+        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select') return true;
+        if (element.isContentEditable) return true;
+        return element.closest('[contenteditable="true"]') !== null;
+    };
+
+    const handleCanvasPaste = async (event: React.ClipboardEvent<HTMLDivElement>) => {
+        if (isEditablePasteTarget(event.target)) return;
+
+        const rawText = event.clipboardData.getData('text/plain');
+        const pastedText = rawText.trim();
+
+        if (!pastedText) {
+            pasteSelection(getCanvasCenterFlowPosition());
+            return;
+        }
+
+        event.preventDefault();
+
+        const maybeMermaidType = detectMermaidDiagramType(pastedText);
+        if (maybeMermaidType) {
+            const result = parseMermaidByType(pastedText, { architectureStrictMode });
+            if (!result.error) {
+                recordHistory();
+
+                if (result.nodes.length > 0) {
+                    try {
+                        const direction = (result as { metadata?: { direction?: string }; direction?: string }).metadata?.direction
+                            || (result as { direction?: string }).direction
+                            || 'TB';
+                        const layoutDirection: 'TB' | 'LR' | 'RL' | 'BT' =
+                            direction === 'LR' || direction === 'RL' || direction === 'BT' || direction === 'TB'
+                                ? direction
+                                : 'TB';
+                        const layoutedNodes = await getElkLayout(result.nodes, result.edges, {
+                            direction: layoutDirection,
+                            algorithm: 'layered',
+                            spacing: 'normal',
+                        });
+                        const smartEdges = assignSmartHandles(layoutedNodes, result.edges);
+                        setNodes(layoutedNodes);
+                        setEdges(smartEdges);
+                    } catch {
+                        setNodes(result.nodes);
+                        setEdges(result.edges);
+                    }
+                } else {
+                    setNodes(result.nodes);
+                    setEdges(result.edges);
+                }
+
+                if ('diagramType' in result && result.diagramType) {
+                    updateTab(activeTabId, { diagramType: result.diagramType });
+                }
+
+                setTimeout(() => fitView({ duration: 600, padding: 0.2 }), 80);
+                return;
+            }
+            if (maybeMermaidType === 'architecture' && architectureStrictMode) {
+                addToast(
+                    t(
+                        'flowCanvas.strictModePasteBlocked',
+                        'Architecture strict mode blocked Mermaid paste. Open Code view, fix diagnostics, then retry.'
+                    ),
+                    'error'
+                );
+                return;
+            }
+        }
+
+        const pasteFlowPosition = getCanvasCenterFlowPosition();
+
+        recordHistory();
+        const textNodeId = createId('text');
+        const { activeLayerId } = useFlowStore.getState();
+        const newTextNode = createTextNode(textNodeId, pasteFlowPosition, pastedText);
+        newTextNode.data = {
+            ...newTextNode.data,
+            layerId: activeLayerId,
+        };
+
+        setNodes((existingNodes) => [
+            ...existingNodes.map((node) => ({ ...node, selected: false })),
+            { ...newTextNode, selected: true },
+        ]);
+        setSelectedNodeId(textNodeId);
+    };
+
     return (
         <div
             className={`w-full h-full relative ${isConnecting ? 'is-connecting' : ''} ${lowDetailModeActive ? 'flow-lod-low' : ''} ${interactionLowDetailModeActive ? 'flow-lod-interaction' : ''} ${farZoomReductionActive ? 'flow-lod-far' : ''}`}
             ref={reactFlowWrapper}
+            onPasteCapture={handleCanvasPaste}
         >
             <ReactFlow
-                nodes={nodes}
+                nodes={layerAdjustedNodes}
                 edges={effectiveEdges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}

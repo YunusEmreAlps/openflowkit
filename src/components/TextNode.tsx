@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { NodeData } from '@/lib/types';
+import { useInlineNodeTextEdit } from '@/hooks/useInlineNodeTextEdit';
 
 const TEXT_COLORS: Record<string, { text: string, border: string }> = {
     slate: { text: 'text-slate-700', border: 'border-slate-300' },
@@ -16,7 +17,7 @@ const TEXT_COLORS: Record<string, { text: string, border: string }> = {
     yellow: { text: 'text-yellow-800', border: 'border-yellow-400' },
 };
 
-const TextNode = ({ data, selected }: NodeProps<NodeData>) => {
+const TextNode = ({ id, data, selected }: NodeProps<NodeData>) => {
     const color = data.color || 'slate';
     const colorSet = TEXT_COLORS[color] || TEXT_COLORS.slate;
     const textColor = colorSet.text;
@@ -40,6 +41,7 @@ const TextNode = ({ data, selected }: NodeProps<NodeData>) => {
         mono: 'font-mono',
     };
     const fontFamilyClass = fontFamilyMap[data.fontFamily || 'inter'];
+    const labelEdit = useInlineNodeTextEdit(id, 'label', data.label || '');
 
     return (
         <>
@@ -69,10 +71,28 @@ const TextNode = ({ data, selected }: NodeProps<NodeData>) => {
                     ...fontSizeStyle
                 }}
             >
-                <div className={`prose prose-sm max-w-none text-center leading-snug font-medium select-none pointer-events-none ${textColor} ${fontSizeClass} ${fontFamilyClass}`}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-                        {data.label || 'Text'}
-                    </ReactMarkdown>
+                <div
+                    className={`prose prose-sm max-w-none text-center leading-snug font-medium ${textColor} ${fontSizeClass} ${fontFamilyClass}`}
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        labelEdit.beginEdit();
+                    }}
+                >
+                    {labelEdit.isEditing ? (
+                        <input
+                            autoFocus
+                            value={labelEdit.draft}
+                            onChange={(event) => labelEdit.setDraft(event.target.value)}
+                            onBlur={labelEdit.commit}
+                            onKeyDown={labelEdit.handleKeyDown}
+                            onMouseDown={(event) => event.stopPropagation()}
+                            className="w-full rounded border border-[var(--brand-primary)] bg-white/90 px-1 py-0.5 text-center outline-none"
+                        />
+                    ) : (
+                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                            {data.label || 'Text'}
+                        </ReactMarkdown>
+                    )}
                 </div>
             </div>
 

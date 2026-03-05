@@ -12,9 +12,9 @@
 | Correctness | Pass | `npm run test -- --run` -> 20 files, 105 tests passed |
 | Performance Artifact Integrity | Pass | `npm run bench:check` -> validated 18 files |
 | Bundle Budget | Pass | `npm run bundle:check` -> JS/CSS budgets all PASS |
-| Reproducibility Artifact Published | Pass | `docs/benchmark-reproducibility-2026-03-03.md` + `benchmarks/results/q1-2026-baseline-package-2026-03-03.json` |
-| Architectural Decision Coverage | Pass | `docs/engineering-decision-records-2026-03-03.md` includes routing/history/determinism decisions with tradeoffs/alternatives |
-| Contributor Workflow Coverage | Pass | `docs/contributor-profiling-regression-guide-2026-03-03.md` includes profiling, triage, fixture onboarding, and no-regression checklist |
+| Reproducibility Artifact Published | Pass | `docs/archive/benchmark-reproducibility-2026-03-03.md` + `benchmarks/results/q1-2026-baseline-package-2026-03-03.json` |
+| Architectural Decision Coverage | Pass | `docs/archive/engineering-decision-records-2026-03-03.md` includes routing/history/determinism decisions with tradeoffs/alternatives |
+| Contributor Workflow Coverage | Pass | `docs/archive/contributor-profiling-regression-guide-2026-03-03.md` includes profiling, triage, fixture onboarding, and no-regression checklist |
 
 ## Noted Warnings
 

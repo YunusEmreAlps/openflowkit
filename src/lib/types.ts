@@ -1,8 +1,30 @@
 import { Edge, Node } from 'reactflow';
 
+export const DIAGRAM_TYPES = [
+  'flowchart',
+  'stateDiagram',
+  'classDiagram',
+  'erDiagram',
+  'gitGraph',
+  'mindmap',
+  'journey',
+  'architecture',
+] as const;
+
+export type DiagramType = (typeof DIAGRAM_TYPES)[number];
+
+export function isDiagramType(value: unknown): value is DiagramType {
+  return typeof value === 'string' && (DIAGRAM_TYPES as readonly string[]).includes(value);
+}
+
 export enum NodeType {
   START = 'start',
   PROCESS = 'process',
+  JOURNEY = 'journey',
+  MINDMAP = 'mindmap',
+  ARCHITECTURE = 'architecture',
+  CLASS = 'class',
+  ER_ENTITY = 'er_entity',
   DECISION = 'decision',
   END = 'end',
   CUSTOM = 'custom',
@@ -33,6 +55,22 @@ export interface NodeData {
   backgroundColor?: string;
   transparency?: number; // 0-1
   variant?: string; // wireframe preset key (e.g. 'landing', 'modal')
+  layerId?: string; // layer identifier for visibility/lock/group operations
+  classStereotype?: string;
+  classAttributes?: string[];
+  classMethods?: string[];
+  erFields?: string[];
+  journeySection?: string;
+  journeyActor?: string;
+  journeyTask?: string;
+  journeyScore?: number;
+  mindmapDepth?: number;
+  archProvider?: string;
+  archResourceType?: string;
+  archEnvironment?: string;
+  archBoundaryId?: string;
+  archZone?: string;
+  archTrustDomain?: string;
 }
 
 export interface AIRequestParams {
@@ -50,6 +88,11 @@ export interface EdgeData {
   strokeWidth?: number; // 1-6, default 2
   dashPattern?: 'solid' | 'dashed' | 'dotted' | 'dashdot';
   opacity?: number; // 0-1, default 1
+  archProtocol?: string;
+  archPort?: string;
+  archDirection?: '-->' | '<--' | '<-->';
+  archSourceSide?: 'L' | 'R' | 'T' | 'B';
+  archTargetSide?: 'L' | 'R' | 'T' | 'B';
 }
 
 export interface GlobalEdgeOptions {
@@ -86,6 +129,7 @@ export interface FlowHistoryState {
 export interface FlowTab {
   id: string;
   name: string;
+  diagramType?: DiagramType;
   nodes: FlowNode[];
   edges: FlowEdge[];
   history: {

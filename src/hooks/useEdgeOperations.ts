@@ -7,6 +7,7 @@ import { NODE_DEFAULTS } from '../theme';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../lib/analytics';
 import { createId } from '../lib/id';
+import { assignSmartHandlesWithOptions, getSmartRoutingOptionsFromViewSettings } from '../services/smartEdgeRouting';
 
 export const useEdgeOperations = (
     recordHistory: () => void,
@@ -64,13 +65,22 @@ export const useEdgeOperations = (
 
         if (isDuplicate) return;
 
+        const { viewSettings } = useFlowStore.getState();
         recordHistory();
-        setEdges((eds) =>
-            addEdge({
+        setEdges((eds) => {
+            const inserted = addEdge({
                 ...params,
                 ...DEFAULT_EDGE_OPTIONS,
-            }, eds)
-        );
+            }, eds);
+            if (!viewSettings.smartRoutingEnabled) {
+                return inserted;
+            }
+            return assignSmartHandlesWithOptions(
+                useFlowStore.getState().nodes,
+                inserted,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
+        });
     }, [edges, setEdges, recordHistory]);
 
     const onConnectStart = useCallback((_, { nodeId, handleId }: { nodeId: string | null; handleId: string | null }) => {
@@ -147,29 +157,53 @@ export const useEdgeOperations = (
         recordHistory();
         const id = createId();
         const defaultStyle = NODE_DEFAULTS[type] || NODE_DEFAULTS['process'];
+        const isJourney = type === 'journey';
         const newNode = {
             id,
             position,
             data: {
-                label: type === 'annotation' ? t('nodes.note') : (shape === 'cylinder' ? t('nodes.database') : shape === 'parallelogram' ? t('nodes.inputOutput') : t('nodes.newNode')),
-                subLabel: type === 'decision' ? t('nodes.branch') : t('nodes.processStep'),
-                icon: defaultStyle?.icon && defaultStyle.icon !== 'none' ? defaultStyle.icon : (type === 'decision' ? 'GitBranch' : (type === 'annotation' ? 'StickyNote' : (shape === 'cylinder' ? 'Database' : 'Settings'))),
-                color: defaultStyle?.color || (type === 'annotation' ? 'yellow' : (type === 'decision' ? 'amber' : (shape === 'cylinder' ? 'emerald' : 'slate'))),
+                label: isJourney
+                    ? 'User Journey'
+                    : type === 'annotation'
+                        ? t('nodes.note')
+                        : (shape === 'cylinder' ? t('nodes.database') : shape === 'parallelogram' ? t('nodes.inputOutput') : t('nodes.newNode')),
+                subLabel: isJourney ? 'User' : (type === 'decision' ? t('nodes.branch') : t('nodes.processStep')),
+                icon: defaultStyle?.icon && defaultStyle.icon !== 'none'
+                    ? defaultStyle.icon
+                    : (type === 'decision' ? 'GitBranch' : (type === 'annotation' ? 'StickyNote' : (shape === 'cylinder' ? 'Database' : 'Settings'))),
+                color: isJourney
+                    ? 'violet'
+                    : defaultStyle?.color || (type === 'annotation' ? 'yellow' : (type === 'decision' ? 'amber' : (shape === 'cylinder' ? 'emerald' : 'slate'))),
                 shape: (shape || defaultStyle?.shape) as NodeData['shape'],
+                ...(isJourney ? {
+                    journeySection: 'General',
+                    journeyTask: 'User Journey',
+                    journeyActor: 'User',
+                    journeyScore: 3,
+                } : {}),
             },
             type,
         };
 
+        const { viewSettings } = useFlowStore.getState();
         setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) =>
-            eds.concat({
+        setEdges((eds) => {
+            const insertedEdges = eds.concat({
                 id: `e-${sourceId}-${id}`,
                 source: sourceId,
                 sourceHandle,
                 target: id,
                 ...DEFAULT_EDGE_OPTIONS,
-            })
-        );
+            });
+            if (!viewSettings.smartRoutingEnabled) {
+                return insertedEdges;
+            }
+            return assignSmartHandlesWithOptions(
+                useFlowStore.getState().nodes.concat(newNode),
+                insertedEdges,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
+        });
         setSelectedNodeId(id);
     }, [setNodes, setEdges, recordHistory, setSelectedNodeId, t]);
 

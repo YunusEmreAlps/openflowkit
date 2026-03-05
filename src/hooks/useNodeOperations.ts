@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Node, useReactFlow } from 'reactflow';
 import { NodeData } from '@/lib/types';
 import { useFlowStore } from '../store';
-import { assignSmartHandles } from '../services/smartEdgeRouting';
+import { assignSmartHandlesWithOptions, getSmartRoutingOptionsFromViewSettings } from '../services/smartEdgeRouting';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../lib/analytics';
 import { createId } from '../lib/id';
+import { createDefaultEdge } from '@/constants';
 import {
     applySectionParenting,
     createAnnotationNode,
@@ -19,7 +20,7 @@ import { getDragStopReconcileDelayMs } from './node-operations/dragStopReconcile
 
 export const useNodeOperations = (recordHistory: () => void) => {
     const { t } = useTranslation();
-    const { nodes, setNodes, setSelectedNodeId } = useFlowStore();
+    const { nodes, setNodes, setEdges, setSelectedNodeId } = useFlowStore();
     const { screenToFlowPosition } = useReactFlow();
     const dragStopReconcileTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -31,12 +32,135 @@ export const useNodeOperations = (recordHistory: () => void) => {
         };
     }, []);
 
+    const getAbsolutePosition = useCallback((node: Node, allNodes: Node[]): { x: number; y: number } => {
+        let absoluteX = node.position.x;
+        let absoluteY = node.position.y;
+        let currentParentId = (node as Node & { parentNode?: string }).parentNode;
+
+        while (currentParentId) {
+            const parentNode = allNodes.find((candidate) => candidate.id === currentParentId);
+            if (!parentNode) {
+                break;
+            }
+            absoluteX += parentNode.position.x;
+            absoluteY += parentNode.position.y;
+            currentParentId = (parentNode as Node & { parentNode?: string }).parentNode;
+        }
+
+        return { x: absoluteX, y: absoluteY };
+    }, []);
+
     // --- Node Data Updates ---
     const updateNodeData = useCallback((id: string, data: Partial<NodeData>) => {
-        setNodes((nds) =>
-            nds.map((node) => node.id === id ? { ...node, data: { ...node.data, ...data } } : node)
-        );
-    }, [setNodes]);
+        setNodes((nds) => {
+            const targetNode = nds.find((node) => node.id === id);
+            if (!targetNode) {
+                return nds;
+            }
+
+            const rawBoundaryId = data.archBoundaryId;
+            const hasBoundaryUpdate = typeof rawBoundaryId === 'string';
+            if (targetNode.type !== 'architecture' || !hasBoundaryUpdate) {
+                return nds.map((node) => (
+                    node.id === id
+                        ? { ...node, data: { ...node.data, ...data } }
+                        : node
+                ));
+            }
+
+            const requestedBoundaryId = rawBoundaryId.trim();
+            const absolutePosition = getAbsolutePosition(targetNode, nds);
+
+            if (requestedBoundaryId.length === 0) {
+                return nds.map((node) => {
+                    if (node.id !== id) {
+                        return node;
+                    }
+                    const nextNode = {
+                        ...node,
+                        position: absolutePosition,
+                        data: {
+                            ...node.data,
+                            ...data,
+                            archBoundaryId: '',
+                        },
+                    } as Node & { parentNode?: string; extent?: 'parent' | undefined };
+                    delete nextNode.parentNode;
+                    delete nextNode.extent;
+                    return nextNode;
+                });
+            }
+
+            const boundaryNode = nds.find(
+                (node) => node.id === requestedBoundaryId && node.type === 'section'
+            );
+            if (!boundaryNode) {
+                return nds.map((node) => (
+                    node.id === id
+                        ? {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                ...data,
+                            },
+                        }
+                        : node
+                ));
+            }
+
+            return nds.map((node) => {
+                if (node.id !== id) {
+                    return node;
+                }
+
+                return {
+                    ...node,
+                    parentNode: boundaryNode.id,
+                    extent: 'parent' as const,
+                    position: {
+                        x: absolutePosition.x - boundaryNode.position.x,
+                        y: absolutePosition.y - boundaryNode.position.y,
+                    },
+                    data: {
+                        ...node.data,
+                        ...data,
+                        archBoundaryId: boundaryNode.id,
+                    },
+                };
+            });
+        });
+    }, [getAbsolutePosition, setNodes]);
+
+    const applyBulkNodeData = useCallback((updates: Partial<NodeData>, labelPrefix = '', labelSuffix = '') => {
+        const hasFieldUpdates = Object.keys(updates).length > 0;
+        const hasLabelUpdates = labelPrefix.length > 0 || labelSuffix.length > 0;
+        if (!hasFieldUpdates && !hasLabelUpdates) {
+            return 0;
+        }
+
+        const selectedNodes = useFlowStore.getState().nodes.filter((node) => node.selected);
+        if (selectedNodes.length === 0) {
+            return 0;
+        }
+
+        const selectedIds = new Set(selectedNodes.map((node) => node.id));
+        recordHistory();
+        setNodes((nds) => nds.map((node) => {
+            if (!selectedIds.has(node.id)) {
+                return node;
+            }
+
+            const nextData: NodeData = { ...node.data, ...updates };
+            if (hasLabelUpdates) {
+                const baseLabel = node.data?.label ?? '';
+                nextData.label = `${labelPrefix}${baseLabel}${labelSuffix}`;
+            }
+
+            return { ...node, data: nextData };
+        }));
+
+        return selectedNodes.length;
+    }, [recordHistory, setNodes]);
 
     const updateNodeType = useCallback((id: string, type: string) => {
         recordHistory();
@@ -91,11 +215,16 @@ export const useNodeOperations = (recordHistory: () => void) => {
     const handleAddNode = useCallback((position?: { x: number; y: number }) => {
         recordHistory();
         const id = createId();
+        const { activeLayerId } = useFlowStore.getState();
         const newNode = createProcessNode(
             id,
             position || getDefaultNodePosition(nodes.length, 100, 100),
             { label: t('nodes.newNode'), subLabel: t('nodes.processStep') }
         );
+        newNode.data = {
+            ...newNode.data,
+            layerId: activeLayerId,
+        };
         setNodes((nds) => nds.concat(newNode));
         setSelectedNodeId(id);
         trackEvent('add_node', { node_type: 'process' });
@@ -104,24 +233,59 @@ export const useNodeOperations = (recordHistory: () => void) => {
     const handleAddAnnotation = useCallback((position?: { x: number; y: number }) => {
         recordHistory();
         const id = createId();
+        const { activeLayerId } = useFlowStore.getState();
         const newNode = createAnnotationNode(
             id,
             position || getDefaultNodePosition(nodes.length, 100, 100),
             { label: t('nodes.note'), subLabel: t('nodes.addCommentsHere') }
         );
+        newNode.data = {
+            ...newNode.data,
+            layerId: activeLayerId,
+        };
         setNodes((nds) => nds.concat(newNode));
         setSelectedNodeId(id);
         trackEvent('add_node', { node_type: 'annotation' });
     }, [setNodes, recordHistory, setSelectedNodeId, t, nodes.length]);
 
+    const handleAddJourneyNode = useCallback((position?: { x: number; y: number }) => {
+        recordHistory();
+        const id = createId('journey');
+        const { activeLayerId } = useFlowStore.getState();
+        const newNode: Node = {
+            id,
+            type: 'journey',
+            position: position || getDefaultNodePosition(nodes.length, 120, 120),
+            data: {
+                label: 'User Journey',
+                subLabel: 'User',
+                color: 'violet',
+                shape: 'rounded',
+                journeySection: 'General',
+                journeyTask: 'User Journey',
+                journeyActor: 'User',
+                journeyScore: 3,
+                layerId: activeLayerId,
+            },
+        };
+        setNodes((nds) => nds.concat(newNode));
+        setSelectedNodeId(id);
+        trackEvent('add_node', { node_type: 'journey' });
+    }, [setNodes, recordHistory, setSelectedNodeId, nodes.length]);
+
     const handleAddSection = useCallback((position?: { x: number; y: number }) => {
         recordHistory();
         const id = createId('section');
+        const { activeLayerId } = useFlowStore.getState();
         const newNode = createSectionNode(
             id,
             position || getDefaultNodePosition(nodes.length, 50, 50),
             t('nodes.newSection')
         );
+        newNode.data = {
+            ...newNode.data,
+            layerId: activeLayerId,
+        };
         setNodes((nds) => nds.concat(newNode));
         setSelectedNodeId(id);
         trackEvent('add_node', { node_type: 'section' });
@@ -130,11 +294,16 @@ export const useNodeOperations = (recordHistory: () => void) => {
     const handleAddTextNode = useCallback((position?: { x: number; y: number }) => {
         recordHistory();
         const id = createId('text');
+        const { activeLayerId } = useFlowStore.getState();
         const newNode = createTextNode(
             id,
             position || getDefaultNodePosition(nodes.length, 100, 100),
             t('nodes.text')
         );
+        newNode.data = {
+            ...newNode.data,
+            layerId: activeLayerId,
+        };
         setNodes((nds) => nds.concat(newNode));
         setSelectedNodeId(id);
         trackEvent('add_node', { node_type: 'text' });
@@ -143,16 +312,183 @@ export const useNodeOperations = (recordHistory: () => void) => {
     const handleAddImage = useCallback((imageUrl: string, position?: { x: number; y: number }) => {
         recordHistory();
         const id = createId('image');
+        const { activeLayerId } = useFlowStore.getState();
         const newNode = createImageNode(
             id,
             imageUrl,
             position || getDefaultNodePosition(nodes.length, 100, 100),
             t('nodes.image')
         );
+        newNode.data = {
+            ...newNode.data,
+            layerId: activeLayerId,
+        };
         setNodes((nds) => nds.concat(newNode));
         setSelectedNodeId(id);
         trackEvent('add_node', { node_type: 'image' });
     }, [setNodes, recordHistory, setSelectedNodeId, t, nodes.length]);
+
+    const handleAddMindmapChild = useCallback((parentId: string): boolean => {
+        const state = useFlowStore.getState();
+        const parentNode = state.nodes.find((node) => node.id === parentId);
+        if (!parentNode || parentNode.type !== 'mindmap') {
+            return false;
+        }
+
+        const parentDepth = typeof parentNode.data?.mindmapDepth === 'number' ? parentNode.data.mindmapDepth : 0;
+        const childDepth = parentDepth + 1;
+        const siblingEdges = state.edges.filter((edge) => edge.source === parentId);
+        const id = createId('mm');
+        const yOffset = siblingEdges.length === 0 ? 0 : siblingEdges.length * 110;
+        const { activeLayerId, viewSettings } = state;
+
+        const newNode: Node = {
+            id,
+            type: 'mindmap',
+            position: {
+                x: parentNode.position.x + 260,
+                y: parentNode.position.y + yOffset,
+            },
+            data: {
+                label: t('nodes.newNode'),
+                color: 'slate',
+                shape: 'rectangle',
+                mindmapDepth: childDepth,
+                layerId: activeLayerId,
+            },
+            selected: true,
+        };
+
+        recordHistory();
+        setNodes((existingNodes) => [
+            ...existingNodes.map((node) => ({ ...node, selected: false })),
+            newNode,
+        ]);
+        setEdges((existingEdges) => {
+            const insertedEdges = existingEdges.concat(createDefaultEdge(parentId, id));
+            if (!viewSettings.smartRoutingEnabled) {
+                return insertedEdges;
+            }
+            return assignSmartHandlesWithOptions(
+                useFlowStore.getState().nodes.concat(newNode),
+                insertedEdges,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
+        });
+        setSelectedNodeId(id);
+        trackEvent('add_node', { node_type: 'mindmap_child' });
+        return true;
+    }, [recordHistory, setNodes, setEdges, setSelectedNodeId, t]);
+
+    const handleAddArchitectureService = useCallback((sourceId: string): boolean => {
+        const state = useFlowStore.getState();
+        const sourceNode = state.nodes.find((node) => node.id === sourceId);
+        if (!sourceNode || sourceNode.type !== 'architecture') {
+            return false;
+        }
+
+        const id = createId('arch');
+        const { activeLayerId, viewSettings } = state;
+        const sameBoundaryNodes = state.nodes.filter(
+            (node) => node.type === 'architecture' && node.data?.archBoundaryId === sourceNode.data?.archBoundaryId
+        );
+        const yOffset = sameBoundaryNodes.length * 90;
+
+        const newNode: Node = {
+            id,
+            type: 'architecture',
+            position: {
+                x: sourceNode.position.x + 260,
+                y: sourceNode.position.y + yOffset,
+            },
+            data: {
+                label: 'New Service',
+                color: 'slate',
+                shape: 'rectangle',
+                icon: 'Server',
+                archProvider: sourceNode.data?.archProvider || 'custom',
+                archResourceType: 'service',
+                archEnvironment: sourceNode.data?.archEnvironment || 'default',
+                archBoundaryId: sourceNode.data?.archBoundaryId,
+                archZone: sourceNode.data?.archZone,
+                archTrustDomain: sourceNode.data?.archTrustDomain,
+                layerId: activeLayerId,
+            },
+            selected: true,
+        };
+
+        recordHistory();
+        setNodes((existingNodes) => [
+            ...existingNodes.map((node) => ({ ...node, selected: false })),
+            newNode,
+        ]);
+        setEdges((existingEdges) => {
+            const insertedEdges = existingEdges.concat(createDefaultEdge(sourceId, id));
+            if (!viewSettings.smartRoutingEnabled) {
+                return insertedEdges;
+            }
+            return assignSmartHandlesWithOptions(
+                useFlowStore.getState().nodes.concat(newNode),
+                insertedEdges,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
+        });
+        setSelectedNodeId(id);
+        trackEvent('add_node', { node_type: 'architecture_service' });
+        return true;
+    }, [recordHistory, setNodes, setEdges, setSelectedNodeId]);
+
+    const handleCreateArchitectureBoundary = useCallback((sourceId: string): boolean => {
+        const state = useFlowStore.getState();
+        const sourceNode = state.nodes.find((node) => node.id === sourceId);
+        if (!sourceNode || sourceNode.type !== 'architecture') {
+            return false;
+        }
+        const sourceAbsolutePosition = getAbsolutePosition(sourceNode, state.nodes);
+
+        const boundaryId = createId('section');
+        const { activeLayerId } = state;
+        const boundaryLabel = `${sourceNode.data?.label || 'System'} Boundary`;
+        const boundaryNode = createSectionNode(
+            boundaryId,
+            { x: sourceAbsolutePosition.x - 80, y: sourceAbsolutePosition.y - 70 },
+            boundaryLabel
+        );
+        boundaryNode.style = { width: 360, height: 260 };
+        boundaryNode.data = {
+            ...boundaryNode.data,
+            layerId: activeLayerId,
+            archBoundaryId: boundaryId,
+        };
+
+        recordHistory();
+        setNodes((existingNodes) => {
+            const nextNodes: Node[] = existingNodes.map((node) => {
+                if (node.id === sourceId) {
+                    return {
+                        ...node,
+                        parentNode: boundaryId,
+                        extent: 'parent' as const,
+                        position: {
+                            x: sourceAbsolutePosition.x - boundaryNode.position.x,
+                            y: sourceAbsolutePosition.y - boundaryNode.position.y,
+                        },
+                        data: {
+                            ...node.data,
+                            archBoundaryId: boundaryId,
+                        },
+                        selected: true,
+                    };
+                }
+                return { ...node, selected: false };
+            });
+            nextNodes.push({ ...boundaryNode, selected: false });
+            return nextNodes;
+        });
+        setSelectedNodeId(sourceId);
+        trackEvent('add_node', { node_type: 'architecture_boundary' });
+        return true;
+    }, [getAbsolutePosition, recordHistory, setNodes, setSelectedNodeId]);
 
     // --- Drag Operations ---
     const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
@@ -192,7 +528,11 @@ export const useNodeOperations = (recordHistory: () => void) => {
         const runReconcile = () => {
             const { nodes: latestNodes, edges: latestEdges, setEdges: setLatestEdges, viewSettings } = useFlowStore.getState();
             if (!viewSettings.smartRoutingEnabled) return;
-            const smartEdges = assignSmartHandles(latestNodes, latestEdges);
+            const smartEdges = assignSmartHandlesWithOptions(
+                latestNodes,
+                latestEdges,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
             setLatestEdges(smartEdges);
         };
 
@@ -224,15 +564,20 @@ export const useNodeOperations = (recordHistory: () => void) => {
 
     return {
         updateNodeData,
+        applyBulkNodeData,
         updateNodeType,
         updateNodeZIndex,
         deleteNode,
         duplicateNode,
         handleAddNode,
         handleAddAnnotation,
+        handleAddJourneyNode,
         handleAddSection,
         handleAddTextNode,
         handleAddImage,
+        handleAddMindmapChild,
+        handleAddArchitectureService,
+        handleCreateArchitectureBoundary,
         onNodeDragStart,
         onNodeDrag,
         onNodeDragStop,

@@ -14,7 +14,7 @@
 | Bundle Budget | Pass | `npm run bundle:check` -> JS/CSS budgets all PASS |
 | Deterministic Export Contract | Pass | Includes canonical ordering + export-mode tests in `canonicalSerialization.test.ts` and `openFlowDSLExporter.test.ts` |
 | Round-Trip Diagnostics | Pass | Includes parser/export diagnostics coverage in `openFlowDSLParser.test.ts`, `flowmindDSLParserV2.test.ts`, and `useFlowEditorActions.test.ts` |
-| Schema Compatibility Policy | Pass | Includes versioned import/export compatibility coverage in `diagramDocument.test.ts` and published matrix in `docs/schema-compatibility-matrix.md` |
+| Schema Compatibility Policy | Pass | Includes versioned import/export compatibility coverage in `diagramDocument.test.ts` and published matrix in `docs/archive/schema-compatibility-matrix.md` |
 
 ## Noted Warnings
 

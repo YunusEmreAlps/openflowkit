@@ -1,5 +1,5 @@
 import { NODE_DEFAULTS } from '@/theme';
-import { assignSmartHandles } from '@/services/smartEdgeRouting';
+import { assignSmartHandlesWithOptions, getSmartRoutingOptionsFromViewSettings } from '@/services/smartEdgeRouting';
 import type { FlowState } from '../types';
 
 type SetFlowState = (partial: Partial<FlowState> | ((state: FlowState) => Partial<FlowState>)) => void;
@@ -14,7 +14,10 @@ export function createViewActions(set: SetFlowState): Pick<
     | 'setGlobalEdgeOptions'
     | 'setDefaultIconsEnabled'
     | 'setSmartRoutingEnabled'
+    | 'setSmartRoutingProfile'
+    | 'setSmartRoutingBundlingEnabled'
     | 'setLargeGraphSafetyMode'
+    | 'setLargeGraphSafetyProfile'
     | 'toggleAnalytics'
 > {
     return {
@@ -84,7 +87,11 @@ export function createViewActions(set: SetFlowState): Pick<
         setSmartRoutingEnabled: (enabled) => set((state) => {
             let newEdges = state.edges;
             if (enabled) {
-                newEdges = assignSmartHandles(state.nodes, state.edges);
+                newEdges = assignSmartHandlesWithOptions(
+                    state.nodes,
+                    state.edges,
+                    getSmartRoutingOptionsFromViewSettings(state.viewSettings)
+                );
             }
 
             return {
@@ -93,8 +100,42 @@ export function createViewActions(set: SetFlowState): Pick<
             };
         }),
 
+        setSmartRoutingProfile: (profile) => set((state) => {
+            const nextViewSettings = { ...state.viewSettings, smartRoutingProfile: profile };
+            const nextEdges = state.viewSettings.smartRoutingEnabled
+                ? assignSmartHandlesWithOptions(
+                    state.nodes,
+                    state.edges,
+                    getSmartRoutingOptionsFromViewSettings(nextViewSettings)
+                )
+                : state.edges;
+            return {
+                viewSettings: nextViewSettings,
+                edges: nextEdges,
+            };
+        }),
+
+        setSmartRoutingBundlingEnabled: (enabled) => set((state) => {
+            const nextViewSettings = { ...state.viewSettings, smartRoutingBundlingEnabled: enabled };
+            const nextEdges = state.viewSettings.smartRoutingEnabled
+                ? assignSmartHandlesWithOptions(
+                    state.nodes,
+                    state.edges,
+                    getSmartRoutingOptionsFromViewSettings(nextViewSettings)
+                )
+                : state.edges;
+            return {
+                viewSettings: nextViewSettings,
+                edges: nextEdges,
+            };
+        }),
+
         setLargeGraphSafetyMode: (mode) => set((state) => ({
             viewSettings: { ...state.viewSettings, largeGraphSafetyMode: mode },
+        })),
+
+        setLargeGraphSafetyProfile: (profile) => set((state) => ({
+            viewSettings: { ...state.viewSettings, largeGraphSafetyProfile: profile },
         })),
 
         toggleAnalytics: (enabled) => set((state) => ({

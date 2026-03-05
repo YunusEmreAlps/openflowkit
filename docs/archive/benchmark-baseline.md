@@ -4,7 +4,7 @@ This runbook defines how to run and capture benchmark baselines for the Q1 plan.
 
 Published reproducibility artifact:
 
-- `docs/benchmark-reproducibility-2026-03-03.md`
+- `docs/archive/benchmark-reproducibility-2026-03-03.md`
 - `benchmarks/results/q1-2026-baseline-package-2026-03-03.json`
 
 ## Scope
@@ -65,7 +65,7 @@ npm run bench:summary -- --fixture <fixture>
 2. Run all five modes for each fixture.
 3. Generate summary for each fixture.
 4. Confirm `status: ok` for all modes in each summary file.
-5. Log run details in `docs/q1_execution_tracker.md`.
+5. Log run details in `docs/archive/q1_execution_tracker.md`.
 
 ## Interpreting Results Safely
 

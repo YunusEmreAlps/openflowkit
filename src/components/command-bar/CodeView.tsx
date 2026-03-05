@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Node, Edge } from 'reactflow';
 import { Link } from 'react-router-dom';
 import { Code2, FileCode, AlertCircle, BookOpen, Loader2, Play } from 'lucide-react';
@@ -6,13 +6,27 @@ import { useTranslation } from 'react-i18next';
 import { ViewHeader } from './ViewHeader';
 import { toMermaid } from '../../services/exportService';
 import { toOpenFlowDSL } from '../../services/openFlowDSLExporter';
-import { parseMermaid } from '@/lib/mermaidParser';
+import { parseMermaidByType } from '@/services/mermaid/parseMermaidByType';
+import { normalizeParseDiagnostics } from '@/services/mermaid/diagnosticFormatting';
+import {
+    getLineSelectionRange,
+    groupArchitectureStrictModeDiagnostics,
+} from '@/services/mermaid/strictModeDiagnosticsPresentation';
+import { buildArchitectureStrictModeGuidance } from '@/services/mermaid/strictModeGuidance';
 import { parseOpenFlowDSL, type ParseDiagnostic } from '@/lib/openFlowDSLParser';
+import {
+    buildImportFidelityReport,
+    mapErrorToIssue,
+    mapParserDiagnosticToIssue,
+    persistLatestImportReport,
+    summarizeImportReport,
+} from '@/services/importFidelity';
 import { getElkLayout } from '../../services/elkLayout';
 import { assignSmartHandles } from '../../services/smartEdgeRouting';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
 import { useFlowStore } from '../../store';
+import { useToast } from '../ui/ToastContext';
 
 interface CodeViewProps {
     mode: 'mermaid' | 'flowmind';
@@ -32,11 +46,13 @@ export const CodeView = ({
     handleBack
 }: CodeViewProps) => {
     const { t } = useTranslation();
-    const { brandConfig } = useFlowStore();
+    const { brandConfig, activeTabId, updateTab, viewSettings } = useFlowStore();
+    const { addToast } = useToast();
     const [code, setCode] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [diagnostics, setDiagnostics] = useState<ParseDiagnostic[]>([]);
     const [isApplying, setIsApplying] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     // No initial sync - start empty for import
     useEffect(() => {
@@ -52,11 +68,30 @@ export const CodeView = ({
     };
 
     const handleApply = async () => {
-        const res = mode === 'mermaid' ? parseMermaid(code) : parseOpenFlowDSL(code);
+        const importStart = performance.now();
+        const res = mode === 'mermaid'
+            ? parseMermaidByType(code, { architectureStrictMode: viewSettings.architectureStrictMode })
+            : parseOpenFlowDSL(code);
         if (res.error) {
+            const parserDiagnostics = 'diagnostics' in res
+                ? normalizeParseDiagnostics(res.diagnostics)
+                : [];
+            const issues = parserDiagnostics.map((diagnostic) => mapParserDiagnosticToIssue(diagnostic));
+            if (issues.length === 0) {
+                issues.push(mapErrorToIssue(res.error));
+            }
+            const report = buildImportFidelityReport({
+                source: mode === 'mermaid' ? 'mermaid' : 'openflowdsl',
+                nodeCount: 0,
+                edgeCount: 0,
+                elapsedMs: Math.round(performance.now() - importStart),
+                issues,
+            });
+            persistLatestImportReport(report);
+            addToast(summarizeImportReport(report), 'error');
             setError(res.error);
-            if ('diagnostics' in res && Array.isArray(res.diagnostics)) {
-                setDiagnostics(res.diagnostics);
+            if ('diagnostics' in res) {
+                setDiagnostics(normalizeParseDiagnostics(res.diagnostics));
             } else {
                 setDiagnostics([]);
             }
@@ -81,14 +116,50 @@ export const CodeView = ({
                 const smartEdges = assignSmartHandles(layoutedNodes, res.edges);
 
                 onApply(layoutedNodes, smartEdges);
+                if (mode === 'mermaid' && 'diagramType' in res && res.diagramType) {
+                    updateTab(activeTabId, { diagramType: res.diagramType });
+                }
+                const report = buildImportFidelityReport({
+                    source: mode === 'mermaid' ? 'mermaid' : 'openflowdsl',
+                    nodeCount: layoutedNodes.length,
+                    edgeCount: smartEdges.length,
+                    elapsedMs: Math.round(performance.now() - importStart),
+                    issues: [],
+                });
+                persistLatestImportReport(report);
+                addToast(summarizeImportReport(report), 'success');
             } catch (err) {
                 console.error('Layout failed, applying raw positions:', err);
                 onApply(res.nodes, res.edges);
+                if (mode === 'mermaid' && 'diagramType' in res && res.diagramType) {
+                    updateTab(activeTabId, { diagramType: res.diagramType });
+                }
+                const report = buildImportFidelityReport({
+                    source: mode === 'mermaid' ? 'mermaid' : 'openflowdsl',
+                    nodeCount: res.nodes.length,
+                    edgeCount: res.edges.length,
+                    elapsedMs: Math.round(performance.now() - importStart),
+                    issues: [mapErrorToIssue('Layout fallback applied after import.')],
+                });
+                persistLatestImportReport(report);
+                addToast(summarizeImportReport(report), 'warning');
             } finally {
                 setIsApplying(false);
             }
         } else {
             onApply(res.nodes, res.edges);
+            if (mode === 'mermaid' && 'diagramType' in res && res.diagramType) {
+                updateTab(activeTabId, { diagramType: res.diagramType });
+            }
+            const report = buildImportFidelityReport({
+                source: mode === 'mermaid' ? 'mermaid' : 'openflowdsl',
+                nodeCount: res.nodes.length,
+                edgeCount: res.edges.length,
+                elapsedMs: Math.round(performance.now() - importStart),
+                issues: [],
+            });
+            persistLatestImportReport(report);
+            addToast(summarizeImportReport(report), 'success');
         }
         onClose();
     };
@@ -110,6 +181,25 @@ export const CodeView = ({
         }
     };
 
+    const isArchitectureStrictModeError = mode === 'mermaid' && Boolean(error?.includes('strict mode rejected'));
+    const strictModeGuidance = isArchitectureStrictModeError
+        ? buildArchitectureStrictModeGuidance(diagnostics)
+        : [];
+    const groupedStrictDiagnostics = useMemo(
+        () => (isArchitectureStrictModeError ? groupArchitectureStrictModeDiagnostics(diagnostics) : []),
+        [isArchitectureStrictModeError, diagnostics]
+    );
+
+    const jumpToDiagnosticLine = useCallback((line: number) => {
+        const textarea = textareaRef.current;
+        if (!textarea) return;
+        const range = getLineSelectionRange(code, line);
+        if (!range) return;
+
+        textarea.focus();
+        textarea.setSelectionRange(range.start, range.end);
+    }, [code]);
+
     return (
         <div className="flex flex-col h-full">
             <ViewHeader
@@ -120,6 +210,7 @@ export const CodeView = ({
             <div className="p-4 flex-1 relative flex flex-col gap-4">
                 <div className="relative flex-1">
                     <Textarea
+                        ref={textareaRef}
                         value={code}
                         onChange={e => handleChange(e.target.value)}
                         onKeyDown={handleKeyDown}
@@ -140,14 +231,66 @@ export const CodeView = ({
                         </div>
                         {diagnostics.length > 0 && (
                             <div className="space-y-1">
-                                {diagnostics.slice(0, 3).map((diagnostic, index) => (
+                                {groupedStrictDiagnostics.length > 0 ? (
+                                    groupedStrictDiagnostics.map((group) => (
+                                        <div key={group.id} className="rounded-md border border-amber-200/70 bg-amber-100/35 p-2">
+                                            <p className="mb-1 text-[11px] font-semibold text-amber-900">
+                                                {t(group.titleKey, { defaultValue: group.defaultTitle })}
+                                            </p>
+                                            <div className="space-y-1">
+                                                {group.diagnostics.slice(0, 3).map((diagnostic, index) => (
+                                                    <div key={`${group.id}-${diagnostic.message}-${index}`} className="text-[11px] leading-relaxed text-amber-800 whitespace-pre-wrap">
+                                                        {typeof diagnostic.line === 'number'
+                                                            ? t('commandBar.code.linePrefix', { line: diagnostic.line, defaultValue: 'Line {{line}}: ' })
+                                                            : ''}
+                                                        {diagnostic.message}
+                                                        {diagnostic.snippet ? `\n> ${diagnostic.snippet}` : ''}
+                                                        {diagnostic.hint
+                                                            ? `\n${t('commandBar.code.hintPrefix', { defaultValue: 'Hint:' })} ${diagnostic.hint}`
+                                                            : ''}
+                                                        {typeof diagnostic.line === 'number' && (
+                                                            <button
+                                                                type="button"
+                                                                className="mt-1 block text-[11px] font-medium text-amber-900 underline decoration-amber-400/80 underline-offset-2 hover:text-amber-950"
+                                                                onClick={() => jumpToDiagnosticLine(diagnostic.line)}
+                                                            >
+                                                                {t('commandBar.code.jumpToLine', {
+                                                                    line: diagnostic.line,
+                                                                    defaultValue: 'Jump to line {{line}}',
+                                                                })}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : diagnostics.slice(0, 3).map((diagnostic, index) => (
                                     <div key={`${diagnostic.message}-${index}`} className="text-[11px] leading-relaxed text-amber-800 whitespace-pre-wrap">
-                                        {typeof diagnostic.line === 'number' ? `Line ${diagnostic.line}: ` : ''}
+                                        {typeof diagnostic.line === 'number'
+                                            ? t('commandBar.code.linePrefix', { line: diagnostic.line, defaultValue: 'Line {{line}}: ' })
+                                            : ''}
                                         {diagnostic.message}
                                         {diagnostic.snippet ? `\n> ${diagnostic.snippet}` : ''}
-                                        {diagnostic.hint ? `\nHint: ${diagnostic.hint}` : ''}
+                                        {diagnostic.hint
+                                            ? `\n${t('commandBar.code.hintPrefix', { defaultValue: 'Hint:' })} ${diagnostic.hint}`
+                                            : ''}
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                        {strictModeGuidance.length > 0 && (
+                            <div className="rounded-md border border-amber-200 bg-amber-100/50 p-2 text-[11px] text-amber-900">
+                                <p className="font-semibold">
+                                    {t('commandBar.code.quickFixes', { defaultValue: 'Quick fixes' })}
+                                </p>
+                                <ul className="mt-1 list-disc pl-4 space-y-0.5">
+                                    {strictModeGuidance.map((item) => (
+                                        <li key={item.key}>
+                                            {t(item.key, { defaultValue: item.defaultText })}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         )}
                     </div>

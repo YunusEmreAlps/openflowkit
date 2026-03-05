@@ -6,6 +6,7 @@ import { NamedIcon } from './IconMap';
 import MemoizedMarkdown from './MemoizedMarkdown';
 import { NODE_COLOR_PALETTE, NODE_EXPORT_COLORS } from '../theme';
 import { useDesignSystem } from '../hooks/useDesignSystem';
+import { useInlineNodeTextEdit } from '@/hooks/useInlineNodeTextEdit';
 
 function getDefaults(type: string): { color: string; icon: string | null; shape: 'rounded' | 'diamond' | 'rectangle' | 'capsule' | 'hexagon' | 'parallelogram' | 'cylinder' | 'circle' | 'ellipse' } {
   switch (type) {
@@ -34,7 +35,7 @@ function toCssSize(value: number | string | undefined): string | undefined {
 }
 
 function CustomNode(props: NodeProps<NodeData>): React.ReactElement {
-  const { data, type, selected } = props;
+  const { id, data, type, selected } = props;
   const width = (props as { width?: number }).width;
   const height = (props as { height?: number }).height;
   const designSystem = useDesignSystem();
@@ -129,6 +130,8 @@ function CustomNode(props: NodeProps<NodeData>): React.ReactElement {
   const isComplexShape = ['diamond', 'hexagon', 'parallelogram', 'cylinder', 'circle', 'ellipse'].includes(activeShape);
   const isCircular = activeShape === 'circle';
   const { minWidth, minHeight } = getMinNodeSize(activeShape);
+  const labelEdit = useInlineNodeTextEdit(id, 'label', data.label || '');
+  const subLabelEdit = useInlineNodeTextEdit(id, 'subLabel', data.subLabel || '');
 
   // Calculate Border Radius from Design System if shape is 'rounded' (default)
   function getBorderRadius(): string | number {
@@ -224,8 +227,24 @@ function CustomNode(props: NodeProps<NodeData>): React.ReactElement {
                 fontWeight: data.fontWeight || 'bold',
                 fontStyle: data.fontStyle || 'normal',
               }}
+              onClick={(event) => {
+                event.stopPropagation();
+                labelEdit.beginEdit();
+              }}
             >
-              <MemoizedMarkdown content={data.label || 'Node'} />
+              {labelEdit.isEditing ? (
+                <input
+                  autoFocus
+                  value={labelEdit.draft}
+                  onChange={(event) => labelEdit.setDraft(event.target.value)}
+                  onBlur={labelEdit.commit}
+                  onKeyDown={labelEdit.handleKeyDown}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  className="w-full rounded border border-[var(--brand-primary)] bg-white/90 px-1 py-0.5 text-center outline-none"
+                />
+              ) : (
+                <MemoizedMarkdown content={data.label || 'Node'} />
+              )}
             </div>
             {data.subLabel && (
               <div
@@ -236,8 +255,24 @@ function CustomNode(props: NodeProps<NodeData>): React.ReactElement {
                   textAlign: data.align || 'center',
                   opacity: 0.85
                 }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  subLabelEdit.beginEdit();
+                }}
               >
-                <MemoizedMarkdown content={data.subLabel} />
+                {subLabelEdit.isEditing ? (
+                  <input
+                    autoFocus
+                    value={subLabelEdit.draft}
+                    onChange={(event) => subLabelEdit.setDraft(event.target.value)}
+                    onBlur={subLabelEdit.commit}
+                    onKeyDown={subLabelEdit.handleKeyDown}
+                    onMouseDown={(event) => event.stopPropagation()}
+                    className="w-full rounded border border-[var(--brand-primary)] bg-white/90 px-1 py-0.5 text-center outline-none"
+                  />
+                ) : (
+                  <MemoizedMarkdown content={data.subLabel} />
+                )}
               </div>
             )}
           </div>

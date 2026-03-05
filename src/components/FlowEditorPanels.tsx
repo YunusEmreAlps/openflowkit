@@ -41,14 +41,19 @@ interface FlowEditorPanelsProps {
     onRestoreSnapshot: (snapshot: FlowSnapshot) => void;
     onDeleteSnapshot: (id: string) => void;
     selectedNode: React.ComponentProps<typeof PropertiesPanel>['selectedNode'];
+    selectedNodes: React.ComponentProps<typeof PropertiesPanel>['selectedNodes'];
     selectedEdge: React.ComponentProps<typeof PropertiesPanel>['selectedEdge'];
     onChangeNode: React.ComponentProps<typeof PropertiesPanel>['onChangeNode'];
+    onBulkChangeNodes: React.ComponentProps<typeof PropertiesPanel>['onBulkChangeNodes'];
     onChangeNodeType: React.ComponentProps<typeof PropertiesPanel>['onChangeNodeType'];
     onChangeEdge: React.ComponentProps<typeof PropertiesPanel>['onChangeEdge'];
     onDeleteNode: React.ComponentProps<typeof PropertiesPanel>['onDeleteNode'];
     onDuplicateNode: React.ComponentProps<typeof PropertiesPanel>['onDuplicateNode'];
     onDeleteEdge: React.ComponentProps<typeof PropertiesPanel>['onDeleteEdge'];
     onUpdateZIndex: React.ComponentProps<typeof PropertiesPanel>['onUpdateZIndex'];
+    onAddMindmapChild: React.ComponentProps<typeof PropertiesPanel>['onAddMindmapChild'];
+    onAddArchitectureService: React.ComponentProps<typeof PropertiesPanel>['onAddArchitectureService'];
+    onCreateArchitectureBoundary: React.ComponentProps<typeof PropertiesPanel>['onCreateArchitectureBoundary'];
     onCloseProperties: () => void;
 }
 
@@ -81,14 +86,19 @@ export function FlowEditorPanels({
     onRestoreSnapshot,
     onDeleteSnapshot,
     selectedNode,
+    selectedNodes,
     selectedEdge,
     onChangeNode,
+    onBulkChangeNodes,
     onChangeNodeType,
     onChangeEdge,
     onDeleteNode,
     onDuplicateNode,
     onDeleteEdge,
     onUpdateZIndex,
+    onAddMindmapChild,
+    onAddArchitectureService,
+    onCreateArchitectureBoundary,
     onCloseProperties,
 }: FlowEditorPanelsProps): React.ReactElement {
     return (
@@ -132,15 +142,20 @@ export function FlowEditorPanels({
 
             <ErrorBoundary className="h-full">
                 <PropertiesPanel
+                    selectedNodes={selectedNodes}
                     selectedNode={selectedNode}
                     selectedEdge={selectedEdge}
                     onChangeNode={onChangeNode}
+                    onBulkChangeNodes={onBulkChangeNodes}
                     onChangeNodeType={onChangeNodeType}
                     onChangeEdge={onChangeEdge}
                     onDeleteNode={onDeleteNode}
                     onDuplicateNode={onDuplicateNode}
                     onDeleteEdge={onDeleteEdge}
                     onUpdateZIndex={onUpdateZIndex}
+                    onAddMindmapChild={onAddMindmapChild}
+                    onAddArchitectureService={onAddArchitectureService}
+                    onCreateArchitectureBoundary={onCreateArchitectureBoundary}
                     onClose={onCloseProperties}
                 />
             </ErrorBoundary>

@@ -504,7 +504,17 @@
       "dslPlaceholder": "{appName} DSL kodunu buraya yapıştırın...",
       "applyShortcut": "⌘+Enter ile uygula",
       "syntaxGuide": "Sözdizimi Kılavuzu",
-      "apply": "Uygula"
+      "apply": "Uygula",
+      "quickFixes": "Hızlı düzeltmeler",
+      "linePrefix": "Satır {{line}}: ",
+      "hintPrefix": "İpucu:",
+      "strictModeGuidance": {
+        "defineEndpoints": "Kenarları bağlamadan önce her bağlantı ucunu açık bir mimari düğümü olarak tanımlayın.",
+        "uniqueIds": "Her service/group/junction düğümü için benzersiz kimlikler kullanın (yinelenen mimari kimliği olmasın).",
+        "edgeSyntax": "`-->`, `<--` veya `<-->` mimari kenar oklarını ve `api:R --> L:db` gibi yan niteleyicileri kullanın.",
+        "nodeSyntax": "Geçerli düğüm tanımlarını kullanın: `service id(icon)[Label]`, `group id[Label]`, `junction id[Label]`.",
+        "fallback": "Otomatik toparlamaya izin vermek için Mimari Katı Modu kapatın veya tanıları düzeltip yeniden deneyin."
+      }
     },
     "layout": {
       "title": "Düzen Stüdyosu",
@@ -570,7 +580,9 @@
       "snapToGrid": "Izgaraya Yapış",
       "snapToGridDesc": "Düğümleri taşırken ızgaraya hizala",
       "miniMap": "Mini Harita",
-      "miniMapDesc": "Sağ altta mini harita göster"
+      "miniMapDesc": "Sağ altta mini harita göster",
+      "architectureStrictMode": "Mimari Katı Mod",
+      "architectureStrictModeDesc": "Mimari tanıları toparlama/doğrulama sorunları içerdiğinde Mermaid içe aktarmayı engeller"
     },
     "ai": {
       "provider": "Sağlayıcı",
@@ -994,6 +1006,9 @@
     "stickyNote": "Yapışkan Not",
     "nodeSettings": "Düğüm Ayarları",
     "connection": "Bağlantı"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "Mimari Katı Mod, Mermaid yapıştırmayı engelledi. Kod görünümünü açın, tanıları düzeltin ve tekrar deneyin."
   },
   "flowTabs": {
     "closeTab": "Sekmeyi Kapat",

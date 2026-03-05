@@ -90,4 +90,4 @@ Still missing:
 - New tests verify memory budget trimming behavior.
 - Undo/redo continuity preserved across tab switches and remount-style flows.
 - Rollback path remains available via feature flag.
-- Pilot rollout follows [History V2 Pilot Checklist](docs/history-v2-pilot-checklist.md).
+- Pilot rollout follows [History V2 Pilot Checklist](docs/archive/history-v2-pilot-checklist.md).

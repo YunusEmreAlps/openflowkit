@@ -4,7 +4,7 @@ Use this checklist before merging/releasing any risky change in Q1.
 
 ## Required Inputs
 
-- Active change ID from `docs/q1_execution_tracker.md`
+- Active change ID from `docs/archive/q1_execution_tracker.md`
 - Baseline reference fixture(s): `small-100`, `medium-300`, `large-1000`
 - Current benchmark artifacts under `benchmarks/results/`
 

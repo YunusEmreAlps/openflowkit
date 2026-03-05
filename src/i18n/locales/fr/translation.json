@@ -473,7 +473,17 @@
       "dslPlaceholder": "Collez le code DSL ici...",
       "applyShortcut": "⌘+Entrée pour appliquer",
       "syntaxGuide": "Guide de syntaxe",
-      "apply": "Appliquer"
+      "apply": "Appliquer",
+      "quickFixes": "Correctifs rapides",
+      "linePrefix": "Ligne {{line}}: ",
+      "hintPrefix": "Astuce:",
+      "strictModeGuidance": {
+        "defineEndpoints": "Définissez chaque extrémité de lien comme un nœud d’architecture explicite avant de connecter les arêtes.",
+        "uniqueIds": "Utilisez des identifiants uniques pour chaque nœud service/groupe/jonction (aucun identifiant d’architecture en double).",
+        "edgeSyntax": "Utilisez les flèches d’arête d’architecture `-->`, `<--` ou `<-->` et des qualificateurs de côté comme `api:R --> L:db`.",
+        "nodeSyntax": "Utilisez des déclarations de nœud valides : `service id(icon)[Label]`, `group id[Label]`, `junction id[Label]`.",
+        "fallback": "Désactivez le mode strict d’architecture pour autoriser la récupération automatique, ou corrigez les diagnostics puis réessayez."
+      }
     },
     "layout": {
       "title": "Studio de mise en page",
@@ -539,7 +549,9 @@
       "snapToGrid": "Aligner sur la grille",
       "snapToGridDesc": "Aligner les nœuds sur la grille",
       "miniMap": "Mini carte",
-      "miniMapDesc": "Afficher la mini carte en bas à droite"
+      "miniMapDesc": "Afficher la mini carte en bas à droite",
+      "architectureStrictMode": "Mode strict d’architecture",
+      "architectureStrictModeDesc": "Bloque l’import Mermaid lorsque les diagnostics d’architecture incluent des problèmes de récupération/validation"
     },
     "ai": {
       "provider": "Fournisseur",
@@ -740,6 +752,9 @@
     "stickyNote": "Note adhésive",
     "nodeSettings": "Paramètres du nœud",
     "connection": "Connexion"
+  },
+  "flowCanvas": {
+    "strictModePasteBlocked": "Le mode strict d’architecture a bloqué le collage Mermaid. Ouvrez la vue Code, corrigez les diagnostics, puis réessayez."
   },
   "flowTabs": {
     "closeTab": "Fermer l'onglet",
