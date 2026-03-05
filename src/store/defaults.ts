@@ -1,4 +1,5 @@
 import type { DesignSystem, GlobalEdgeOptions } from '@/lib/types';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import type { AISettings, BrandConfig, BrandKit, Layer, ViewSettings } from './types';
 
 export const DEFAULT_DESIGN_SYSTEM: DesignSystem = {
@@ -97,7 +98,7 @@ export const INITIAL_VIEW_SETTINGS: ViewSettings = {
     largeGraphSafetyMode: 'auto',
     largeGraphSafetyProfile: 'balanced',
     exportSerializationMode: 'deterministic',
-    historyModelV2Enabled: import.meta.env.VITE_HISTORY_MODEL_V2 !== '0',
+    historyModelV2Enabled: ROLLOUT_FLAGS.historyModelV2,
     analyticsEnabled: true,
     language: 'en',
 };
