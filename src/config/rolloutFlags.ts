@@ -81,14 +81,14 @@ const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = 
     shapeLibraryV1: {
         key: 'shapeLibraryV1',
         envVar: 'VITE_SHAPE_LIBRARY_V1',
-        defaultEnabled: false,
+        defaultEnabled: true,
         description: 'Shape library registry scaffold rollout',
     },
     templateLibraryV1: {
         key: 'templateLibraryV1',
         envVar: 'VITE_TEMPLATE_LIBRARY_V1',
-        defaultEnabled: false,
-        description: 'Template registry scaffold rollout',
+        defaultEnabled: true,
+        description: 'Template registry rollout',
     },
     collaborationV1: {
         key: 'collaborationV1',

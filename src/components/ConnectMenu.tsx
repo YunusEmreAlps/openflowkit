@@ -1,21 +1,129 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Settings, WandSparkles, StickyNote, X, Database, ArrowRightLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { isMindmapConnectorSource } from '@/lib/connectCreationPolicy';
+import { useFlowStore } from '@/store';
+import type { DomainLibraryCategory, DomainLibraryItem } from '@/services/domainLibrary';
+import { loadProviderCatalogSuggestions, loadProviderShapePreview } from '@/services/shapeLibrary/providerCatalog';
+import { Tooltip } from './Tooltip';
+import { loadIconAssetSuggestions } from '@/services/iconAssetCatalog';
+import { NamedIcon } from './IconMap';
 
 interface ConnectMenuProps {
     position: { x: number; y: number };
+    sourceId: string;
     sourceType?: string | null;
     onSelect: (type: string, shape?: string) => void;
+    onSelectAsset: (item: DomainLibraryItem) => void;
     onClose: () => void;
 }
 
-export const ConnectMenu = ({ position, sourceType, onSelect, onClose }: ConnectMenuProps): React.ReactElement => {
+export const ConnectMenu = ({ position, sourceId, sourceType, onSelect, onSelectAsset, onClose }: ConnectMenuProps): React.ReactElement => {
     const { t } = useTranslation();
+    const sourceNode = useFlowStore((state) => state.nodes.find((node) => node.id === sourceId));
     const isMindmapSource = isMindmapConnectorSource(sourceType);
+    const isAssetSource = sourceNode?.data?.assetPresentation === 'icon'
+        && typeof sourceNode.data?.assetProvider === 'string';
+    const assetProvider = (sourceNode?.data?.assetProvider || null) as DomainLibraryCategory | null;
+    const assetCategory = typeof sourceNode?.data?.assetCategory === 'string' ? sourceNode.data.assetCategory : undefined;
+    const currentShapeId = typeof sourceNode?.data?.archIconShapeId === 'string' ? sourceNode.data.archIconShapeId : undefined;
+    const currentIconName = typeof sourceNode?.data?.icon === 'string' ? sourceNode.data.icon : undefined;
+    const iconSuggestions = useMemo(() => loadIconAssetSuggestions({
+        category: assetCategory,
+        excludeIcon: currentIconName,
+        limit: 18,
+    }), [assetCategory, currentIconName]);
+    const providerItemsKey = isAssetSource && assetProvider
+        ? `${assetProvider}:${assetCategory ?? 'all'}:${currentShapeId ?? currentIconName ?? 'all'}`
+        : null;
+    const [providerItemsState, setProviderItemsState] = useState<{ key: string | null; items: DomainLibraryItem[] }>({ key: null, items: [] });
+    const [previewUrls, setPreviewUrls] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (!isAssetSource || !assetProvider) {
+            return;
+        }
+
+        let cancelled = false;
+        const suggestionPromise = assetProvider === 'icons'
+            ? Promise.resolve(iconSuggestions)
+            : loadProviderCatalogSuggestions(assetProvider, {
+                category: assetCategory,
+                excludeShapeId: currentShapeId,
+                limit: 18,
+            });
+
+        suggestionPromise.then((items) => {
+            if (!cancelled) {
+                setProviderItemsState({ key: providerItemsKey, items });
+            }
+        }).catch(() => {
+            if (!cancelled) {
+                setProviderItemsState({ key: providerItemsKey, items: [] });
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [assetCategory, assetProvider, currentShapeId, iconSuggestions, isAssetSource, providerItemsKey]);
+
+    const providerItems = useMemo(
+        () => (providerItemsState.key === providerItemsKey ? providerItemsState.items : []),
+        [providerItemsKey, providerItemsState]
+    );
+
+    useEffect(() => {
+        if (providerItems.length === 0) {
+            return;
+        }
+
+        let cancelled = false;
+        Promise.all(providerItems.map(async (item) => {
+            if (!item.archIconPackId || !item.archIconShapeId || previewUrls[item.id]) {
+                return null;
+            }
+            const preview = await loadProviderShapePreview(item.archIconPackId, item.archIconShapeId);
+            return preview ? [item.id, preview.previewUrl] as const : null;
+        })).then((entries) => {
+            if (cancelled) {
+                return;
+            }
+            const loadedEntries = entries.filter((entry): entry is readonly [string, string] => entry !== null);
+            if (loadedEntries.length === 0) {
+                return;
+            }
+            setPreviewUrls((current) => {
+                const next = { ...current };
+                loadedEntries.forEach(([itemId, previewUrl]) => {
+                    next[itemId] = previewUrl;
+                });
+                return next;
+            });
+        }).catch(() => undefined);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [previewUrls, providerItems]);
+
+    const providerTitle = useMemo(() => {
+        if (!assetProvider) {
+            return '';
+        }
+        return assetProvider.toUpperCase();
+    }, [assetProvider]);
 
     function handleSelect(type: string, shape?: string): void {
         onSelect(type, shape);
+        onClose();
+    }
+
+    function handleSelectAsset(item: DomainLibraryItem): void {
+        onSelectAsset({
+            ...item,
+            ...(previewUrls[item.id] ? { previewUrl: previewUrls[item.id] } : {}),
+        });
         onClose();
     }
 
@@ -49,6 +157,35 @@ export const ConnectMenu = ({ position, sourceType, onSelect, onClose }: Connect
                                 <span className="text-[10px] text-slate-400 font-medium">Create connected topic</span>
                             </div>
                         </button>
+                    ) : isAssetSource && providerItems.length > 0 ? (
+                        <>
+                            <div className="px-3 py-2">
+                                <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-slate-400">
+                                    {providerTitle} suggestions
+                                </div>
+                            </div>
+                            <div className="max-h-[16rem] overflow-y-auto px-3 pb-3 custom-scrollbar">
+                            <div className="grid grid-cols-6 gap-2">
+                                {providerItems.map((item) => (
+                                    <Tooltip key={item.id} text={item.label}>
+                                        <button
+                                            aria-label={item.label}
+                                            onClick={() => handleSelectAsset(item)}
+                                            className="flex aspect-square items-center justify-center rounded-xl border border-slate-200 bg-white p-2 transition-all hover:border-slate-300 hover:bg-slate-50"
+                                        >
+                                            {previewUrls[item.id] ? (
+                                                <img src={previewUrls[item.id]} alt="" className="h-10 w-10 object-contain" />
+                                            ) : item.category === 'icons' ? (
+                                                <NamedIcon name={item.icon} fallbackName="Box" className="w-5 h-5 text-slate-500" />
+                                            ) : (
+                                                <Database className="w-4.5 h-4.5 text-slate-400" />
+                                            )}
+                                        </button>
+                                    </Tooltip>
+                                ))}
+                            </div>
+                            </div>
+                        </>
                     ) : (
                         <>
                             <button

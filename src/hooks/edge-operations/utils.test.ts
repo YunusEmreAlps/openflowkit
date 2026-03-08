@@ -243,5 +243,27 @@ describe('edge operation utils', () => {
       clientPosition: { x: 30, y: 40 },
       sourceType: 'process',
     });
+
+    const iconAssetMenu = resolveConnectEndAction({
+      nodes: [{
+        id: 'icon-1',
+        type: 'custom',
+        position: { x: 0, y: 0 },
+        data: { label: 'Athena', assetPresentation: 'icon' },
+      }],
+      edges: [],
+      sourceId: 'icon-1',
+      sourceHandle: 'right',
+      position: { x: 600, y: 600 },
+      clientPosition: { x: 50, y: 60 },
+      targetIsPane: true,
+      canvasInteractionsV1Enabled: true,
+    });
+
+    expect(iconAssetMenu).toEqual({
+      type: 'menu',
+      clientPosition: { x: 50, y: 60 },
+      sourceType: 'custom',
+    });
   });
 });

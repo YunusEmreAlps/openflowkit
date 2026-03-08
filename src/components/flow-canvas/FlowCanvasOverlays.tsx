@@ -5,6 +5,7 @@ import type { UseFlowCanvasContextActionsResult } from './useFlowCanvasContextAc
 import { FlowCanvasAlignmentGuidesOverlay } from './FlowCanvasAlignmentGuidesOverlay';
 import type { AlignmentGuides, SelectionDragPreview } from './alignmentGuides';
 import type { FlowNode } from '@/lib/types';
+import type { DomainLibraryItem } from '@/services/domainLibrary';
 
 const LazyConnectMenu = lazy(async () => {
     const module = await import('../ConnectMenu');
@@ -34,6 +35,12 @@ interface FlowCanvasOverlaysProps {
         sourceHandle?: string,
         shape?: NodeData['shape']
     ) => void;
+    handleAddDomainLibraryItemAndConnect: (
+        item: DomainLibraryItem,
+        position: { x: number; y: number },
+        sourceId?: string,
+        sourceHandle?: string,
+    ) => void;
     contextMenu: ContextMenuState;
     onCloseContextMenu: () => void;
     copySelection: () => void;
@@ -52,6 +59,7 @@ export function FlowCanvasOverlays({
     setConnectMenu,
     screenToFlowPosition,
     handleAddAndConnect,
+    handleAddDomainLibraryItemAndConnect,
     contextMenu,
     onCloseContextMenu,
     copySelection,
@@ -73,11 +81,16 @@ export function FlowCanvasOverlays({
                 <Suspense fallback={null}>
                     <LazyConnectMenu
                         position={connectMenu.position}
+                        sourceId={connectMenu.sourceId}
                         sourceType={connectMenu.sourceType}
                         onClose={() => setConnectMenu(null)}
                         onSelect={(type, shape) => {
                             const flowPos = screenToFlowPosition(connectMenu.position);
                             handleAddAndConnect(type, flowPos, connectMenu.sourceId, connectMenu.sourceHandle, shape as NodeData['shape']);
+                        }}
+                        onSelectAsset={(item) => {
+                            const flowPos = screenToFlowPosition(connectMenu.position);
+                            handleAddDomainLibraryItemAndConnect(item, flowPos, connectMenu.sourceId, connectMenu.sourceHandle);
                         }}
                     />
                 </Suspense>

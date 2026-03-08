@@ -2,6 +2,44 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ConnectMenu } from './ConnectMenu';
 
+vi.mock('@/store', () => ({
+  useFlowStore: (selector: (state: { nodes: Array<{ id: string; data: Record<string, unknown> }> }) => unknown) => selector({
+    nodes: [
+      {
+        id: 'asset-1',
+        data: {
+          label: 'Analytics Athena',
+          assetPresentation: 'icon',
+          assetProvider: 'aws',
+          assetCategory: 'Analytics',
+          archIconShapeId: 'analytics-athena',
+        },
+      },
+    ],
+  }),
+}));
+
+vi.mock('@/services/shapeLibrary/providerCatalog', () => ({
+  loadProviderCatalogSuggestions: vi.fn(async () => [
+    {
+      id: 'aws-official-starter-v1:analytics-glue',
+      category: 'aws',
+      label: 'Analytics Glue',
+      description: 'AWS Analytics',
+      icon: 'Box',
+      color: 'amber',
+      nodeType: 'custom',
+      assetPresentation: 'icon',
+      providerShapeCategory: 'Analytics',
+      archIconPackId: 'aws-official-starter-v1',
+      archIconShapeId: 'analytics-glue',
+    },
+  ]),
+  loadProviderShapePreview: vi.fn(async () => ({
+    previewUrl: '/mock/glue.svg',
+  })),
+}));
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (_key: string, fallback?: string) => fallback ?? _key,
@@ -13,8 +51,10 @@ describe('ConnectMenu', () => {
     render(
       <ConnectMenu
         position={{ x: 100, y: 100 }}
+        sourceId="mind-1"
         sourceType="mindmap"
         onSelect={vi.fn()}
+        onSelectAsset={vi.fn()}
         onClose={vi.fn()}
       />
     );
@@ -28,8 +68,10 @@ describe('ConnectMenu', () => {
     render(
       <ConnectMenu
         position={{ x: 100, y: 100 }}
+        sourceId="mind-1"
         sourceType="mindmap"
         onSelect={onSelect}
+        onSelectAsset={vi.fn()}
         onClose={vi.fn()}
       />
     );
@@ -37,5 +79,21 @@ describe('ConnectMenu', () => {
     fireEvent.click(screen.getByText('Topic'));
 
     expect(onSelect).toHaveBeenCalledWith('mindmap', undefined);
+  });
+
+  it('shows provider suggestions for asset nodes instead of generic shapes', async () => {
+    render(
+      <ConnectMenu
+        position={{ x: 100, y: 100 }}
+        sourceId="asset-1"
+        sourceType="custom"
+        onSelect={vi.fn()}
+        onSelectAsset={vi.fn()}
+        onClose={vi.fn()}
+      />
+    );
+
+    expect(await screen.findByRole('button', { name: /Analytics Glue/i })).toBeTruthy();
+    expect(screen.queryByText('connectMenu.process')).toBeNull();
   });
 });

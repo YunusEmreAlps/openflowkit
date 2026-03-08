@@ -45,6 +45,8 @@ const NODE_ATTRIBUTE_KEYS = [
     'archBoundaryId',
     'archZone',
     'archTrustDomain',
+    'archIconPackId',
+    'archIconShapeId',
 ] as const;
 
 const EDGE_ATTRIBUTE_KEYS = [

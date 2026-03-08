@@ -1,7 +1,7 @@
 import type { Node } from '@/lib/reactflowCompat';
 import type { NodeData } from '@/lib/types';
 
-export type DomainLibraryCategory = 'aws' | 'azure' | 'gcp' | 'kubernetes' | 'network' | 'security';
+export type DomainLibraryCategory = 'aws' | 'azure' | 'gcp' | 'cncf' | 'network' | 'security' | 'icons';
 
 export interface DomainLibraryItem {
     id: string;
@@ -11,16 +11,15 @@ export interface DomainLibraryItem {
     icon: string;
     color: string;
     shape?: NodeData['shape'];
+    nodeType?: 'process' | 'architecture' | 'custom';
+    previewUrl?: string;
+    providerShapeCategory?: string;
+    archIconPackId?: string;
+    archIconShapeId?: string;
+    assetPresentation?: 'icon';
 }
 
 export const DOMAIN_LIBRARY_ITEMS: DomainLibraryItem[] = [
-    { id: 'aws-ec2', category: 'aws', label: 'EC2 Instance', description: 'Virtual machine compute', icon: 'Server', color: 'amber' },
-    { id: 'aws-lambda', category: 'aws', label: 'Lambda', description: 'Serverless function runtime', icon: 'FunctionSquare', color: 'amber' },
-    { id: 'aws-s3', category: 'aws', label: 'S3 Bucket', description: 'Object storage', icon: 'Database', color: 'amber', shape: 'cylinder' },
-    { id: 'aws-rds', category: 'aws', label: 'RDS Database', description: 'Managed relational database', icon: 'Database', color: 'amber', shape: 'cylinder' },
-    { id: 'aws-apigw', category: 'aws', label: 'API Gateway', description: 'Managed API entrypoint', icon: 'Waypoints', color: 'amber' },
-    { id: 'aws-cloudfront', category: 'aws', label: 'CloudFront CDN', description: 'Global content delivery', icon: 'Globe', color: 'amber' },
-
     { id: 'azure-vm', category: 'azure', label: 'Azure VM', description: 'Virtual machine compute', icon: 'Server', color: 'blue' },
     { id: 'azure-functions', category: 'azure', label: 'Azure Functions', description: 'Serverless function runtime', icon: 'FunctionSquare', color: 'blue' },
     { id: 'azure-storage', category: 'azure', label: 'Storage Account', description: 'Blob and file storage', icon: 'Database', color: 'blue', shape: 'cylinder' },
@@ -35,12 +34,12 @@ export const DOMAIN_LIBRARY_ITEMS: DomainLibraryItem[] = [
     { id: 'gcp-lb', category: 'gcp', label: 'Cloud Load Balancer', description: 'Global traffic balancing', icon: 'Network', color: 'emerald' },
     { id: 'gcp-run', category: 'gcp', label: 'Cloud Run', description: 'Serverless container runtime', icon: 'Container', color: 'emerald' },
 
-    { id: 'k8s-cluster', category: 'kubernetes', label: 'Cluster', description: 'Kubernetes control plane', icon: 'ShipWheel', color: 'cyan' },
-    { id: 'k8s-node', category: 'kubernetes', label: 'Node Pool', description: 'Worker node group', icon: 'ServerCog', color: 'cyan' },
-    { id: 'k8s-pod', category: 'kubernetes', label: 'Pod', description: 'Deployable workload unit', icon: 'Box', color: 'cyan' },
-    { id: 'k8s-service', category: 'kubernetes', label: 'Service', description: 'Stable internal endpoint', icon: 'Network', color: 'cyan' },
-    { id: 'k8s-ingress', category: 'kubernetes', label: 'Ingress', description: 'HTTP edge routing', icon: 'Route', color: 'cyan' },
-    { id: 'k8s-configmap', category: 'kubernetes', label: 'ConfigMap', description: 'Runtime configuration', icon: 'SlidersHorizontal', color: 'cyan' },
+    { id: 'k8s-cluster', category: 'cncf', label: 'Cluster', description: 'Kubernetes control plane', icon: 'ShipWheel', color: 'cyan' },
+    { id: 'k8s-node', category: 'cncf', label: 'Node Pool', description: 'Worker node group', icon: 'ServerCog', color: 'cyan' },
+    { id: 'k8s-pod', category: 'cncf', label: 'Pod', description: 'Deployable workload unit', icon: 'Box', color: 'cyan' },
+    { id: 'k8s-service', category: 'cncf', label: 'Service', description: 'Stable internal endpoint', icon: 'Network', color: 'cyan' },
+    { id: 'k8s-ingress', category: 'cncf', label: 'Ingress', description: 'HTTP edge routing', icon: 'Route', color: 'cyan' },
+    { id: 'k8s-configmap', category: 'cncf', label: 'ConfigMap', description: 'Runtime configuration', icon: 'SlidersHorizontal', color: 'cyan' },
 
     { id: 'net-lb', category: 'network', label: 'Load Balancer', description: 'Traffic distribution', icon: 'Network', color: 'violet' },
     { id: 'net-router', category: 'network', label: 'Router', description: 'Layer 3 routing', icon: 'Route', color: 'violet' },
@@ -63,6 +62,50 @@ export function createDomainLibraryNode(
     position: { x: number; y: number },
     layerId: string
 ): Node<NodeData> {
+    if (item.assetPresentation === 'icon' && (item.previewUrl || item.icon)) {
+        return {
+            id,
+            type: 'custom',
+            position,
+            data: {
+                label: item.label,
+                subLabel: '',
+                color: 'custom',
+                customColor: '#ffffff',
+                ...(item.previewUrl ? { customIconUrl: item.previewUrl } : {}),
+                ...(item.icon ? { icon: item.icon } : {}),
+                assetPresentation: 'icon',
+                assetProvider: item.category,
+                assetCategory: item.providerShapeCategory,
+                archIconPackId: item.archIconPackId,
+                archIconShapeId: item.archIconShapeId,
+                layerId,
+            },
+            style: { width: 96 },
+        };
+    }
+
+    if (item.nodeType === 'architecture' && item.archIconPackId && item.archIconShapeId) {
+        return {
+            id,
+            type: 'architecture',
+            position,
+            data: {
+                label: item.label,
+                subLabel: item.providerShapeCategory || item.description,
+                color: item.color,
+                shape: item.shape || 'rectangle',
+                icon: item.icon,
+                archProvider: item.category,
+                archResourceType: 'service',
+                archEnvironment: 'default',
+                archIconPackId: item.archIconPackId,
+                archIconShapeId: item.archIconShapeId,
+                layerId,
+            },
+        };
+    }
+
     return {
         id,
         type: 'process',

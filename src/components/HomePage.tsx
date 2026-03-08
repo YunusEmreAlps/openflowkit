@@ -3,7 +3,6 @@ import { useFlowStore } from '../store';
 import { useBrandConfig } from '@/store/brandHooks';
 import { useTabActions, useTabsState } from '@/store/tabHooks';
 import { FlowSnapshot } from '@/lib/types';
-import { WelcomeModal } from './WelcomeModal';
 import { trackEvent } from '../lib/analytics';
 import { HomeDashboard, type HomeFlowCard } from './home/HomeDashboard';
 import { HomeFlowDeleteDialog, HomeFlowRenameDialog } from './home/HomeFlowDialogs';
@@ -41,7 +40,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     const [activeSettingsTab, setActiveSettingsTab] = useState<'brand' | 'general' | 'shortcuts' | 'privacy' | 'ai'>('brand');
     const [flowPendingRename, setFlowPendingRename] = useState<HomeFlowCard | null>(null);
     const [flowPendingDelete, setFlowPendingDelete] = useState<HomeFlowCard | null>(null);
-    const [showWelcomeModal] = useState(() => shouldShowWelcomeModal());
+    const showWelcomeModal = shouldShowWelcomeModal();
 
     const activeTab = propActiveTab || internalActiveTab;
     const flows: HomeFlowCard[] = tabs.map((tab) => {

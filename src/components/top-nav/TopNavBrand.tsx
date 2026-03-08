@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { OpenFlowLogo } from '../icons/OpenFlowLogo';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 
 interface BrandUIConfig {
@@ -17,6 +17,7 @@ interface TopNavBrandProps {
 
 export function TopNavBrand({ appName, logoUrl, logoStyle, ui }: TopNavBrandProps): React.ReactElement {
     const { t } = useTranslation();
+    const showPrivacyBadge = ui.showBeta !== false;
 
     return (
         <div className="flex items-center gap-2">
@@ -41,10 +42,12 @@ export function TopNavBrand({ appName, logoUrl, logoStyle, ui }: TopNavBrandProp
                             />
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-primary-50)] rounded-[var(--radius-md)] border border-[var(--brand-primary-100)] opacity-80 hover:opacity-100 transition-opacity cursor-help" title={t('nav.uploadWideLogo', 'Upload a wide logo in Brand Settings to see it here')}>
-                            <OpenFlowLogo className="w-4 h-4" />
-                            <span className="text-xs font-semibold whitespace-nowrap">{t('nav.wideLogo', 'Your Wide Logo')}</span>
-                        </div>
+                        <Tooltip text={t('nav.uploadWideLogo', 'Upload a wide logo in Brand Settings to see it here')} side="bottom">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--brand-primary-50)] rounded-[var(--radius-md)] border border-[var(--brand-primary-100)] opacity-80 hover:opacity-100 transition-opacity cursor-help">
+                                <OpenFlowLogo className="w-4 h-4" />
+                                <span className="text-xs font-semibold whitespace-nowrap">{t('nav.wideLogo', 'Your Wide Logo')}</span>
+                            </div>
+                        </Tooltip>
                     )}
                 </div>
             )}
@@ -55,13 +58,13 @@ export function TopNavBrand({ appName, logoUrl, logoStyle, ui }: TopNavBrandProp
                 </div>
             )}
 
-            {(ui.showBeta ?? true) && (
-                <Tooltip text={t('nav.privacyMessage', 'All your diagrams stay in your local storage and none of it is saved in our servers.')} side="bottom">
+            {showPrivacyBadge ? (
+                <Tooltip text={t('nav.privacyMessage', { defaultValue: 'All your diagram data is stored locally in your browser, not on our servers.' })} side="bottom">
                     <div className="flex items-center justify-center text-[var(--brand-primary)] animate-in fade-in zoom-in-50 duration-300">
-                        <ShieldAlert className="w-[18px] h-[18px] drop-shadow-sm text-white" fill="var(--brand-primary)" />
+                        <ShieldCheck className="w-[18px] h-[18px] drop-shadow-sm text-white" fill="var(--brand-primary)" />
                     </div>
                 </Tooltip>
-            )}
+            ) : null}
         </div>
     );
 }

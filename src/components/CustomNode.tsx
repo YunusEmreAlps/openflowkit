@@ -15,6 +15,7 @@ import { NodeChrome } from './NodeChrome';
 import { NodeTransformControls } from './NodeTransformControls';
 import { useActiveNodeSelection } from './useActiveNodeSelection';
 import { useTranslation } from 'react-i18next';
+import { loadProviderShapePreview } from '@/services/shapeLibrary/providerCatalog';
 
 type NodeShape = NonNullable<NodeData['shape']>;
 
@@ -72,6 +73,10 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   const explicitHeight = data.height ?? explicitNodeStyle?.height;
   const measuredHeight = (props as { height?: number }).height;
   const [shiftHeld, setShiftHeld] = useState(false);
+  const providerAssetKey = data.archIconPackId && data.archIconShapeId
+    ? `${data.archIconPackId}:${data.archIconShapeId}`
+    : null;
+  const [resolvedAssetIconState, setResolvedAssetIconState] = useState<{ key: string | null; url: string | null }>({ key: null, url: null });
   const designSystem = useDesignSystem();
   const isActiveSelected = useActiveNodeSelection(Boolean(selected));
   const { t } = useTranslation();
@@ -85,7 +90,10 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   const visualStyle = resolveNodeVisualStyle(activeColor, activeColorMode, data.customColor);
 
   // Resolve icons
-  const iconName = data.customIconUrl || !activeIconKey ? null : activeIconKey;
+  const resolvedAssetIconUrl = typeof data.customIconUrl === 'string' && data.customIconUrl.length > 0
+    ? data.customIconUrl
+    : (resolvedAssetIconState.key === providerAssetKey ? resolvedAssetIconState.url : null);
+  const iconName = resolvedAssetIconUrl || !activeIconKey ? null : activeIconKey;
 
   // Typography
   const fontFamilyMap: Record<string, string> = {
@@ -172,12 +180,38 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   const emptyLabelPrompt = t('nodes.addText', 'Add text');
   const showEmptyLabelPrompt = !hasLabel && isActiveSelected;
   const lodPreserveClass = isActiveSelected ? 'flow-lod-preserve' : '';
+  const isIconAssetNode = data.assetPresentation === 'icon' && (Boolean(resolvedAssetIconUrl) || Boolean(activeIconKey) || Boolean(providerAssetKey));
+
+  useEffect(() => {
+    if (typeof data.customIconUrl === 'string' && data.customIconUrl.length > 0) {
+      return;
+    }
+    if (!data.archIconPackId || !data.archIconShapeId || !providerAssetKey) {
+      return;
+    }
+
+    let cancelled = false;
+    loadProviderShapePreview(data.archIconPackId, data.archIconShapeId)
+      .then((preview) => {
+        if (!cancelled) {
+          setResolvedAssetIconState({ key: providerAssetKey, url: preview?.previewUrl || null });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setResolvedAssetIconState({ key: providerAssetKey, url: null });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [data.archIconPackId, data.archIconShapeId, data.customIconUrl, providerAssetKey]);
   const labelDisplayValue = hasLabel
     ? <MemoizedMarkdown content={data.label} />
     : showEmptyLabelPrompt
       ? <span className="text-slate-400/80">{emptyLabelPrompt}</span>
       : null;
-  const labelTitle = hasLabel ? data.label : showEmptyLabelPrompt ? emptyLabelPrompt : undefined;
 
   // Calculate Border Radius from Design System if shape is 'rounded' (default)
   function getBorderRadius(): string | number {
@@ -208,6 +242,85 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
     backgroundColor: !isComplexShape ? visualStyle.bg : undefined,
     borderColor: !isComplexShape ? visualStyle.border : undefined,
   };
+
+  if (isIconAssetNode) {
+    const iconScale = 1;
+    const iconFrameSize = 72;
+    const iconHandleStyleExtras = {
+      left: { top: 42 },
+      right: { top: 42 },
+    };
+
+    return (
+      <>
+        {selected && <ShiftKeyResizeWatcher onShiftChange={setShiftHeld} />}
+        <NodeTransformControls
+          isVisible={Boolean(selected)}
+          minWidth={96}
+          minHeight={96}
+          keepAspectRatio={false}
+        />
+        <NodeChrome
+          selected={Boolean(selected)}
+          minWidth={96}
+          minHeight={hasLabel ? 108 : 88}
+          keepAspectRatio={false}
+          handleClassName={connectionHandleClass}
+          handleStyleExtras={iconHandleStyleExtras}
+        >
+          <div
+            className="inline-flex min-w-[88px] max-w-[96px] flex-col items-center justify-start gap-2 bg-transparent px-1 py-1"
+            style={{
+              width: toCssSize(explicitWidth) ?? '96px',
+            }}
+            {...getTransformDiagnosticsAttrs({
+              nodeFamily: 'custom',
+              selected: Boolean(selected),
+              compact: false,
+              minHeight: 96,
+              actualHeight: nodeHeightPx,
+              hasIcon: true,
+              hasSubLabel: false,
+            })}
+          >
+            <div
+              className="flex items-center justify-center overflow-visible"
+              style={{ width: iconFrameSize, height: iconFrameSize }}
+            >
+              {resolvedAssetIconUrl ? (
+                <img
+                  src={resolvedAssetIconUrl}
+                  alt={typeof data.label === 'string' ? data.label : 'icon'}
+                  className="h-full w-full object-contain"
+                  style={{ transform: `scale(${iconScale})` }}
+                />
+              ) : activeIconKey ? (
+                <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-50 text-slate-700">
+                  <NamedIcon name={activeIconKey} fallbackName="Box" className="h-10 w-10" />
+                </div>
+              ) : null}
+            </div>
+            {hasLabel ? (
+              <InlineTextEditSurface
+                isEditing={labelEdit.isEditing}
+                draft={labelEdit.draft}
+                displayValue={<MemoizedMarkdown content={data.label} />}
+                onBeginEdit={labelEdit.beginEdit}
+                onDraftChange={labelEdit.setDraft}
+                onCommit={labelEdit.commit}
+                onKeyDown={labelEdit.handleKeyDown}
+                className="block max-w-full break-words text-center text-sm font-semibold leading-tight markdown-content [&_p]:m-0"
+                style={{ color: '#334155' }}
+                inputMode="multiline"
+                inputClassName="text-center"
+                isSelected={isActiveSelected}
+              />
+            ) : null}
+          </div>
+        </NodeChrome>
+      </>
+    );
+  }
 
   return (
     <>
@@ -266,12 +379,12 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
 
           {/* Icon Area */}
           <div className={`flex items-center gap-1.5 shrink-0 flow-lod-far-target flow-lod-far-flex-target ${lodPreserveClass} ${hasIcon ? 'mb-0' : 'mb-2'}`}>
-            {data.customIconUrl && (
+            {resolvedAssetIconUrl && (
               <div
                 className={`shrink-0 ${isCompactNode ? 'w-7 h-7' : 'w-8 h-8'} rounded-lg flex items-center justify-center border border-black/5 shadow-sm overflow-hidden flow-lod-shadow`}
                 style={{ backgroundColor: visualStyle.iconBg }}
               >
-                <img src={data.customIconUrl} alt="icon" className={`${isCompactNode ? 'w-4 h-4' : 'w-5 h-5'} object-contain`} />
+                <img src={resolvedAssetIconUrl} alt="icon" className={`${isCompactNode ? 'w-4 h-4' : 'w-5 h-5'} object-contain`} />
               </div>
             )}
 
@@ -313,7 +426,6 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
                   }
                   : {}),
               }}
-              title={labelTitle}
               inputMode="multiline"
               inputClassName="text-center"
               isSelected={isActiveSelected}

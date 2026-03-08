@@ -4,27 +4,30 @@ import { ShareModal } from './ShareModal';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback?: string) => fallback ?? _key,
+    t: (_key: string, fallback?: string | { defaultValue?: string; count?: number }) => {
+      if (typeof fallback === 'string') return fallback;
+      if (fallback?.defaultValue) return fallback.defaultValue.replace('{{count}}', String(fallback.count ?? ''));
+      return _key;
+    },
   }),
 }));
 
 describe('ShareModal', () => {
-  it('shows collaboration link details and cache recovery state', () => {
+  it('shows the room id with a simplified privacy note', () => {
     render(
       <ShareModal
         isOpen
         onClose={vi.fn()}
         onCopyInvite={vi.fn()}
-        roomId="https://flowmind.ai/editor?room=abc"
-        cacheState="hydrated"
+        roomId="abc-room"
         status="fallback"
         viewerCount={1}
       />
     );
 
-    expect(screen.getAllByText('Collaboration Link')).toHaveLength(2);
-    expect(screen.getByText('Copy a collaboration link for this live canvas session. This does not package the diagram into the URL.')).toBeTruthy();
-    expect(screen.getByText('Recovered from local cache')).toBeTruthy();
+    expect(screen.getByText('Share design')).toBeTruthy();
+    expect(screen.getByText('abc-room')).toBeTruthy();
+    expect(screen.getByText('All your diagram data stays local in the browser unless you export it.')).toBeTruthy();
     expect(screen.getByText('Copy Link')).toBeTruthy();
   });
 
@@ -36,8 +39,7 @@ describe('ShareModal', () => {
         isOpen
         onClose={vi.fn()}
         onCopyInvite={onCopyInvite}
-        roomId="https://flowmind.ai/editor?room=abc"
-        cacheState="unavailable"
+        roomId="abc-room"
         status="realtime"
         viewerCount={2}
       />
@@ -46,6 +48,6 @@ describe('ShareModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /Copy Link/i }));
 
     expect(onCopyInvite).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('Realtime sync active')).toBeTruthy();
+    expect(screen.getByText('Live sync')).toBeTruthy();
   });
 });

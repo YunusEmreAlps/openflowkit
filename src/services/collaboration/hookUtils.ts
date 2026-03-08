@@ -168,7 +168,7 @@ export function resolveLocalCollaborationRoomSecret(input: {
         return input.roomId;
     }
 
-    const generatedRoomSecret = createId('collab-secret');
+    const generatedRoomSecret = input.roomId;
     window.sessionStorage.setItem(storageKey, generatedRoomSecret);
     return generatedRoomSecret;
 }

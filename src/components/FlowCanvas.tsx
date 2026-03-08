@@ -103,6 +103,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         onNodeDragStart, onNodeDragStop,
         onConnectStart, onConnectEnd,
         handleAddAndConnect,
+        handleAddDomainLibraryItemAndConnect,
         handleAddNode,
         deleteNode, deleteEdge, duplicateNode,
         updateNodeZIndex,
@@ -314,6 +315,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 setConnectMenu={setConnectMenu}
                 screenToFlowPosition={screenToFlowPosition}
                 handleAddAndConnect={handleAddAndConnect}
+                handleAddDomainLibraryItemAndConnect={handleAddDomainLibraryItemAndConnect}
                 contextMenu={contextMenu}
                 onCloseContextMenu={onCloseContextMenu}
                 copySelection={copySelection}

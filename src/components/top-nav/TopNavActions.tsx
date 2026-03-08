@@ -179,7 +179,6 @@ export function TopNavActions({
                         onClose={() => setIsShareModalOpen(false)}
                         onCopyInvite={collaboration.onCopyShareLink}
                         roomId={collaboration.roomId}
-                        cacheState={collaboration.cacheState}
                         status={collaboration.status}
                         viewerCount={viewerCount}
                     />

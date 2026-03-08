@@ -78,6 +78,11 @@ export interface NodeData {
   archBoundaryId?: string;
   archZone?: string;
   archTrustDomain?: string;
+  archIconPackId?: string;
+  archIconShapeId?: string;
+  assetPresentation?: 'icon';
+  assetProvider?: string;
+  assetCategory?: string;
 }
 
 export interface AIRequestParams {

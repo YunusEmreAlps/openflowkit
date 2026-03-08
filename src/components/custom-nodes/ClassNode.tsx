@@ -122,7 +122,6 @@ function ClassNode({ id, data, selected }: LegacyNodeProps<NodeData>): React.Rea
             onCommit={labelEdit.commit}
             onKeyDown={labelEdit.handleKeyDown}
             className={`${visualQualityV2Enabled ? 'text-[13px]' : 'text-sm'} font-semibold text-slate-800 break-words`}
-            title={data.label || 'Class'}
             inputClassName="text-center"
             isSelected={Boolean(selected)}
           />

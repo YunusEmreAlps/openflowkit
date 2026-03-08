@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     AppWindow,
     Boxes,
@@ -7,7 +7,6 @@ import {
     Group,
     Image as ImageIcon,
     Search,
-    Shield,
     Smartphone,
     StickyNote,
     Type,
@@ -17,11 +16,20 @@ import { Input } from '../ui/Input';
 import { ViewHeader } from './ViewHeader';
 import { AssetsIcon } from '../icons/AssetsIcon';
 import { NamedIcon } from '../IconMap';
+import { Tooltip } from '../Tooltip';
+import { Select } from '../ui/Select';
 import {
     DOMAIN_LIBRARY_ITEMS,
     type DomainLibraryCategory,
     type DomainLibraryItem,
 } from '@/services/domainLibrary';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
+import {
+    getProviderCatalogCount,
+    loadProviderCatalog,
+    loadProviderShapePreview,
+} from '@/services/shapeLibrary/providerCatalog';
+import { loadIconAssetCatalog } from '@/services/iconAssetCatalog';
 
 interface AssetsViewProps {
     onClose: () => void;
@@ -38,7 +46,7 @@ interface AssetsViewProps {
     onAddDomainLibraryItem: (item: DomainLibraryItem) => void;
 }
 
-type AssetTab = 'general' | 'aws' | 'gcp' | 'azure' | 'network' | 'security';
+type AssetTab = 'general' | 'icons' | 'aws' | 'azure' | 'gcp' | 'cncf';
 
 interface GeneralAssetItem {
     id: string;
@@ -49,21 +57,25 @@ interface GeneralAssetItem {
 }
 
 interface CloudTabDefinition {
-    id: Extract<AssetTab, 'aws' | 'gcp' | 'azure' | 'network' | 'security'>;
+    id: Extract<AssetTab, 'icons' | 'aws' | 'azure' | 'gcp' | 'cncf'>;
     label: string;
     category: DomainLibraryCategory;
 }
 
-const TAB_ORDER: AssetTab[] = ['general', 'aws', 'gcp', 'azure', 'network', 'security'];
+const TAB_ORDER: AssetTab[] = ['general', 'icons', 'aws', 'azure', 'gcp', 'cncf'];
 
 const CLOUD_TABS: CloudTabDefinition[] = [
+    { id: 'icons', label: 'Icons', category: 'icons' },
     { id: 'aws', label: 'AWS', category: 'aws' },
-    { id: 'gcp', label: 'GCP', category: 'gcp' },
     { id: 'azure', label: 'Azure', category: 'azure' },
-    { id: 'network', label: 'Network', category: 'network' },
-    { id: 'security', label: 'Security', category: 'security' },
+    { id: 'gcp', label: 'GCP', category: 'gcp' },
+    { id: 'cncf', label: 'CNCF', category: 'cncf' },
 ];
 const IMAGE_UPLOAD_INPUT_ID = 'assets-image-upload-input';
+const MAX_CLOUD_RESULTS = 240;
+const PROVIDER_BACKED_TABS = new Set<AssetTab>(['aws', 'azure', 'gcp', 'cncf']);
+
+type CloudAssetState = 'idle' | 'loading' | 'ready' | 'error';
 
 function getTileClass(): string {
     return 'group flex aspect-square flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-slate-200 bg-white px-3 py-4 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--brand-primary-200)] hover:bg-[var(--brand-primary-50)] hover:shadow-md';
@@ -93,8 +105,32 @@ export function AssetsView({
 }: AssetsViewProps): React.ReactElement {
     const { t } = useTranslation();
     const [query, setQuery] = useState('');
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<AssetTab>('general');
+    const [providerItems, setProviderItems] = useState<Partial<Record<CloudTabDefinition['id'], DomainLibraryItem[]>>>({});
+    const [providerLoadState, setProviderLoadState] = useState<Partial<Record<CloudTabDefinition['id'], CloudAssetState>>>({});
+    const [providerPreviewUrls, setProviderPreviewUrls] = useState<Record<string, string>>({});
+    const [categoryFilters, setCategoryFilters] = useState<Partial<Record<CloudTabDefinition['id'], string>>>({});
+    const [pendingSelectionState, setPendingSelectionState] = useState<{ scope: string; ids: string[] }>({ scope: '', ids: [] });
+    const iconItems = useMemo(() => loadIconAssetCatalog(), []);
+
+    const loadProviderTab = useCallback((tabId: CloudTabDefinition['id']): void => {
+        if (!ROLLOUT_FLAGS.shapeLibraryV1 || tabId === 'icons') {
+            return;
+        }
+        if (providerLoadState[tabId] === 'loading' || providerLoadState[tabId] === 'ready') {
+            return;
+        }
+
+        setProviderLoadState((current) => ({ ...current, [tabId]: 'loading' }));
+        loadProviderCatalog(tabId)
+            .then((items) => {
+                setProviderItems((current) => ({ ...current, [tabId]: items }));
+                setProviderLoadState((current) => ({ ...current, [tabId]: 'ready' }));
+            })
+            .catch(() => {
+                setProviderLoadState((current) => ({ ...current, [tabId]: 'error' }));
+            });
+    }, [providerLoadState]);
 
     function requestImageUpload(): void {
         document.getElementById(IMAGE_UPLOAD_INPUT_ID)?.click();
@@ -210,6 +246,10 @@ export function AssetsView({
     ];
 
     const normalizedQuery = query.trim().toLowerCase();
+
+    useEffect(() => {
+        CLOUD_TABS.forEach((tab) => loadProviderTab(tab.id));
+    }, [loadProviderTab]);
     const filteredGeneralItems = generalItems.filter((item) => (
         normalizedQuery.length === 0
         || item.label.toLowerCase().includes(normalizedQuery)
@@ -218,8 +258,16 @@ export function AssetsView({
 
     const filteredCloudItems = useMemo(() => {
         return CLOUD_TABS.reduce<Record<CloudTabDefinition['id'], DomainLibraryItem[]>>((accumulator, tab) => {
-            accumulator[tab.id] = DOMAIN_LIBRARY_ITEMS.filter((item) => {
+            const availableItems = DOMAIN_LIBRARY_ITEMS
+                .filter((item) => item.category === tab.category && !PROVIDER_BACKED_TABS.has(tab.id))
+                .concat(providerItems[tab.id] || []);
+
+            accumulator[tab.id] = availableItems.filter((item) => {
+                const selectedCategory = categoryFilters[tab.id];
                 if (item.category !== tab.category) {
+                    return false;
+                }
+                if (selectedCategory && selectedCategory !== 'all' && item.providerShapeCategory !== selectedCategory) {
                     return false;
                 }
                 return normalizedQuery.length === 0
@@ -229,23 +277,127 @@ export function AssetsView({
             return accumulator;
         }, {
             aws: [],
-            gcp: [],
             azure: [],
-            network: [],
-            security: [],
+            gcp: [],
+            cncf: [],
+            icons: [],
         });
-    }, [normalizedQuery]);
+    }, [categoryFilters, normalizedQuery, providerItems]);
 
-    const tabCounts: Record<AssetTab, number> = {
-        general: filteredGeneralItems.length,
-        aws: filteredCloudItems.aws.length,
-        gcp: filteredCloudItems.gcp.length,
-        azure: filteredCloudItems.azure.length,
-        network: filteredCloudItems.network.length,
-        security: filteredCloudItems.security.length,
+    const baseTabCounts: Record<AssetTab, number> = {
+        general: generalItems.length,
+        icons: iconItems.length,
+        aws: getProviderCatalogCount('aws'),
+        azure: getProviderCatalogCount('azure'),
+        gcp: getProviderCatalogCount('gcp'),
+        cncf: getProviderCatalogCount('cncf'),
     };
 
+    const filteredIconItems = useMemo(() => {
+        const selectedCategory = categoryFilters.icons;
+        return iconItems.filter((item) => {
+            if (selectedCategory && selectedCategory !== 'all' && item.providerShapeCategory !== selectedCategory) {
+                return false;
+            }
+            return normalizedQuery.length === 0
+                || item.label.toLowerCase().includes(normalizedQuery)
+                || item.description.toLowerCase().includes(normalizedQuery)
+                || (item.providerShapeCategory || '').toLowerCase().includes(normalizedQuery);
+        });
+    }, [categoryFilters.icons, iconItems, normalizedQuery]);
+
+    const hasActiveFilters = normalizedQuery.length > 0 || Object.values(categoryFilters).some((value) => Boolean(value && value !== 'all'));
+    const tabCounts: Record<AssetTab, number> = hasActiveFilters
+        ? {
+            general: filteredGeneralItems.length,
+            icons: filteredIconItems.length,
+            aws: filteredCloudItems.aws.length,
+            azure: filteredCloudItems.azure.length,
+            gcp: filteredCloudItems.gcp.length,
+            cncf: filteredCloudItems.cncf.length,
+        }
+        : baseTabCounts;
+
     const activeCloudTab = CLOUD_TABS.find((tab) => tab.id === activeTab);
+    const activeTabItems = useMemo(() => (
+        activeCloudTab
+            ? activeCloudTab.id === 'icons'
+                ? filteredIconItems
+                : filteredCloudItems[activeCloudTab.id]
+            : []
+    ), [activeCloudTab, filteredCloudItems, filteredIconItems]);
+    const visibleCloudItems = useMemo(
+        () => (activeCloudTab ? activeTabItems.slice(0, MAX_CLOUD_RESULTS) : []),
+        [activeCloudTab, activeTabItems]
+    );
+    const cloudItemsHiddenCount = activeCloudTab ? Math.max(activeTabItems.length - visibleCloudItems.length, 0) : 0;
+    const activeCloudCategories = activeCloudTab
+        ? Array.from(new Set(
+            (activeCloudTab.id === 'icons' ? iconItems : (providerItems[activeCloudTab.id] || []))
+                .map((item) => item.providerShapeCategory)
+                .filter((value): value is string => Boolean(value))
+        )).sort((left, right) => left.localeCompare(right))
+        : [];
+
+    const selectionScope = `${activeTab}:${normalizedQuery}:${JSON.stringify(categoryFilters)}`;
+    const pendingSelectionIds = pendingSelectionState.scope === selectionScope ? pendingSelectionState.ids : [];
+    const pendingSelectedItems = visibleCloudItems.filter((item) => pendingSelectionIds.includes(item.id));
+
+    async function insertProviderItem(item: DomainLibraryItem): Promise<void> {
+        const preview = item.archIconPackId && item.archIconShapeId
+            ? await loadProviderShapePreview(item.archIconPackId, item.archIconShapeId)
+            : null;
+        onAddDomainLibraryItem({
+            ...item,
+            ...(preview ? { previewUrl: preview.previewUrl } : {}),
+        });
+    }
+
+    useEffect(() => {
+        if (!ROLLOUT_FLAGS.shapeLibraryV1 || !activeCloudTab || activeCloudTab.id === 'icons') {
+            return;
+        }
+
+        const previewCandidates = visibleCloudItems.filter((item) => (
+            item.archIconPackId
+            && item.archIconShapeId
+            && !providerPreviewUrls[item.id]
+        ));
+
+        if (previewCandidates.length === 0) {
+            return;
+        }
+
+        let cancelled = false;
+
+        Promise.all(previewCandidates.map(async (item) => {
+            const preview = await loadProviderShapePreview(item.archIconPackId as string, item.archIconShapeId as string);
+            return preview ? [item.id, preview.previewUrl] as const : null;
+        }))
+            .then((entries) => {
+                if (cancelled) {
+                    return;
+                }
+                const loadedEntries = entries.filter((entry): entry is readonly [string, string] => entry !== null);
+                if (loadedEntries.length === 0) {
+                    return;
+                }
+                setProviderPreviewUrls((current) => {
+                    const next = { ...current };
+                    loadedEntries.forEach(([itemId, previewUrl]) => {
+                        next[itemId] = previewUrl;
+                    });
+                    return next;
+                });
+            })
+            .catch(() => {
+                // Ignore per-tile preview failures and keep fallback icons.
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [activeCloudTab, providerPreviewUrls, visibleCloudItems]);
 
     return (
         <div className="flex h-full flex-col bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.06),_transparent_45%)]">
@@ -264,49 +416,32 @@ export function AssetsView({
             />
 
             <div className="border-b border-slate-200/70 bg-white/85 px-4 py-3 backdrop-blur-sm">
-                <div className="flex items-center justify-between gap-3">
-                    <div>
-                        <p className="text-sm font-semibold text-slate-700">Insert assets</p>
-                        <p className="text-xs text-slate-500">General blocks and cloud libraries in one place.</p>
-                    </div>
-                    <button
-                        onClick={() => setIsSearchOpen((current) => !current)}
-                        className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] border transition-colors ${
-                            isSearchOpen
-                                ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
-                                : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-slate-700'
-                        }`}
-                        aria-label="Toggle asset search"
-                    >
-                        <Search className="h-4 w-4" />
-                    </button>
+                <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Input
+                        value={query}
+                        onChange={(event) => setQuery(event.target.value)}
+                        onKeyDown={(event) => event.stopPropagation()}
+                        placeholder="Search assets, icons, AWS services, Azure diagrams..."
+                        className="w-full pl-10 focus:border-[var(--brand-primary-400)]"
+                    />
                 </div>
 
-                {isSearchOpen && (
-                    <div className="mt-3">
-                        <Input
-                            value={query}
-                            onChange={(event) => setQuery(event.target.value)}
-                            onKeyDown={(event) => event.stopPropagation()}
-                            placeholder="Search assets..."
-                            className="w-full focus:border-[var(--brand-primary-400)]"
-                        />
+                <div className="mt-3 overflow-x-auto pb-1 no-scrollbar">
+                    <div className="flex min-w-max flex-nowrap gap-1.5">
+                        {TAB_ORDER.map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`${getTabButtonClass(activeTab === tab)} shrink-0 whitespace-nowrap px-3`}
+                            >
+                                {tab.toUpperCase()}
+                                <span className={`ml-2 text-[10px] ${activeTab === tab ? 'text-white/75' : 'text-slate-400'}`}>
+                                    {tabCounts[tab]}
+                                </span>
+                            </button>
+                        ))}
                     </div>
-                )}
-
-                <div className="mt-3 flex flex-wrap gap-2">
-                    {TAB_ORDER.map((tab) => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={getTabButtonClass(activeTab === tab)}
-                        >
-                            {tab === 'general' ? 'General' : tab.toUpperCase()}
-                            <span className={`ml-2 text-[10px] ${activeTab === tab ? 'text-white/75' : 'text-slate-400'}`}>
-                                {tabCounts[tab]}
-                            </span>
-                        </button>
-                    ))}
                 </div>
             </div>
 
@@ -338,34 +473,110 @@ export function AssetsView({
                         </div>
                     )
                 ) : activeCloudTab ? (
-                    tabCounts[activeCloudTab.id] > 0 ? (
-                        <div className="grid grid-cols-4 gap-3">
-                            {filteredCloudItems[activeCloudTab.id].map((item) => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => {
-                                        onAddDomainLibraryItem(item);
-                                        onClose();
-                                    }}
-                                    className={getTileClass()}
-                                >
-                                    <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-slate-200 bg-slate-50 text-slate-600 transition-colors group-hover:border-[var(--brand-primary-200)] group-hover:bg-white group-hover:text-[var(--brand-primary)]">
-                                        <NamedIcon
-                                            name={item.icon}
-                                            fallbackName={activeCloudTab.id === 'security' ? 'Shield' : 'Box'}
-                                            className="h-5 w-5"
-                                        />
+                    providerLoadState[activeCloudTab.id] === 'loading' && tabCounts[activeCloudTab.id] === 0 ? (
+                        <div className="rounded-[var(--radius-lg)] border border-dashed border-slate-200 bg-white/80 px-4 py-10 text-center">
+                            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+                                <Boxes className="h-4 w-4" />
+                            </div>
+                            <div className="mt-3 text-sm font-medium text-slate-600">Loading {activeCloudTab.label} asset pack</div>
+                        </div>
+                    ) : tabCounts[activeCloudTab.id] > 0 ? (
+                        <div className="space-y-3">
+                            {activeCloudCategories.length > 1 ? (
+                                <Select
+                                    value={categoryFilters[activeCloudTab.id] || 'all'}
+                                    onChange={(value) => setCategoryFilters((current) => ({ ...current, [activeCloudTab.id]: value }))}
+                                    options={[
+                                        { value: 'all', label: 'All categories' },
+                                        ...activeCloudCategories.map((category) => ({ value: category, label: category })),
+                                    ]}
+                                    placeholder="All categories"
+                                    className="w-full"
+                                />
+                            ) : null}
+                            {pendingSelectionIds.length > 0 ? (
+                                <div className="flex items-center justify-between rounded-[var(--radius-md)] border border-[var(--brand-primary-200)] bg-[var(--brand-primary-50)] px-3 py-2">
+                                    <div className="text-xs font-medium text-slate-700">
+                                        {pendingSelectionIds.length} asset{pendingSelectionIds.length === 1 ? '' : 's'} selected
                                     </div>
-                                    <div className="text-xs font-semibold text-slate-700 group-hover:text-[var(--brand-primary-900)]">
-                                        {item.label}
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            className="text-xs font-semibold text-slate-500 transition-colors hover:text-slate-700"
+                                            onClick={() => setPendingSelectionState({ scope: selectionScope, ids: [] })}
+                                        >
+                                            Clear
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="rounded-[var(--radius-md)] bg-[var(--brand-primary)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm"
+                                            onClick={async () => {
+                                                for (const item of pendingSelectedItems) {
+                                                    await insertProviderItem(item);
+                                                }
+                                                onClose();
+                                            }}
+                                        >
+                                            Add selected
+                                        </button>
                                     </div>
-                                </button>
+                                </div>
+                            ) : null}
+                            <div className="grid grid-cols-6 gap-3">
+                            {visibleCloudItems.map((item) => (
+                                <Tooltip key={item.id} text={item.label}>
+                                    <button
+                                        aria-label={item.label}
+                                        onClick={async (event) => {
+                                            if (event.metaKey || event.ctrlKey) {
+                                                setPendingSelectionState((current) => {
+                                                    const currentIds = current.scope === selectionScope ? current.ids : [];
+                                                    return {
+                                                        scope: selectionScope,
+                                                        ids: currentIds.includes(item.id)
+                                                            ? currentIds.filter((value) => value !== item.id)
+                                                            : currentIds.concat(item.id),
+                                                    };
+                                                });
+                                                return;
+                                            }
+
+                                            await insertProviderItem(item);
+                                            if (pendingSelectionIds.length === 0) {
+                                                onClose();
+                                            }
+                                        }}
+                                        className={`group flex aspect-square items-center justify-center rounded-[var(--radius-lg)] border bg-white p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--brand-primary-200)] hover:bg-[var(--brand-primary-50)] hover:shadow-md ${
+                                            pendingSelectionIds.includes(item.id)
+                                                ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-50)] shadow-md'
+                                                : 'border-slate-200'
+                                        }`}
+                                    >
+                                        <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] border border-slate-200 bg-slate-50 text-slate-600 transition-colors group-hover:border-[var(--brand-primary-200)] group-hover:bg-white group-hover:text-[var(--brand-primary)]">
+                                            {providerPreviewUrls[item.id] ? (
+                                                <img src={providerPreviewUrls[item.id]} alt="" className="h-10 w-10 object-contain" loading="lazy" />
+                                            ) : (
+                                                <NamedIcon
+                                                    name={item.icon}
+                                                    fallbackName={activeCloudTab.id === 'icons' ? item.icon : 'Box'}
+                                                    className="h-5 w-5"
+                                                />
+                                            )}
+                                        </div>
+                                    </button>
+                                </Tooltip>
                             ))}
+                            </div>
+                            {cloudItemsHiddenCount > 0 ? (
+                                <div className="text-[11px] text-slate-500">
+                                    Showing the first {MAX_CLOUD_RESULTS} icons. Search to narrow the pack.
+                                </div>
+                            ) : null}
                         </div>
                     ) : (
                         <div className="rounded-[var(--radius-lg)] border border-dashed border-slate-200 bg-white/80 px-4 py-10 text-center">
                             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-                                {activeCloudTab.id === 'security' ? <Shield className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+                                <Search className="h-4 w-4" />
                             </div>
                             <div className="mt-3 text-sm font-medium text-slate-600">No {activeCloudTab.label} assets found</div>
                         </div>
