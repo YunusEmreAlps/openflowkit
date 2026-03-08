@@ -1,5 +1,0 @@
-interface:
-  display_name: "React Flow v12 Migration"
-  short_description: "Controlled migration to @xyflow/react v12 with regressions guarded."
-  default_prompt: "Use $reactflow-v12-migration to upgrade from reactflow v11 to @xyflow/react v12 safely and verify core canvas behavior."
-
