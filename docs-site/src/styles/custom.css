@@ -1,0 +1,11 @@
+/* OpenFlowKit brand colours for Starlight */
+:root {
+  --sl-color-accent-low: #fbe9e3;
+  --sl-color-accent: #e95420;
+  --sl-color-accent-high: #c2410c;
+}
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #3b1509;
+  --sl-color-accent: #f97316;
+  --sl-color-accent-high: #fed7aa;
+}

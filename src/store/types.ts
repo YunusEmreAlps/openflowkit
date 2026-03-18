@@ -22,7 +22,6 @@ export interface ViewSettings {
     largeGraphSafetyMode: 'auto' | 'on' | 'off';
     largeGraphSafetyProfile: 'performance' | 'balanced' | 'quality';
     exportSerializationMode: ExportSerializationMode;
-    historyModelV2Enabled: boolean;
     analyticsEnabled: boolean;
     language: string;
 }
@@ -106,29 +105,22 @@ export interface PendingNodeLabelEditRequest {
 }
 
 export interface FlowState {
+    // -------------------------------------------------------------------------
+    // SLICE: Canvas — active node/edge data synced with React Flow
+    // -------------------------------------------------------------------------
     nodes: FlowNode[];
     edges: FlowEdge[];
-    tabs: FlowTab[];
-    activeTabId: string;
-    designSystems: DesignSystem[];
-    activeDesignSystemId: string;
-    viewSettings: ViewSettings;
-    globalEdgeOptions: GlobalEdgeOptions;
-    aiSettings: AISettings;
-    brandConfig: BrandConfig;
-    brandKits: BrandKit[];
-    activeBrandKitId: string;
-    layers: Layer[];
-    activeLayerId: string;
-    selectedNodeId: string | null;
-    selectedEdgeId: string | null;
-    pendingNodeLabelEditRequest: PendingNodeLabelEditRequest | null;
-    mermaidDiagnostics: MermaidDiagnosticsSnapshot | null;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
     setNodes: (nodes: FlowNode[] | ((nodes: FlowNode[]) => FlowNode[])) => void;
     setEdges: (edges: FlowEdge[] | ((edges: FlowEdge[]) => FlowEdge[])) => void;
     onConnect: (connection: Connection) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: Tabs — multi-diagram workspace
+    // -------------------------------------------------------------------------
+    tabs: FlowTab[];
+    activeTabId: string;
     setActiveTabId: (id: string) => void;
     setTabs: (tabs: FlowTab[]) => void;
     addTab: () => string;
@@ -138,16 +130,50 @@ export interface FlowState {
     updateTab: (id: string, updates: Partial<FlowTab>) => void;
     copySelectedToTab: (targetTabId: string) => number;
     moveSelectedToTab: (targetTabId: string) => number;
+
+    // -------------------------------------------------------------------------
+    // SLICE: History — store-level undo/redo (V2 model)
+    // -------------------------------------------------------------------------
+    recordHistoryV2: () => void;
+    undoV2: () => void;
+    redoV2: () => void;
+    canUndoV2: () => boolean;
+    canRedoV2: () => boolean;
+
+    // -------------------------------------------------------------------------
+    // SLICE: Design — design systems and global edge appearance
+    // -------------------------------------------------------------------------
+    designSystems: DesignSystem[];
+    activeDesignSystemId: string;
+    globalEdgeOptions: GlobalEdgeOptions;
     setActiveDesignSystem: (id: string) => void;
     addDesignSystem: (ds: DesignSystem) => void;
     updateDesignSystem: (id: string, updates: Partial<DesignSystem>) => void;
     deleteDesignSystem: (id: string) => void;
     duplicateDesignSystem: (id: string) => void;
+    setGlobalEdgeOptions: (options: Partial<GlobalEdgeOptions>) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: Brand — app name, colors, logo, kits
+    // -------------------------------------------------------------------------
+    brandConfig: BrandConfig;
+    brandKits: BrandKit[];
+    activeBrandKitId: string;
+    setBrandConfig: (config: Partial<BrandConfig>) => void;
+    resetBrandConfig: () => void;
+    addBrandKit: (name: string, base?: BrandConfig) => void;
+    updateBrandKitName: (id: string, name: string) => void;
+    deleteBrandKit: (id: string) => void;
+    setActiveBrandKitId: (id: string) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: View — UI preferences, routing, safety mode, grid
+    // -------------------------------------------------------------------------
+    viewSettings: ViewSettings;
     toggleGrid: () => void;
     toggleSnap: () => void;
     setShortcutsHelpOpen: (open: boolean) => void;
     setViewSettings: (settings: Partial<ViewSettings>) => void;
-    setGlobalEdgeOptions: (options: Partial<GlobalEdgeOptions>) => void;
     setDefaultIconsEnabled: (enabled: boolean) => void;
     setSmartRoutingEnabled: (enabled: boolean) => void;
     setSmartRoutingProfile: (profile: ViewSettings['smartRoutingProfile']) => void;
@@ -155,13 +181,18 @@ export interface FlowState {
     setLargeGraphSafetyMode: (mode: ViewSettings['largeGraphSafetyMode']) => void;
     setLargeGraphSafetyProfile: (profile: ViewSettings['largeGraphSafetyProfile']) => void;
     toggleAnalytics: (enabled: boolean) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: AI — provider config and generation settings
+    // -------------------------------------------------------------------------
+    aiSettings: AISettings;
     setAISettings: (settings: Partial<AISettings>) => void;
-    setBrandConfig: (config: Partial<BrandConfig>) => void;
-    resetBrandConfig: () => void;
-    addBrandKit: (name: string, base?: BrandConfig) => void;
-    updateBrandKitName: (id: string, name: string) => void;
-    deleteBrandKit: (id: string) => void;
-    setActiveBrandKitId: (id: string) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: Layers — canvas layer management
+    // -------------------------------------------------------------------------
+    layers: Layer[];
+    activeLayerId: string;
     addLayer: (name?: string) => string;
     renameLayer: (id: string, name: string) => void;
     deleteLayer: (id: string) => void;
@@ -171,17 +202,20 @@ export interface FlowState {
     moveLayer: (id: string, direction: 'up' | 'down') => void;
     moveSelectedNodesToLayer: (layerId: string) => void;
     selectNodesInLayer: (layerId: string) => void;
+
+    // -------------------------------------------------------------------------
+    // SLICE: Selection & transient UI state
+    // -------------------------------------------------------------------------
+    selectedNodeId: string | null;
+    selectedEdgeId: string | null;
+    pendingNodeLabelEditRequest: PendingNodeLabelEditRequest | null;
+    mermaidDiagnostics: MermaidDiagnosticsSnapshot | null;
     setSelectedNodeId: (id: string | null) => void;
     setSelectedEdgeId: (id: string | null) => void;
     queuePendingNodeLabelEditRequest: (request: PendingNodeLabelEditRequest) => void;
     clearPendingNodeLabelEditRequest: () => void;
     setMermaidDiagnostics: (snapshot: MermaidDiagnosticsSnapshot | null) => void;
     clearMermaidDiagnostics: () => void;
-    recordHistoryV2: () => void;
-    undoV2: () => void;
-    redoV2: () => void;
-    canUndoV2: () => boolean;
-    canRedoV2: () => boolean;
 }
 
 export type { EdgeChange, NodeChange };

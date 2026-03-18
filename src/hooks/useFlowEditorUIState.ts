@@ -10,8 +10,8 @@ export type CommandBarView =
     | 'assets';
 
 export type FlowEditorMode = 'canvas' | 'studio';
-export type StudioTab = 'ai' | 'code';
-export type StudioCodeMode = 'flowmind' | 'mermaid';
+export type StudioTab = 'ai' | 'code' | 'playback';
+export type StudioCodeMode = 'openflow' | 'mermaid';
 
 interface UseFlowEditorUIStateResult {
     isHistoryOpen: boolean;
@@ -41,7 +41,7 @@ export function useFlowEditorUIState(): UseFlowEditorUIStateResult {
     const [commandBarView, setCommandBarView] = useState<CommandBarView>('root');
     const [editorMode, setEditorMode] = useState<FlowEditorMode>('canvas');
     const [studioTab, setStudioTab] = useState<StudioTab>('ai');
-    const [studioCodeMode, setStudioCodeMode] = useState<StudioCodeMode>('flowmind');
+    const [studioCodeMode, setStudioCodeMode] = useState<StudioCodeMode>('openflow');
     const [isSelectMode, setIsSelectMode] = useState(true);
 
     function openHistory(): void {

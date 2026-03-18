@@ -3,6 +3,7 @@ import type { RefObject } from 'react';
 
 interface UseExportMenuParams {
     onExportPNG: (format: 'png' | 'jpeg') => void;
+    onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
     onExportPlantUML: () => void;
@@ -19,6 +20,7 @@ interface UseExportMenuResult {
 
 export function useExportMenu({
     onExportPNG,
+    onExportAnimated,
     onExportJSON,
     onExportMermaid,
     onExportPlantUML,
@@ -44,6 +46,8 @@ export function useExportMenu({
     const handlers: Record<string, () => void> = {
         png: () => onExportPNG('png'),
         jpeg: () => onExportPNG('jpeg'),
+        video: () => onExportAnimated('video'),
+        gif: () => onExportAnimated('gif'),
         json: onExportJSON,
         openflow: onExportOpenFlowDSL,
         mermaid: onExportMermaid,

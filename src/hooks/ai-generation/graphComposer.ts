@@ -9,7 +9,7 @@ export interface ParsedFlowResult {
 }
 
 export function parseDslOrThrow(dslText: string): ParsedFlowResult {
-  const cleanDsl = dslText.replace(/```(yaml|flowmind|)?/g, '').replace(/```/g, '').trim();
+  const cleanDsl = dslText.replace(/```(yaml|openflow|flowmind|)?/g, '').replace(/```/g, '').trim();
   const parseResult = parseOpenFlowDSL(cleanDsl);
   if (parseResult.error) {
     throw new Error(parseResult.error);

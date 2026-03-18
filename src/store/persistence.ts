@@ -1,5 +1,6 @@
 import { INITIAL_EDGES, INITIAL_NODES } from '@/constants';
 import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
+import { clonePlaybackState, sanitizePlaybackState } from '@/services/playback/model';
 import type { FlowTab } from '@/lib/types';
 import { isDiagramType } from '@/lib/types';
 import {
@@ -37,6 +38,7 @@ function createFallbackTab(): FlowTab {
         updatedAt: new Date().toISOString(),
         nodes: INITIAL_NODES,
         edges: INITIAL_EDGES,
+        playback: undefined,
         history: { past: [], future: [] },
     };
 }
@@ -66,6 +68,7 @@ export function sanitizePersistedTab(tab: FlowTab): FlowTab {
         ...tab,
         nodes: tab.nodes.map(sanitizePersistedNode),
         edges: tab.edges.map(sanitizePersistedEdge),
+        playback: clonePlaybackState(tab.playback),
         history: {
             past: tab.history.past.map((entry) => ({
                 nodes: entry.nodes.map(sanitizePersistedNode),
@@ -107,6 +110,7 @@ export function normalizePersistedTab(rawTab: unknown): FlowTab | null {
         updatedAt: typeof tab.updatedAt === 'string' ? tab.updatedAt : new Date().toISOString(),
         nodes: Array.isArray(tab.nodes) ? tab.nodes : [],
         edges: Array.isArray(tab.edges) ? tab.edges : [],
+        playback: sanitizePlaybackState(tab.playback),
         history: {
             past: Array.isArray(tab.history?.past) ? tab.history.past : [],
             future: Array.isArray(tab.history?.future) ? tab.history.future : [],

@@ -17,6 +17,7 @@ import {
     toMarkerUrl,
 } from './classRelationSemantics';
 import { resolveStandardEdgeMarkers } from './standardEdgeMarkers';
+import { resolveAnimatedEdgePresentation } from './animatedEdgePresentation';
 
 interface CustomEdgeWrapperProps {
     id: string;
@@ -35,6 +36,7 @@ interface CustomEdgeWrapperProps {
     markerStart?: string;
     markerStartConfig?: FlowEdge['markerStart'];
     selected?: boolean;
+    edgeAnimated?: boolean;
 }
 
 function toLabelTransform(x: number, y: number): string {
@@ -58,6 +60,7 @@ export function CustomEdgeWrapper({
     markerStart,
     markerStartConfig,
     selected = false,
+    edgeAnimated = false,
 }: CustomEdgeWrapperProps): React.ReactElement {
     const { setEdges, screenToFlowPosition } = useReactFlow();
     const pathRef = useRef<SVGPathElement>(null);
@@ -74,16 +77,20 @@ export function CustomEdgeWrapper({
         label
     );
 
-    const relationStyle: React.CSSProperties = relationVisualSpec?.dashed
-        ? { strokeDasharray: '6 4' }
-        : { strokeDasharray: undefined };
+    const relationStyle = useMemo<React.CSSProperties>(
+        () => (relationVisualSpec?.dashed ? { strokeDasharray: '6 4' } : {}),
+        [relationVisualSpec?.dashed],
+    );
 
-    const resolvedStyle: React.CSSProperties = {
-        stroke: designSystem.colors.edge,
-        strokeWidth: designSystem.components.edge.strokeWidth,
-        ...style,
-        ...relationStyle,
-    };
+    const resolvedStyle = useMemo<React.CSSProperties>(
+        () => ({
+            stroke: designSystem.colors.edge,
+            strokeWidth: designSystem.components.edge.strokeWidth,
+            ...style,
+            ...relationStyle,
+        }),
+        [designSystem.colors.edge, designSystem.components.edge.strokeWidth, style, relationStyle],
+    );
 
     const relationResolvedMarkerStart = relationVisualSpec
         ? toMarkerUrl(relationVisualSpec.markerStartId)
@@ -112,16 +119,14 @@ export function CustomEdgeWrapper({
     });
     const resolvedMarkerStart = standardMarkers.markerStartUrl;
     const resolvedMarkerEnd = standardMarkers.markerEndUrl;
-    const isAnimated = selected || isHovered;
-    const animatedStrokeStyle = useMemo<React.CSSProperties>(() => {
-        return {
-            stroke: resolvedStyle.stroke,
-            strokeWidth: Math.max(Number(resolvedStyle.strokeWidth ?? 2), 2),
-            strokeDasharray: typeof resolvedStyle.strokeDasharray === 'string' && resolvedStyle.strokeDasharray.length > 0
-                ? resolvedStyle.strokeDasharray
-                : '8 8',
-        };
-    }, [resolvedStyle.stroke, resolvedStyle.strokeDasharray, resolvedStyle.strokeWidth]);
+    const animatedPresentation = useMemo(() => resolveAnimatedEdgePresentation({
+        animatedExportEnabled: ROLLOUT_FLAGS.animatedExportV1,
+        selected,
+        hovered: isHovered,
+        edgeAnimated,
+        animationConfig: data?.animation,
+        baseStyle: resolvedStyle,
+    }), [data?.animation, edgeAnimated, isHovered, resolvedStyle, selected]);
 
     useEffect(() => {
         const labelNode = labelRef.current;
@@ -272,12 +277,12 @@ export function CustomEdgeWrapper({
                 </defs>
             </svg>
             <BaseEdge path={path} markerEnd={resolvedMarkerEnd} markerStart={resolvedMarkerStart} style={resolvedStyle} />
-            {isAnimated && (
+            {animatedPresentation.shouldRenderOverlay && (
                 <path
                     d={path}
                     fill="none"
                     strokeLinecap="round"
-                    style={animatedStrokeStyle}
+                    style={animatedPresentation.overlayStyle}
                     className="flow-edge-animated-overlay"
                     pointerEvents="none"
                     aria-hidden="true"

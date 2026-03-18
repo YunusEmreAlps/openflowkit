@@ -1,8 +1,9 @@
 import React from 'react';
 import type { ComponentType } from 'react';
-import { Figma, FileCode, FileJson, GitBranch, Image, Wand2 } from 'lucide-react';
+import { Figma, FileCode, FileJson, Film, GitBranch, Image, Wand2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBrandConfig } from '@/store/brandHooks';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 
 interface ExportMenuPanelProps {
     onSelect: (key: string) => void;
@@ -26,6 +27,12 @@ export function ExportMenuPanel({ onSelect }: ExportMenuPanelProps): React.React
     const exportOptions: ExportOption[] = [
         { key: 'png', label: t('export.png', 'Export PNG'), hint: t('export.hintTransparent4K', 'Transparent (4K)'), Icon: Image },
         { key: 'jpeg', label: t('export.jpeg', 'Export JPG'), hint: t('export.hintWhiteBg4K', 'White Background (4K)'), Icon: Image },
+        ...(ROLLOUT_FLAGS.animatedExportV1
+            ? [
+                { key: 'video', label: t('export.video', 'Playback Video'), hint: t('export.hintPlaybackWebM', 'Playback timeline (WebM/MP4)'), Icon: Film },
+                { key: 'gif', label: t('export.gif', 'Playback GIF'), hint: t('export.hintPlaybackGif', 'Short loop for docs/social'), Icon: Film },
+            ]
+            : []),
         { key: 'json', label: t('export.jsonLabel', 'JSON File'), hint: t('export.hintDownload', 'Download'), Icon: FileJson },
         { key: 'openflow', label: t('export.openflowdslLabel', { appName: brandConfig.appName, defaultValue: `${brandConfig.appName} DSL` }), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: Wand2 },
         { key: 'mermaid', label: t('export.mermaid', 'Mermaid'), hint: t('export.hintClipboard', 'Copy to clipboard'), Icon: GitBranch },

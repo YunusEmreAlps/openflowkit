@@ -68,6 +68,7 @@ function createEdgeRenderer(variant: 'bezier' | 'smoothstep' | 'step' | 'straigh
                 markerStart={props.markerStart}
                 markerStartConfig={currentEdge?.markerStart as FlowEdge['markerStart']}
                 selected={props.selected}
+                edgeAnimated={Boolean(currentEdge?.animated)}
             />
         );
     };

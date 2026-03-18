@@ -1,0 +1,54 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="container nav-inner">
+        <a href="/" class="logo">
+          <img src="/favicon.svg" alt="OpenFlowKit" width="28" height="28" />
+          <span>OpenFlowKit</span>
+        </a>
+        <div class="nav-links">
+          <a href="https://docs.openflowkit.com">Docs</a>
+          <a href="https://github.com/Vrun-design/openflowkit">GitHub</a>
+          <a href="https://app.openflowkit.com" class="btn-primary nav-cta">Open App</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <span>© {new Date().getFullYear()} OpenFlowKit — MIT License</span>
+        <div class="footer-links">
+          <a href="https://docs.openflowkit.com">Docs</a>
+          <a href="https://github.com/Vrun-design/openflowkit">GitHub</a>
+          <a href="https://docs.openflowkit.com/introduction">About</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

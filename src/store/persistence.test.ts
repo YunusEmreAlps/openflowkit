@@ -25,6 +25,7 @@ function createTab(id: string, name: string, nodes: FlowNode[], edges: FlowEdge[
         name,
         nodes,
         edges,
+        playback: undefined,
         history: { past: [], future: [] },
     };
 }
@@ -76,6 +77,37 @@ describe('store persistence helpers', () => {
         expect(persistedNode.measured).toBeUndefined();
         expect(persistedNode.positionAbsolute).toBeUndefined();
         expect(persistedEdge?.selected).toBeUndefined();
+    });
+
+    it('preserves sanitized playback state in persisted tabs', () => {
+        const tab = createTab('tab-2', 'Tab 2', [createNode('n2', 'Recovered Tab 2')], []);
+        tab.playback = {
+            version: 1,
+            scenes: [{ id: 'scene-1', name: 'Intro', stepIds: ['step-1'] }],
+            timeline: [{ id: 'step-1', nodeId: 'n2', durationMs: 1200 }],
+            selectedSceneId: 'scene-1',
+            defaultStepDurationMs: 1500,
+        };
+
+        const persistedSlice = partializePersistedFlowState({
+            ...createInitialFlowState(),
+            tabs: [tab],
+            activeTabId: 'tab-2',
+            nodes: tab.nodes,
+            edges: tab.edges,
+        } as never);
+
+        expect(persistedSlice.tabs[0].playback?.timeline[0]?.nodeId).toBe('n2');
+
+        const migrated = migratePersistedFlowState({
+            tabs: [persistedSlice.tabs[0]],
+            activeTabId: 'tab-2',
+        }) as {
+            tabs: FlowTab[];
+        };
+
+        expect(migrated.tabs[0].playback?.scenes[0]?.name).toBe('Intro');
+        expect(migrated.tabs[0].playback?.selectedSceneId).toBe('scene-1');
     });
 
     it('migrates malformed tabs and invalid active ids to a safe fallback', () => {

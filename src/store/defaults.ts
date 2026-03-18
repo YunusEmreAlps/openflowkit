@@ -98,7 +98,6 @@ export const INITIAL_VIEW_SETTINGS: ViewSettings = {
     largeGraphSafetyMode: 'auto',
     largeGraphSafetyProfile: 'balanced',
     exportSerializationMode: 'deterministic',
-    historyModelV2Enabled: ROLLOUT_FLAGS.historyModelV2,
     analyticsEnabled: false,
     language: 'en',
 };

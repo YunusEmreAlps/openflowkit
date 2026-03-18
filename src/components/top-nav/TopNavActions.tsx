@@ -28,6 +28,7 @@ interface CollaborationState {
 interface TopNavActionsProps {
     onPlay: () => void;
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
     onExportPlantUML: () => void;
@@ -92,6 +93,7 @@ function getCollaborationStatusDotClass(status: CollaborationState['status']): s
 export function TopNavActions({
     onPlay,
     onExportPNG,
+    onExportAnimated,
     onExportJSON,
     onExportMermaid,
     onExportPlantUML,
@@ -164,6 +166,7 @@ export function TopNavActions({
 
                 <ExportMenu
                     onExportPNG={onExportPNG}
+                    onExportAnimated={onExportAnimated}
                     onExportJSON={onExportJSON}
                     onExportMermaid={onExportMermaid}
                     onExportPlantUML={onExportPlantUML}

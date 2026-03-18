@@ -89,7 +89,7 @@ describe('StudioCodePanel', () => {
   });
 
   it('disables apply when the draft is invalid', () => {
-    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="flowmind" onModeChange={vi.fn()} />);
+    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="openflow" onModeChange={vi.fn()} />);
 
     const textbox = screen.getByRole('textbox');
     fireEvent.change(textbox, { target: { value: 'broken dsl' } });
@@ -99,7 +99,7 @@ describe('StudioCodePanel', () => {
   });
 
   it('applies valid changed drafts and marks them applied', async () => {
-    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="flowmind" onModeChange={vi.fn()} />);
+    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="openflow" onModeChange={vi.fn()} />);
 
     const textbox = screen.getByRole('textbox');
     fireEvent.change(textbox, { target: { value: 'flow: "Updated"\ndirection: TB' } });

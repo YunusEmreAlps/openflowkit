@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useState } from 'react';
-import { Handle, Position } from '@/lib/reactflowCompat';
 import type { LegacyNodeProps } from '@/lib/reactflowCompat';
 import type { NodeData } from '@/lib/types';
 
@@ -66,6 +65,139 @@ function ShiftKeyResizeWatcher({ onShiftChange }: { onShiftChange: (held: boolea
   return null;
 }
 
+interface NodeShapeSVGProps {
+  shape: NodeShape;
+  fill: string;
+  stroke: string;
+  strokeWidth: number | string;
+}
+
+/** Pure SVG geometry for complex node shapes. Rendered inside a 100×100 viewBox. */
+function NodeShapeSVG({ shape, fill, stroke, strokeWidth }: NodeShapeSVGProps): React.ReactElement | null {
+  const commonProps = { stroke, strokeWidth, vectorEffect: 'non-scaling-stroke' as const, fill };
+  switch (shape) {
+    case 'diamond':
+      return <polygon points="50,0 100,50 50,100 0,50" {...commonProps} />;
+    case 'hexagon':
+      return <polygon points="15,0 85,0 100,50 85,100 15,100 0,50" {...commonProps} />;
+    case 'parallelogram':
+      return <polygon points="15,0 100,0 85,100 0,100" {...commonProps} />;
+    case 'cylinder':
+      return (
+        <>
+          <path d="M0,15 L0,85 Q0,100 50,100 Q100,100 100,85 L100,15 Q100,0 50,0 Q0,0 0,15 Z" {...commonProps} />
+          <ellipse cx="50" cy="15" rx="50" ry="15" stroke={stroke} strokeWidth="2" vectorEffect="non-scaling-stroke" fill={fill} fillOpacity={0.5} />
+        </>
+      );
+    case 'circle':
+      return <circle cx="50" cy="50" r="48" {...commonProps} />;
+    case 'ellipse':
+      return <ellipse cx="50" cy="50" rx="48" ry="48" {...commonProps} />;
+    default:
+      return null;
+  }
+}
+
+interface IconAssetNodeBodyProps {
+  selected: boolean;
+  setShiftHeld: (held: boolean) => void;
+  connectionHandleClass: string;
+  explicitWidth: number | string | undefined;
+  nodeHeightPx: number | undefined;
+  hasLabel: boolean;
+  resolvedAssetIconUrl: string | null;
+  activeIconKey: string | null;
+  label: string | undefined;
+  isActiveSelected: boolean;
+  labelEdit: {
+    isEditing: boolean;
+    draft: string;
+    beginEdit: () => void;
+    setDraft: (v: string) => void;
+    commit: () => void;
+    handleKeyDown: (e: React.KeyboardEvent) => void;
+  };
+}
+
+/** Renders the compact icon-first presentation used for architecture asset nodes. */
+function IconAssetNodeBody({
+  selected,
+  setShiftHeld,
+  connectionHandleClass,
+  explicitWidth,
+  nodeHeightPx,
+  hasLabel,
+  resolvedAssetIconUrl,
+  activeIconKey,
+  label,
+  isActiveSelected,
+  labelEdit,
+}: IconAssetNodeBodyProps): React.ReactElement {
+  const iconScale = 1;
+  const iconFrameSize = 72;
+  const iconHandleStyleExtras = { left: { top: 42 }, right: { top: 42 } };
+
+  return (
+    <>
+      {selected && <ShiftKeyResizeWatcher onShiftChange={setShiftHeld} />}
+      <NodeTransformControls isVisible={selected} minWidth={96} minHeight={96} keepAspectRatio={false} />
+      <NodeChrome
+        selected={selected}
+        minWidth={96}
+        minHeight={hasLabel ? 108 : 88}
+        keepAspectRatio={false}
+        handleClassName={connectionHandleClass}
+        handleStyleExtras={iconHandleStyleExtras}
+      >
+        <div
+          className="inline-flex min-w-[88px] max-w-[96px] flex-col items-center justify-start gap-2 bg-transparent px-1 py-1"
+          style={{ width: toCssSize(explicitWidth) ?? '96px' }}
+          {...getTransformDiagnosticsAttrs({
+            nodeFamily: 'custom',
+            selected,
+            compact: false,
+            minHeight: 96,
+            actualHeight: nodeHeightPx,
+            hasIcon: true,
+            hasSubLabel: false,
+          })}
+        >
+          <div className="flex items-center justify-center overflow-visible" style={{ width: iconFrameSize, height: iconFrameSize }}>
+            {resolvedAssetIconUrl ? (
+              <img
+                src={resolvedAssetIconUrl}
+                alt={typeof label === 'string' ? label : 'icon'}
+                className="h-full w-full object-contain"
+                style={{ transform: `scale(${iconScale})` }}
+              />
+            ) : activeIconKey ? (
+              <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-50 text-slate-700">
+                <NamedIcon name={activeIconKey} fallbackName="Box" className="h-10 w-10" />
+              </div>
+            ) : null}
+          </div>
+          {hasLabel ? (
+            <InlineTextEditSurface
+              isEditing={labelEdit.isEditing}
+              draft={labelEdit.draft}
+              displayValue={<MemoizedMarkdown content={label} />}
+              onBeginEdit={labelEdit.beginEdit}
+              onDraftChange={labelEdit.setDraft}
+              onCommit={labelEdit.commit}
+              onKeyDown={labelEdit.handleKeyDown}
+              className="block max-w-full break-words text-center text-sm font-semibold leading-tight markdown-content [&_p]:m-0"
+              style={{ color: '#334155' }}
+              inputMode="multiline"
+              inputClassName="text-center"
+              isSelected={isActiveSelected}
+            />
+          ) : null}
+        </div>
+      </NodeChrome>
+    </>
+  );
+}
+
 function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   const { id, data, type, selected } = props;
   const explicitNodeStyle = (props as { style?: React.CSSProperties }).style;
@@ -130,40 +262,6 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   const hasIcon = Boolean(iconName) || Boolean(data.customIconUrl);
   const hasLabel = Boolean(data.label?.trim());
   const hasSubLabel = Boolean(data.subLabel);
-
-  // -- Shape Rendering Logic -- //
-  function getShapeSVG(): React.ReactElement | null {
-    const strokeColor = visualStyle.border;
-    const fillColor = visualStyle.bg;
-
-    const commonProps = {
-      stroke: strokeColor,
-      strokeWidth: designSystem.components.edge.strokeWidth || "2", // Use DS edge width or default
-      vectorEffect: "non-scaling-stroke",
-      fill: fillColor
-    };
-
-    switch (activeShape) {
-      case 'diamond':
-        return <polygon points="50,0 100,50 50,100 0,50" {...commonProps} />;
-      case 'hexagon':
-        return <polygon points="15,0 85,0 100,50 85,100 15,100 0,50" {...commonProps} />;
-      case 'parallelogram':
-        return <polygon points="15,0 100,0 85,100 0,100" {...commonProps} />;
-      case 'cylinder':
-        return (
-          <>
-            <path d="M0,15 L0,85 Q0,100 50,100 Q100,100 100,85 L100,15 Q100,0 50,0 Q0,0 0,15 Z" {...commonProps} />
-            <ellipse cx="50" cy="15" rx="50" ry="15" stroke={strokeColor} strokeWidth="2" vectorEffect="non-scaling-stroke" fill={fillColor} fillOpacity={0.5} />
-          </>
-        );
-      case 'circle':
-        return <circle cx="50" cy="50" r="48" {...commonProps} />;
-      case 'ellipse':
-        return <ellipse cx="50" cy="50" rx="48" ry="48" {...commonProps} />;
-      default: return null;
-    }
-  }
 
   const isComplexShape = COMPLEX_SHAPES.includes(activeShape);
   const { minWidth, minHeight } = getMinNodeSize(activeShape);
@@ -244,81 +342,20 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
   };
 
   if (isIconAssetNode) {
-    const iconScale = 1;
-    const iconFrameSize = 72;
-    const iconHandleStyleExtras = {
-      left: { top: 42 },
-      right: { top: 42 },
-    };
-
     return (
-      <>
-        {selected && <ShiftKeyResizeWatcher onShiftChange={setShiftHeld} />}
-        <NodeTransformControls
-          isVisible={Boolean(selected)}
-          minWidth={96}
-          minHeight={96}
-          keepAspectRatio={false}
-        />
-        <NodeChrome
-          selected={Boolean(selected)}
-          minWidth={96}
-          minHeight={hasLabel ? 108 : 88}
-          keepAspectRatio={false}
-          handleClassName={connectionHandleClass}
-          handleStyleExtras={iconHandleStyleExtras}
-        >
-          <div
-            className="inline-flex min-w-[88px] max-w-[96px] flex-col items-center justify-start gap-2 bg-transparent px-1 py-1"
-            style={{
-              width: toCssSize(explicitWidth) ?? '96px',
-            }}
-            {...getTransformDiagnosticsAttrs({
-              nodeFamily: 'custom',
-              selected: Boolean(selected),
-              compact: false,
-              minHeight: 96,
-              actualHeight: nodeHeightPx,
-              hasIcon: true,
-              hasSubLabel: false,
-            })}
-          >
-            <div
-              className="flex items-center justify-center overflow-visible"
-              style={{ width: iconFrameSize, height: iconFrameSize }}
-            >
-              {resolvedAssetIconUrl ? (
-                <img
-                  src={resolvedAssetIconUrl}
-                  alt={typeof data.label === 'string' ? data.label : 'icon'}
-                  className="h-full w-full object-contain"
-                  style={{ transform: `scale(${iconScale})` }}
-                />
-              ) : activeIconKey ? (
-                <div className="flex h-full w-full items-center justify-center rounded-2xl bg-slate-50 text-slate-700">
-                  <NamedIcon name={activeIconKey} fallbackName="Box" className="h-10 w-10" />
-                </div>
-              ) : null}
-            </div>
-            {hasLabel ? (
-              <InlineTextEditSurface
-                isEditing={labelEdit.isEditing}
-                draft={labelEdit.draft}
-                displayValue={<MemoizedMarkdown content={data.label} />}
-                onBeginEdit={labelEdit.beginEdit}
-                onDraftChange={labelEdit.setDraft}
-                onCommit={labelEdit.commit}
-                onKeyDown={labelEdit.handleKeyDown}
-                className="block max-w-full break-words text-center text-sm font-semibold leading-tight markdown-content [&_p]:m-0"
-                style={{ color: '#334155' }}
-                inputMode="multiline"
-                inputClassName="text-center"
-                isSelected={isActiveSelected}
-              />
-            ) : null}
-          </div>
-        </NodeChrome>
-      </>
+      <IconAssetNodeBody
+        selected={Boolean(selected)}
+        setShiftHeld={setShiftHeld}
+        connectionHandleClass={connectionHandleClass}
+        explicitWidth={explicitWidth}
+        nodeHeightPx={nodeHeightPx}
+        hasLabel={hasLabel}
+        resolvedAssetIconUrl={resolvedAssetIconUrl}
+        activeIconKey={activeIconKey}
+        label={data.label}
+        isActiveSelected={isActiveSelected}
+        labelEdit={labelEdit}
+      />
     );
   }
 
@@ -362,7 +399,7 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
               preserveAspectRatio="xMidYMid meet"
               className="w-full h-full overflow-visible drop-shadow-sm"
             >
-              {getShapeSVG()}
+              <NodeShapeSVG shape={activeShape} fill={visualStyle.bg} stroke={visualStyle.border} strokeWidth={designSystem.components.edge.strokeWidth || "2"} />
             </svg>
           </div>
         )}

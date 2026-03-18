@@ -1,5 +1,4 @@
 export type RolloutFlagKey =
-    | 'historyModelV2'
     | 'visualQualityV2'
     | 'mermaidSyncV1'
     | 'familyPluginV1'
@@ -12,6 +11,14 @@ export type RolloutFlagKey =
     | 'templateLibraryV1'
     | 'collaborationV1'
     | 'collaborationIndexedDbV1'
+    | 'animationTimelineV1'
+    | 'playbackStudioV1'
+    | 'animatedExportV1'
+    | 'importAdaptersV1'
+    | 'terraformImportV1'
+    | 'openApiImportV1'
+    | 'liveBindingsV1'
+    | 'documentModelV2'
     | 'reactFlowV12Migration'
     | 'architectureParentingV12'
     | 'reactFlowV12Cleanup';
@@ -24,12 +31,6 @@ interface RolloutFlagDefinition {
 }
 
 const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = {
-    historyModelV2: {
-        key: 'historyModelV2',
-        envVar: 'VITE_HISTORY_MODEL_V2',
-        defaultEnabled: true,
-        description: 'Store-level history model v2 path',
-    },
     visualQualityV2: {
         key: 'visualQualityV2',
         envVar: 'VITE_VISUAL_QUALITY_V2',
@@ -102,6 +103,54 @@ const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = 
         defaultEnabled: true,
         description: 'Local IndexedDB persistence for collaboration rooms',
     },
+    animationTimelineV1: {
+        key: 'animationTimelineV1',
+        envVar: 'VITE_ANIMATION_TIMELINE_V1',
+        defaultEnabled: false,
+        description: 'Typed playback timeline contracts and sequencing foundation',
+    },
+    playbackStudioV1: {
+        key: 'playbackStudioV1',
+        envVar: 'VITE_PLAYBACK_STUDIO_V1',
+        defaultEnabled: false,
+        description: 'Dedicated playback studio shell and authoring tools',
+    },
+    animatedExportV1: {
+        key: 'animatedExportV1',
+        envVar: 'VITE_ANIMATED_EXPORT_V1',
+        defaultEnabled: false,
+        description: 'Animated diagram export pipeline',
+    },
+    importAdaptersV1: {
+        key: 'importAdaptersV1',
+        envVar: 'VITE_IMPORT_ADAPTERS_V1',
+        defaultEnabled: false,
+        description: 'External import adapter framework',
+    },
+    terraformImportV1: {
+        key: 'terraformImportV1',
+        envVar: 'VITE_TERRAFORM_IMPORT_V1',
+        defaultEnabled: false,
+        description: 'Terraform graph and plan import pipeline',
+    },
+    openApiImportV1: {
+        key: 'openApiImportV1',
+        envVar: 'VITE_OPENAPI_IMPORT_V1',
+        defaultEnabled: false,
+        description: 'OpenAPI-driven topology import pipeline',
+    },
+    liveBindingsV1: {
+        key: 'liveBindingsV1',
+        envVar: 'VITE_LIVE_BINDINGS_V1',
+        defaultEnabled: false,
+        description: 'Read-only live bindings and runtime overlays',
+    },
+    documentModelV2: {
+        key: 'documentModelV2',
+        envVar: 'VITE_DOCUMENT_MODEL_V2',
+        defaultEnabled: false,
+        description: 'Extended document metadata for scenes, exports, and bindings',
+    },
     reactFlowV12Migration: {
         key: 'reactFlowV12Migration',
         envVar: 'VITE_REACTFLOW_V12_MIGRATION',
@@ -139,7 +188,6 @@ export function isRolloutFlagEnabled(key: RolloutFlagKey): boolean {
 }
 
 export const ROLLOUT_FLAGS: Record<RolloutFlagKey, boolean> = {
-    historyModelV2: isRolloutFlagEnabled('historyModelV2'),
     visualQualityV2: isRolloutFlagEnabled('visualQualityV2'),
     mermaidSyncV1: isRolloutFlagEnabled('mermaidSyncV1'),
     familyPluginV1: isRolloutFlagEnabled('familyPluginV1'),
@@ -152,6 +200,14 @@ export const ROLLOUT_FLAGS: Record<RolloutFlagKey, boolean> = {
     templateLibraryV1: isRolloutFlagEnabled('templateLibraryV1'),
     collaborationV1: isRolloutFlagEnabled('collaborationV1'),
     collaborationIndexedDbV1: isRolloutFlagEnabled('collaborationIndexedDbV1'),
+    animationTimelineV1: isRolloutFlagEnabled('animationTimelineV1'),
+    playbackStudioV1: isRolloutFlagEnabled('playbackStudioV1'),
+    animatedExportV1: isRolloutFlagEnabled('animatedExportV1'),
+    importAdaptersV1: isRolloutFlagEnabled('importAdaptersV1'),
+    terraformImportV1: isRolloutFlagEnabled('terraformImportV1'),
+    openApiImportV1: isRolloutFlagEnabled('openApiImportV1'),
+    liveBindingsV1: isRolloutFlagEnabled('liveBindingsV1'),
+    documentModelV2: isRolloutFlagEnabled('documentModelV2'),
     reactFlowV12Migration: isRolloutFlagEnabled('reactFlowV12Migration'),
     architectureParentingV12: isRolloutFlagEnabled('architectureParentingV12'),
     reactFlowV12Cleanup: isRolloutFlagEnabled('reactFlowV12Cleanup'),

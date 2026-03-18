@@ -1,4 +1,4 @@
-import type { FlowEditorMode } from '@/hooks/useFlowEditorUIState';
+import type { FlowEditorMode, StudioTab } from '@/hooks/useFlowEditorUIState';
 
 interface SelectionSnapshot {
     selectedNodeId: string | null;
@@ -7,6 +7,7 @@ interface SelectionSnapshot {
 
 interface ShouldExitStudioOnSelectionParams extends SelectionSnapshot {
     editorMode: FlowEditorMode;
+    studioTab: StudioTab;
     studioSelectionSnapshot: SelectionSnapshot | null;
 }
 
@@ -27,11 +28,16 @@ function hasSelectionChanged(
 
 export function shouldExitStudioOnSelection({
     editorMode,
+    studioTab,
     studioSelectionSnapshot,
     selectedNodeId,
     selectedEdgeId,
 }: ShouldExitStudioOnSelectionParams): boolean {
     if (editorMode !== 'studio') {
+        return false;
+    }
+
+    if (studioTab === 'playback') {
         return false;
     }
 

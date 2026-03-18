@@ -26,12 +26,12 @@ describe('useCommandBarCommands', () => {
 
         const ids = result.current.map((command) => command.id);
         expect(ids).toContain('studio-ai');
-        expect(ids).toContain('studio-flowmind');
+        expect(ids).toContain('studio-openflow');
         expect(ids).toContain('studio-mermaid');
         expect(ids).toContain('assets');
 
         result.current.find((command) => command.id === 'studio-ai')?.action?.();
-        result.current.find((command) => command.id === 'studio-flowmind')?.action?.();
+        result.current.find((command) => command.id === 'studio-openflow')?.action?.();
         result.current.find((command) => command.id === 'studio-mermaid')?.action?.();
 
         expect(onOpenStudioAI).toHaveBeenCalledTimes(1);

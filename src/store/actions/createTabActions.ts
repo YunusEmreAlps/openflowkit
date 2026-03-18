@@ -1,6 +1,7 @@
 import type { FlowTab } from '@/lib/types';
 import { createId } from '@/lib/id';
 import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
+import { clonePlaybackState } from '@/services/playback/model';
 import type { FlowState } from '../types';
 
 type SetFlowState = (partial: Partial<FlowState> | ((state: FlowState) => Partial<FlowState>)) => void;
@@ -37,6 +38,7 @@ export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
                 data: edge.data ? { ...edge.data } : edge.data,
                 style: edge.style ? { ...edge.style } : edge.style,
             })),
+            playback: clonePlaybackState(tab.playback),
             history: { past: [], future: [] },
             updatedAt: nowIso(),
         };
@@ -82,6 +84,7 @@ export function createTabActions(set: SetFlowState, get: GetFlowState): Pick<
                 updatedAt: nowIso(),
                 nodes: [],
                 edges: [],
+                playback: undefined,
                 history: { past: [], future: [] },
             };
 

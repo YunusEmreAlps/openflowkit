@@ -5,7 +5,7 @@ import { handleIdToSide } from '@/lib/nodeHandles';
 import { assignSmartHandlesWithOptions } from './smartEdgeRouting';
 import { normalizeLayoutInputsForDeterminism } from './elk-layout/determinism';
 import { buildResolvedLayoutConfiguration, getDeterministicSeedOptions, resolveLayoutPresetOptions } from './elk-layout/options';
-import type { FlowNodeWithMeasuredDimensions, LayoutAlgorithm, LayoutDirection, LayoutOptions } from './elk-layout/types';
+import type { FlowNodeWithMeasuredDimensions, LayoutOptions } from './elk-layout/types';
 
 interface ElkLayoutEngine {
     layout: (graph: ElkNode) => Promise<ElkNode>;
@@ -13,6 +13,11 @@ interface ElkLayoutEngine {
 
 let elkInstancePromise: Promise<ElkLayoutEngine> | null = null;
 const ELK_BOUNDARY_FANOUT_MIN_GROUP_SIZE = 2;
+
+/** Reset the cached ELK instance — useful in tests or when the instance may have become stale. */
+export function resetElkInstance(): void {
+    elkInstancePromise = null;
+}
 
 function getElkBoundaryFanoutSpacing(groupSize: number): number {
     return Math.min(28, 16 + Math.max(0, groupSize - ELK_BOUNDARY_FANOUT_MIN_GROUP_SIZE) * 2);

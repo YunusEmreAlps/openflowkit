@@ -1,0 +1,82 @@
+import { defineConfig } from 'astro/config';
+import starlight from '@astrojs/starlight';
+
+export default defineConfig({
+  site: 'https://docs.openflowkit.com',
+  integrations: [
+    starlight({
+      title: 'OpenFlowKit Docs',
+      description: 'Documentation for OpenFlowKit — the local-first, AI-powered diagramming tool.',
+      logo: {
+        src: './src/assets/logo.svg',
+        alt: 'OpenFlowKit',
+      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/Vrun-design/openflowkit' },
+      ],
+      editLink: {
+        baseUrl: 'https://github.com/Vrun-design/openflowkit/edit/main/docs/',
+      },
+      // Root locale keeps English at clean URLs (/introduction not /en/introduction)
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        tr: { label: 'Türkçe', lang: 'tr' },
+      },
+      sidebar: [
+        {
+          label: 'AI Assistant',
+          items: [
+            { label: 'Ask Flowpilot', slug: 'ask-flowpilot' },
+          ],
+        },
+        {
+          label: 'Getting Started',
+          items: [
+            { label: 'Introduction', slug: 'introduction' },
+            { label: 'Quick Start', slug: 'quick-start' },
+          ],
+        },
+        {
+          label: 'Core Features',
+          items: [
+            { label: 'Canvas Basics', slug: 'canvas-basics' },
+            { label: 'Node Types', slug: 'node-types' },
+            { label: 'Properties Panel', slug: 'properties-panel' },
+            { label: 'Command Center', slug: 'command-center' },
+          ],
+        },
+        {
+          label: 'Advanced Tools',
+          items: [
+            { label: 'AI Generation', slug: 'ai-generation' },
+            { label: 'Smart Layout', slug: 'smart-layout' },
+            { label: 'Playback & History', slug: 'playback-history' },
+            { label: 'OpenFlow DSL', slug: 'openflow-dsl' },
+          ],
+        },
+        {
+          label: 'Guides & Use Cases',
+          items: [
+            { label: 'Prompting AI Agents', slug: 'prompting-agents' },
+            { label: 'Mermaid vs OpenFlow', slug: 'mermaid-vs-openflow' },
+            { label: 'AWS Architecture', slug: 'aws-architecture' },
+            { label: 'Payment Flow', slug: 'payment-flow' },
+            { label: 'Mermaid Integration', slug: 'mermaid-integration' },
+            { label: 'Exporting', slug: 'exporting' },
+            { label: 'Keyboard Shortcuts', slug: 'keyboard-shortcuts' },
+            { label: 'Theming', slug: 'theming' },
+          ],
+        },
+        {
+          label: 'Announcements',
+          items: [
+            { label: 'V1 Beta Launch', slug: 'v1-beta-launch' },
+            { label: 'Roadmap', slug: 'roadmap' },
+          ],
+        },
+      ],
+      customCss: ['./src/styles/custom.css'],
+    }),
+  ],
+});

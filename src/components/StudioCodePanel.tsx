@@ -50,7 +50,7 @@ export function StudioCodePanel({
     const { addToast } = useToast();
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const modeOptions: CodeModeOption[] = [
-        { id: 'flowmind', label: `${brandConfig.appName} DSL` },
+        { id: 'openflow', label: `${brandConfig.appName} DSL` },
         { id: 'mermaid', label: 'Mermaid' },
     ];
     const {
@@ -158,7 +158,7 @@ export function StudioCodePanel({
                             ) : null}
                         </div>
 
-                        {mode === 'flowmind' ? (
+                        {mode === 'openflow' ? (
                             <a
                                 href="#/docs/openflow-dsl"
                                 target="_blank"

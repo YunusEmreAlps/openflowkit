@@ -24,6 +24,7 @@ interface TopNavProps {
 
     // Actions
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
     onExportPlantUML: () => void;
@@ -72,6 +73,7 @@ export function TopNav({
     onCloseTab,
     onRenameTab,
     onExportPNG,
+    onExportAnimated,
     onExportJSON,
     onExportMermaid,
     onExportPlantUML,
@@ -86,6 +88,10 @@ export function TopNav({
     const brandConfig = useBrandConfig();
     const isBeveled = useBrandButtonStyle() === 'beveled';
     const handleExportPNG = trackAndRunExport(onExportPNG);
+    const handleExportAnimated = (format: 'video' | 'gif') => {
+        trackEvent('export_animated', { format });
+        onExportAnimated(format);
+    };
     const handleExportJSON = trackAndRun('export_json', onExportJSON);
     const handleExportMermaid = trackAndRun('export_mermaid', onExportMermaid);
     const handleExportPlantUML = trackAndRun('export_plantuml', onExportPlantUML);
@@ -140,6 +146,7 @@ export function TopNav({
             <TopNavActions
                 onPlay={onPlay}
                 onExportPNG={handleExportPNG}
+                onExportAnimated={handleExportAnimated}
                 onExportJSON={handleExportJSON}
                 onExportMermaid={handleExportMermaid}
                 onExportPlantUML={handleExportPlantUML}

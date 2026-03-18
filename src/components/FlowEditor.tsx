@@ -212,9 +212,30 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         handleCommandBarApply
     );
 
+    // --- Playback ---
+    const {
+        isPlaying,
+        currentStepIndex,
+        totalSteps,
+        startPlayback,
+        stopPlayback,
+        togglePlay,
+        nextStep,
+        prevStep,
+        setPlaybackSpeed,
+        playbackSpeed,
+        jumpToStep,
+    } = usePlayback();
+
     // --- Export ---
-    const { fileInputRef, handleExport, handleExportJSON, handleImportJSON, onFileImport } = useFlowExport(
-        recordHistory, reactFlowWrapper
+    const { fileInputRef, handleExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport } = useFlowExport(
+        recordHistory,
+        reactFlowWrapper,
+        {
+            jumpToStep,
+            stopPlayback,
+            playbackSpeed,
+        }
     );
 
     useEffect(() => {
@@ -246,18 +267,6 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
             }
         }, [handleAddMindmapChild, handleAddMindmapSibling])
     );
-
-    // --- Playback ---
-    const {
-        isPlaying,
-        currentStepIndex,
-        totalSteps,
-        startPlayback,
-        stopPlayback,
-        togglePlay,
-        nextStep,
-        prevStep
-    } = usePlayback();
 
     const {
         isLayouting,
@@ -305,11 +314,13 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         openStudioPanel,
         openStudioAI,
         openStudioCode,
+        openStudioPlayback,
         toggleStudioPanel,
         closeStudioPanel,
         handleCanvasEntityIntent,
     } = useFlowEditorStudioController({
         editorMode,
+        studioTab,
         selectedNodeId,
         selectedEdgeId,
         setStudioTab,
@@ -335,6 +346,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         handleInsertTemplate,
         openStudioAI,
         openStudioCode,
+        openStudioPlayback,
         commandBarView,
         handleAddAnnotation,
         handleAddSection,
@@ -383,6 +395,19 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         setStudioTab,
         studioCodeMode,
         setStudioCodeMode,
+        playback: {
+            currentStepIndex,
+            totalSteps,
+            isPlaying,
+            onStartPlayback: startPlayback,
+            onPlayPause: togglePlay,
+            onStop: stopPlayback,
+            onScrubToStep: jumpToStep,
+            onNext: nextStep,
+            onPrev: prevStep,
+            playbackSpeed,
+            onPlaybackSpeedChange: setPlaybackSpeed,
+        },
         editorMode,
     }), [
         isCommandBarOpen,
@@ -395,6 +420,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         handleInsertTemplate,
         openStudioAI,
         openStudioCode,
+        openStudioPlayback,
         commandBarView,
         handleAddAnnotation,
         handleAddSection,
@@ -443,6 +469,17 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         setStudioTab,
         studioCodeMode,
         setStudioCodeMode,
+        currentStepIndex,
+        totalSteps,
+        isPlaying,
+        startPlayback,
+        togglePlay,
+        stopPlayback,
+        jumpToStep,
+        nextStep,
+        prevStep,
+        playbackSpeed,
+        setPlaybackSpeed,
         editorMode,
     ]);
 
@@ -458,6 +495,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                     onCloseTab={handleCloseTab}
                     onRenameTab={handleRenameTab}
                     onExportPNG={handleExport}
+                    onExportAnimated={handleAnimatedExport}
                     onExportJSON={handleExportJSON}
                     onExportMermaid={handleExportMermaid}
                     onExportPlantUML={handleExportPlantUML}

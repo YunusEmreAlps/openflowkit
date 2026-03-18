@@ -1,53 +1,70 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useReactFlow } from '@/lib/reactflowCompat';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { useFlowStore } from '../store';
-import type { CSSProperties } from 'react';
+import {
+    applyPlaybackStepStyles,
+    buildPlaybackSequence,
+    buildPlaybackSequenceFromState,
+    capturePlaybackStyles,
+    restorePlaybackStyles,
+} from '@/services/playback/contracts';
 
 export function usePlayback() {
-    const { nodes, setNodes } = useFlowStore();
+    const { nodes, tabs, activeTabId, setNodes } = useFlowStore();
     const { fitView } = useReactFlow();
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentStepIndex, setCurrentStepIndex] = useState(-1);
     const [playbackSpeed, setPlaybackSpeed] = useState(2000);
-    const [steps, setSteps] = useState<string[]>([]);
+    const [steps, setSteps] = useState(() => buildPlaybackSequence([]).steps);
 
-    const initialStyles = useRef<Record<string, CSSProperties | undefined>>({});
+    const initialStyles = useRef(capturePlaybackStyles([]));
 
-    const generateSequence = useCallback(() => {
-        return [...nodes]
-            .sort((a, b) => {
-                const yDiff = a.position.y - b.position.y;
-                // Group by rows (within 50px tolerance)
-                if (Math.abs(yDiff) > 50) return yDiff;
-                // Then sort by column
-                return a.position.x - b.position.x;
-            })
-            .map(n => n.id);
-    }, [nodes]);
+    const resolveSequence = useCallback(() => {
+        const activeTabPlayback = tabs.find((tab) => tab.id === activeTabId)?.playback;
+        return ROLLOUT_FLAGS.animationTimelineV1
+            ? buildPlaybackSequenceFromState(nodes, activeTabPlayback, playbackSpeed)
+            : buildPlaybackSequence(nodes, playbackSpeed);
+    }, [activeTabId, nodes, playbackSpeed, tabs]);
 
     const restoreStyles = useCallback(() => {
         if (Object.keys(initialStyles.current).length > 0) {
-            setNodes(nds => nds.map(n => {
-                const originalStyle = initialStyles.current[n.id];
-                return originalStyle ? { ...n, style: originalStyle } : n;
-            }));
+            setNodes((nds) => restorePlaybackStyles(nds, initialStyles.current));
             initialStyles.current = {};
         }
     }, [setNodes]);
 
     const startPlayback = useCallback(() => {
         if (Object.keys(initialStyles.current).length === 0) {
-            const styles: Record<string, CSSProperties | undefined> = {};
-            nodes.forEach(n => { styles[n.id] = n.style || {}; });
-            initialStyles.current = styles;
+            initialStyles.current = capturePlaybackStyles(nodes);
         }
 
-        const newSteps = generateSequence();
-        setSteps(newSteps);
-        setCurrentStepIndex(0);
+        const sequence = resolveSequence();
+        setSteps(sequence.steps);
+        setCurrentStepIndex(sequence.steps.length > 0 ? 0 : -1);
         setIsPlaying(false);
-    }, [generateSequence, nodes]);
+    }, [nodes, resolveSequence]);
+
+    const jumpToStep = useCallback((stepIndex: number) => {
+        const normalizedIndex = Math.max(0, stepIndex);
+
+        if (Object.keys(initialStyles.current).length === 0) {
+            initialStyles.current = capturePlaybackStyles(nodes);
+        }
+
+        const sequence = resolveSequence();
+        if (sequence.steps.length === 0) {
+            setSteps([]);
+            setCurrentStepIndex(-1);
+            setIsPlaying(false);
+            return;
+        }
+
+        setSteps(sequence.steps);
+        setCurrentStepIndex(Math.min(normalizedIndex, sequence.steps.length - 1));
+        setIsPlaying(false);
+    }, [nodes, resolveSequence]);
 
     const stopPlayback = useCallback(() => {
         setIsPlaying(false);
@@ -83,29 +100,16 @@ export function usePlayback() {
     useEffect(() => {
         if (currentStepIndex < 0 || !steps[currentStepIndex]) return;
 
-        const nodeId = steps[currentStepIndex];
+        const step = steps[currentStepIndex];
 
-        setNodes(nds => nds.map(n => {
-            const isActive = n.id === nodeId;
-            return {
-                ...n,
-                style: {
-                    ...n.style,
-                    opacity: isActive ? 1 : 0.2,
-                    filter: isActive
-                        ? 'drop-shadow(0 0 12px var(--brand-primary))'
-                        : 'grayscale(100%)',
-                    transition: 'all 0.5s ease'
-                }
-            };
-        }));
+        setNodes((nds) => applyPlaybackStepStyles(nds, step, initialStyles.current));
 
         fitView({
-            nodes: [{ id: nodeId }],
-            duration: 800,
-            padding: 2,
-            minZoom: 0.5,
-            maxZoom: 1.5
+            nodes: [{ id: step.nodeId }],
+            duration: step.viewport.duration,
+            padding: step.viewport.padding,
+            minZoom: step.viewport.minZoom,
+            maxZoom: step.viewport.maxZoom
         });
     }, [currentStepIndex, steps, fitView, setNodes]);
 
@@ -118,6 +122,8 @@ export function usePlayback() {
         togglePlay,
         nextStep,
         prevStep,
-        setPlaybackSpeed
+        setPlaybackSpeed,
+        playbackSpeed,
+        jumpToStep,
     };
 }
