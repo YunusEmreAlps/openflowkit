@@ -19,36 +19,10 @@ const { title, description } = Astro.props;
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
   <body>
-    <nav>
-      <div class="container nav-inner">
-        <a href="/" class="logo">
-          <img src="/favicon.svg" alt="OpenFlowKit" width="28" height="28" />
-          <span>OpenFlowKit</span>
-        </a>
-        <div class="nav-links">
-          <a href="https://docs.openflowkit.com">Docs</a>
-          <a href="https://github.com/Vrun-design/openflowkit">GitHub</a>
-          <a href="https://app.openflowkit.com" class="btn-primary nav-cta">Open App</a>
-        </div>
-      </div>
-    </nav>
-
-    <main>
-      <slot />
-    </main>
-
-    <footer>
-      <div class="container footer-inner">
-        <span>© {new Date().getFullYear()} OpenFlowKit — MIT License</span>
-        <div class="footer-links">
-          <a href="https://docs.openflowkit.com">Docs</a>
-          <a href="https://github.com/Vrun-design/openflowkit">GitHub</a>
-          <a href="https://docs.openflowkit.com/introduction">About</a>
-        </div>
-      </div>
-    </footer>
+    <slot />
   </body>
 </html>
