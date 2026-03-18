@@ -10,7 +10,9 @@ import {
     WandSparkles,
     Workflow,
 } from 'lucide-react';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { useFlowStore } from '@/store';
+import { APP_NAME } from '@/lib/brand';
 import type { CommandItem, CommandBarProps } from './types';
 import { AssetsIcon } from '../icons/AssetsIcon';
 
@@ -21,6 +23,7 @@ interface UseCommandBarCommandsParams {
     onOpenStudioAI?: CommandBarProps['onOpenStudioAI'];
     onOpenStudioFlowMind?: CommandBarProps['onOpenStudioFlowMind'];
     onOpenStudioMermaid?: CommandBarProps['onOpenStudioMermaid'];
+    onOpenStudioPlayback?: CommandBarProps['onOpenStudioPlayback'];
 }
 
 export function useCommandBarCommands({
@@ -30,6 +33,7 @@ export function useCommandBarCommands({
     onOpenStudioAI,
     onOpenStudioFlowMind,
     onOpenStudioMermaid,
+    onOpenStudioPlayback,
 }: UseCommandBarCommandsParams): CommandItem[] {
     return useMemo(() => {
         return [
@@ -42,11 +46,11 @@ export function useCommandBarCommands({
                 action: onOpenStudioAI,
             },
             {
-                id: 'studio-flowmind',
+                id: 'studio-openflow',
                 label: 'Edit Flow DSL',
                 icon: <FileCode className="w-4 h-4 text-emerald-500" />,
                 type: 'action',
-                description: `Open ${useFlowStore.getState().brandConfig.appName} DSL in Studio`,
+                description: `Open ${APP_NAME} DSL in Studio`,
                 action: onOpenStudioFlowMind,
             },
             {
@@ -57,6 +61,16 @@ export function useCommandBarCommands({
                 description: 'Open Mermaid editing in Studio',
                 action: onOpenStudioMermaid,
             },
+            ...(ROLLOUT_FLAGS.playbackStudioV1
+                ? [{
+                    id: 'studio-playback',
+                    label: 'Open Playback Studio',
+                    icon: <Workflow className="w-4 h-4 text-violet-500" />,
+                    type: 'action' as const,
+                    description: 'Author scenes, timeline order, and playback preview',
+                    action: onOpenStudioPlayback,
+                }]
+                : []),
             {
                 id: 'assets',
                 label: 'Assets',
@@ -153,5 +167,5 @@ export function useCommandBarCommands({
                 description: 'Manage themes & styles',
             },
         ];
-    }, [onOpenStudioAI, onOpenStudioFlowMind, onOpenStudioMermaid, settings, onUndo, onRedo]);
+    }, [onOpenStudioAI, onOpenStudioFlowMind, onOpenStudioMermaid, onOpenStudioPlayback, settings, onUndo, onRedo]);
 }

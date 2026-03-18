@@ -21,6 +21,7 @@ interface BuildFlowEditorPanelsPropsParams {
     handleInsertTemplate: (template: FlowTemplate) => void;
     openStudioAI: () => void;
     openStudioCode: (codeMode: StudioCodeMode) => void;
+    openStudioPlayback: () => void;
     commandBarView: CommandBarView;
     handleAddAnnotation: () => void;
     handleAddSection: () => void;
@@ -69,6 +70,7 @@ interface BuildFlowEditorPanelsPropsParams {
     setStudioTab: (tab: StudioTab) => void;
     studioCodeMode: StudioCodeMode;
     setStudioCodeMode: (mode: StudioCodeMode) => void;
+    playback: FlowEditorPanelsProps['studio']['playback'];
     editorMode: FlowEditorMode;
 }
 
@@ -83,6 +85,7 @@ export function buildFlowEditorPanelsProps({
     handleInsertTemplate,
     openStudioAI,
     openStudioCode,
+    openStudioPlayback,
     commandBarView,
     handleAddAnnotation,
     handleAddSection,
@@ -131,6 +134,7 @@ export function buildFlowEditorPanelsProps({
     setStudioTab,
     studioCodeMode,
     setStudioCodeMode,
+    playback,
     editorMode,
 }: BuildFlowEditorPanelsPropsParams): FlowEditorPanelsProps {
     return {
@@ -144,8 +148,9 @@ export function buildFlowEditorPanelsProps({
             onLayout,
             onSelectTemplate: handleInsertTemplate,
             onOpenStudioAI: openStudioAI,
-            onOpenStudioFlowMind: () => openStudioCode('flowmind'),
+            onOpenStudioFlowMind: () => openStudioCode('openflow'),
             onOpenStudioMermaid: () => openStudioCode('mermaid'),
+            onOpenStudioPlayback: openStudioPlayback,
             initialView: commandBarView,
             onAddAnnotation: handleAddAnnotation,
             onAddSection: handleAddSection,
@@ -201,6 +206,7 @@ export function buildFlowEditorPanelsProps({
             onTabChange: setStudioTab,
             codeMode: studioCodeMode,
             onCodeModeChange: setStudioCodeMode,
+            playback,
         },
         isHistoryOpen,
         editorMode,

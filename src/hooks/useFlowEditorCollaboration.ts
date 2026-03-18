@@ -126,7 +126,11 @@ export function useFlowEditorCollaboration({
 
         const params = new URLSearchParams(location.search);
         params.set(COLLAB_ROOM_QUERY_PARAM, collaborationRoomId);
-        params.set(COLLAB_SECRET_QUERY_PARAM, collaborationRoomSecret);
+        if (collaborationRoomSecret !== collaborationRoomId) {
+            params.set(COLLAB_SECRET_QUERY_PARAM, collaborationRoomSecret);
+        } else {
+            params.delete(COLLAB_SECRET_QUERY_PARAM);
+        }
         navigate(
             {
                 pathname: location.pathname,

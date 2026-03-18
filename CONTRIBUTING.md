@@ -59,3 +59,68 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit the first line to 72 characters or less
 - Reference issues and pull requests liberally after the first line
+
+---
+
+## Developer Setup
+
+```bash
+# Install dependencies (also activates husky pre-commit hooks)
+npm install
+
+# Start dev server
+npm run dev          # http://localhost:5173
+
+# Run unit + integration tests (Vitest)
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Run E2E tests (requires dev server already running)
+npm run e2e
+
+# Lint
+npm run lint
+```
+
+### Pre-commit hooks
+
+Husky runs `lint-staged` on every commit. It lints changed `.ts` / `.tsx` files with ESLint. Fix all errors before pushing — the CI gate runs the same check.
+
+---
+
+## Code Guidelines
+
+- **TypeScript everywhere** — avoid `any`; if you must use it, add a comment explaining why.
+- **React 19 Compiler** rules: `useMemo` / `useCallback` dependencies must be stable store references, not inline-constructed objects.
+- **Component size**: aim for ≤ 250 lines per component. Larger components should be split (see `ARCHITECTURE.md` for how `CustomNode` was decomposed).
+- **No new runtime dependencies** without opening an issue and getting agreement first.
+
+---
+
+## Rollout Flags
+
+Gate new features behind a flag in `src/config/rolloutFlags.ts`:
+
+```ts
+export type RolloutFlagKey = 'myFeature' | /* … */;
+
+export const ROLLOUT_FLAGS = {
+  myFeature: import.meta.env.VITE_ROLLOUT_MY_FEATURE === 'true',
+};
+```
+
+Remove the flag and its dead branches once the feature is fully promoted.
+
+---
+
+## Storage Key Warning
+
+Persistence keys (`flowmind_snapshots`, `flowmind-clipboard`, etc.) use a legacy prefix. **Do not rename them** without a migration path — renaming silently erases existing user browser data.
+
+---
+
+## Architecture Reference
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for a full breakdown of the store slices, hook hierarchy, node system, DSL, and export pipeline.

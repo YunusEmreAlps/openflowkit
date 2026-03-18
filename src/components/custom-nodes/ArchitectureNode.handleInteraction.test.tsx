@@ -7,6 +7,7 @@ import ArchitectureNode from './ArchitectureNode';
 vi.mock('@/config/rolloutFlags', () => ({
   ROLLOUT_FLAGS: {
     visualQualityV2: true,
+    shapeLibraryV1: false,
   },
 }));
 

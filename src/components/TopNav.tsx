@@ -7,7 +7,7 @@ import { TopNavMenu } from './top-nav/TopNavMenu';
 import { TopNavBrand } from './top-nav/TopNavBrand';
 import { TopNavActions } from './top-nav/TopNavActions';
 import { useTopNavState } from './top-nav/useTopNavState';
-import { useBrandButtonStyle, useBrandConfig } from '@/store/brandHooks';
+import { APP_NAME, IS_BEVELED } from '@/lib/brand';
 
 const LazySettingsModal = lazy(async () => {
     const module = await import('./SettingsModal/SettingsModal');
@@ -24,6 +24,7 @@ interface TopNavProps {
 
     // Actions
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
     onExportPlantUML: () => void;
@@ -72,6 +73,7 @@ export function TopNav({
     onCloseTab,
     onRenameTab,
     onExportPNG,
+    onExportAnimated,
     onExportJSON,
     onExportMermaid,
     onExportPlantUML,
@@ -83,9 +85,12 @@ export function TopNav({
     onPlay,
     collaboration,
 }: TopNavProps): React.ReactElement {
-    const brandConfig = useBrandConfig();
-    const isBeveled = useBrandButtonStyle() === 'beveled';
+    const isBeveled = IS_BEVELED;
     const handleExportPNG = trackAndRunExport(onExportPNG);
+    const handleExportAnimated = (format: 'video' | 'gif') => {
+        trackEvent('export_animated', { format });
+        onExportAnimated(format);
+    };
     const handleExportJSON = trackAndRun('export_json', onExportJSON);
     const handleExportMermaid = trackAndRun('export_mermaid', onExportMermaid);
     const handleExportPlantUML = trackAndRun('export_plantuml', onExportPlantUML);
@@ -116,10 +121,10 @@ export function TopNav({
                     onImportJSON={onImportJSON}
                 />
                 <TopNavBrand
-                    appName={brandConfig.appName}
-                    logoUrl={brandConfig.logoUrl}
-                    logoStyle={brandConfig.logoStyle}
-                    ui={brandConfig.ui}
+                    appName={APP_NAME}
+                    logoUrl={null}
+                    logoStyle={'text'}
+                    ui={{ showBeta: true }}
                 />
             </div>
 
@@ -140,6 +145,7 @@ export function TopNav({
             <TopNavActions
                 onPlay={onPlay}
                 onExportPNG={handleExportPNG}
+                onExportAnimated={handleExportAnimated}
                 onExportJSON={handleExportJSON}
                 onExportMermaid={handleExportMermaid}
                 onExportPlantUML={handleExportPlantUML}

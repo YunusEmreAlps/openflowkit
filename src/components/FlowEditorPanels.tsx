@@ -46,6 +46,7 @@ export interface CommandBarPanelProps {
     onOpenStudioAI: () => void;
     onOpenStudioFlowMind: () => void;
     onOpenStudioMermaid: () => void;
+    onOpenStudioPlayback: () => void;
     initialView: CommandBarView;
     onAddAnnotation: () => void;
     onAddSection: () => void;
@@ -104,6 +105,19 @@ export interface StudioRailProps {
     onTabChange: (tab: StudioTab) => void;
     codeMode: StudioCodeMode;
     onCodeModeChange: (mode: StudioCodeMode) => void;
+    playback: {
+        currentStepIndex: number;
+        totalSteps: number;
+        isPlaying: boolean;
+        onStartPlayback: () => void;
+        onPlayPause: () => void;
+        onStop: () => void;
+        onScrubToStep: (index: number) => void;
+        onNext: () => void;
+        onPrev: () => void;
+        playbackSpeed: number;
+        onPlaybackSpeedChange: (durationMs: number) => void;
+    };
 }
 
 export interface FlowEditorPanelsProps {
@@ -140,6 +154,7 @@ export function FlowEditorPanels({
                 onTabChange={studio.onTabChange}
                 codeMode={studio.codeMode}
                 onCodeModeChange={studio.onCodeModeChange}
+                playback={studio.playback}
             />
         </Suspense>
     ) : showPropertiesRail ? (
@@ -182,6 +197,7 @@ export function FlowEditorPanels({
                             onOpenStudioAI={commandBar.onOpenStudioAI}
                             onOpenStudioFlowMind={commandBar.onOpenStudioFlowMind}
                             onOpenStudioMermaid={commandBar.onOpenStudioMermaid}
+                            onOpenStudioPlayback={commandBar.onOpenStudioPlayback}
                             initialView={commandBar.initialView}
                             onAddAnnotation={commandBar.onAddAnnotation}
                             onAddSection={commandBar.onAddSection}

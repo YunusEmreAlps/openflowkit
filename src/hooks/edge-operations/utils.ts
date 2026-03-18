@@ -289,6 +289,14 @@ export function resolveConnectEndAction({
     }
 
     const sourceNode = nodes.find((node) => node.id === sourceId);
+    if (sourceNode?.data?.assetPresentation === 'icon') {
+        return {
+            type: 'menu',
+            clientPosition,
+            sourceType: sourceNode.type ?? null,
+        };
+    }
+
     if (canvasInteractionsV1Enabled || shouldBypassConnectMenu(sourceNode?.type)) {
         const defaultConnectedNode = getDefaultConnectedNodeSpec(sourceNode?.type);
         return {

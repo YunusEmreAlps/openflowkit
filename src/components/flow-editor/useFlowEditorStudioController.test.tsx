@@ -5,6 +5,7 @@ import { useFlowEditorStudioController } from './useFlowEditorStudioController';
 function createBaseProps(overrides: Partial<Parameters<typeof useFlowEditorStudioController>[0]> = {}) {
     return {
         editorMode: 'canvas' as const,
+        studioTab: 'ai' as const,
         selectedNodeId: null,
         selectedEdgeId: null,
         setStudioTab: vi.fn(),
@@ -46,6 +47,19 @@ describe('useFlowEditorStudioController', () => {
         expect(props.closeCommandBar).toHaveBeenCalled();
     });
 
+    it('opens the playback studio panel and closes the launcher', () => {
+        const props = createBaseProps();
+        const { result } = renderHook(() => useFlowEditorStudioController(props));
+
+        act(() => {
+            result.current.openStudioPlayback();
+        });
+
+        expect(props.setStudioTab).toHaveBeenCalledWith('playback');
+        expect(props.setStudioMode).toHaveBeenCalled();
+        expect(props.closeCommandBar).toHaveBeenCalled();
+    });
+
     it('toggles studio closed by clearing selection and returning to canvas mode', () => {
         const props = createBaseProps({
             editorMode: 'studio',
@@ -79,6 +93,7 @@ describe('useFlowEditorStudioController', () => {
         rerender({
             ...initialProps,
             editorMode: 'studio',
+            studioTab: 'ai',
             selectedNodeId: 'node-2',
         });
 

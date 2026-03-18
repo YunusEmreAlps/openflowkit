@@ -2,10 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { createStarterTemplateRegistry, STARTER_TEMPLATE_MANIFESTS } from './starterTemplates';
 
 describe('starter template manifests', () => {
-    it('includes flowchart and architecture starter templates', () => {
+    it('includes the curated 20-template starter catalog', () => {
         const ids = STARTER_TEMPLATE_MANIFESTS.map((template) => template.id);
 
-        expect(ids).toEqual(['starter-flowchart-checkout', 'starter-architecture-api']);
+        expect(ids).toHaveLength(20);
+        expect(ids).toContain('aws-event-api');
+        expect(ids).toContain('azure-ai-platform');
+        expect(ids).toContain('cncf-gitops');
+        expect(ids).toContain('mindmap-product-discovery');
+        expect(ids).toContain('wireframe-saas-starter');
     });
 
     it('has deterministic graph integrity for every starter template', () => {
@@ -26,8 +31,9 @@ describe('starter template manifests', () => {
     it('is consumable by template registry scaffold', () => {
         const registry = createStarterTemplateRegistry();
 
-        expect(registry.listTemplates()).toHaveLength(2);
-        expect(registry.getTemplate('starter-flowchart-checkout')?.graph.nodes).toHaveLength(5);
-        expect(registry.getTemplate('starter-architecture-api')?.graph.nodes).toHaveLength(4);
+        expect(registry.listTemplates()).toHaveLength(20);
+        expect(registry.getTemplate('flow-subscription-upgrade')?.graph.nodes).toHaveLength(7);
+        expect(registry.getTemplate('aws-event-api')?.graph.nodes).toHaveLength(7);
+        expect(registry.getTemplate('mindmap-product-discovery')?.graph.nodes).toHaveLength(9);
     });
 });

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Ban, Upload } from 'lucide-react';
 import { ICON_NAMES, ICON_PICKER_PRIORITY_NAMES, NamedIcon } from '../IconMap';
+import { Tooltip } from '../Tooltip';
 
 interface IconPickerProps {
     selectedIcon?: string;
@@ -45,36 +46,39 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
             <div className="grid grid-cols-6 gap-2 p-2 bg-[var(--brand-background)] rounded-[var(--brand-radius)] border border-slate-200 max-h-40 overflow-y-auto custom-scrollbar">
                 {/* No Icon Option */}
-                <button
-                    onClick={() => onChange('none')}
-                    className={`
-                        p-2 rounded-lg flex items-center justify-center transition-all
-                        ${selectedIcon === 'none'
-                            ? 'bg-red-100 text-red-600 ring-1 ring-red-400'
-                            : 'hover:bg-white hover:shadow-sm text-slate-400'
-                        }
-                    `}
-                    title="No Icon"
-                >
-                    <Ban className="w-5 h-5" />
-                </button>
+                <Tooltip text="No Icon">
+                    <button
+                        onClick={() => onChange('none')}
+                        className={`
+                            p-2 rounded-lg flex items-center justify-center transition-all
+                            ${selectedIcon === 'none'
+                                ? 'bg-red-100 text-red-600 ring-1 ring-red-400'
+                                : 'hover:bg-white hover:shadow-sm text-slate-400'
+                            }
+                        `}
+                        aria-label="No Icon"
+                    >
+                        <Ban className="w-5 h-5" />
+                    </button>
+                </Tooltip>
 
                 {filteredIcons.map((key) => {
                     return (
-                        <button
-                            key={key}
-                            onClick={() => onChange(key)}
-                            className={`
-                                p-2 rounded-lg flex items-center justify-center transition-all
-                                ${selectedIcon === key
-                                    ? 'bg-[var(--brand-primary-100)] text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary-400)]'
-                                    : 'hover:bg-[var(--brand-surface)] hover:shadow-sm text-[var(--brand-secondary)]'
-                                }
-                            `}
-                            title={key}
-                        >
-                            <NamedIcon name={key} className="w-5 h-5" />
-                        </button>
+                        <Tooltip key={key} text={key}>
+                            <button
+                                onClick={() => onChange(key)}
+                                className={`
+                                    p-2 rounded-lg flex items-center justify-center transition-all
+                                    ${selectedIcon === key
+                                        ? 'bg-[var(--brand-primary-100)] text-[var(--brand-primary)] ring-1 ring-[var(--brand-primary-400)]'
+                                        : 'hover:bg-[var(--brand-surface)] hover:shadow-sm text-[var(--brand-secondary)]'
+                                    }
+                                `}
+                                aria-label={key}
+                            >
+                                <NamedIcon name={key} className="w-5 h-5" />
+                            </button>
+                        </Tooltip>
                     );
                 })}
             </div>

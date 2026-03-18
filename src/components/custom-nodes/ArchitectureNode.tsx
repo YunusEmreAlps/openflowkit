@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import type { LegacyNodeProps } from '@/lib/reactflowCompat';
 import type { NodeData } from '@/lib/types';
 import { useInlineNodeTextEdit } from '@/hooks/useInlineNodeTextEdit';
@@ -6,6 +6,8 @@ import { InlineTextEditSurface } from '@/components/InlineTextEditSurface';
 import { NodeChrome } from '@/components/NodeChrome';
 import { getTransformDiagnosticsAttrs } from '@/components/transformDiagnostics';
 import { resolveNodeVisualStyle } from '@/theme';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
+import { loadProviderShapePreview } from '@/services/shapeLibrary/providerCatalog';
 
 function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): React.ReactElement {
   const labelEdit = useInlineNodeTextEdit(id, 'label', data.label || '');
@@ -21,6 +23,35 @@ function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): Re
     junction: '◆',
     service: '▣',
   }[resourceType] ?? '▣';
+  const packId = typeof data.archIconPackId === 'string' ? data.archIconPackId : undefined;
+  const shapeId = typeof data.archIconShapeId === 'string' ? data.archIconShapeId : undefined;
+  const previewKey = packId && shapeId ? `${packId}:${shapeId}` : null;
+  const [providerPreviewState, setProviderPreviewState] = useState<{ key: string | null; url: string | null }>({ key: null, url: null });
+  const providerPreviewUrl = providerPreviewState.key === previewKey ? providerPreviewState.url : null;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!ROLLOUT_FLAGS.shapeLibraryV1 || !packId || !shapeId || !previewKey) {
+      return;
+    }
+
+    loadProviderShapePreview(packId, shapeId)
+      .then((preview) => {
+        if (!cancelled) {
+          setProviderPreviewState({ key: previewKey, url: preview?.previewUrl ?? null });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setProviderPreviewState({ key: previewKey, url: null });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [packId, previewKey, shapeId]);
 
   return (
     <NodeChrome
@@ -53,7 +84,11 @@ function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): Re
               color: visualStyle.iconColor,
             }}
           >
-            <span>{resourceIcon}</span>
+            {providerPreviewUrl ? (
+              <img src={providerPreviewUrl} alt="" className="h-3.5 w-3.5 object-contain" loading="lazy" />
+            ) : (
+              <span>{resourceIcon}</span>
+            )}
             <span>{provider}</span>
           </span>
           <span className="font-semibold" style={{ color: visualStyle.subText }}>{resourceType}</span>

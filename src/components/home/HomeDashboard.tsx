@@ -98,7 +98,7 @@ export function HomeDashboard({
                             </div>
                             <div className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3">
                                 <p className="text-xs font-semibold text-slate-900">Autosave by default</p>
-                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Everything stays in this browser until you export or share it.</p>
+                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Diagram data stays local in this browser unless you export or open a collaboration room.</p>
                             </div>
                         </div>
                     </div>
@@ -128,7 +128,6 @@ export function HomeDashboard({
                                             }}
                                             className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                                             aria-label={t('common.rename', 'Rename')}
-                                            title={t('common.rename', 'Rename')}
                                         >
                                             <Pencil className="h-3 w-3" />
                                         </button>
@@ -140,7 +139,6 @@ export function HomeDashboard({
                                             }}
                                             className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                                             aria-label={t('common.duplicate', 'Duplicate')}
-                                            title={t('common.duplicate', 'Duplicate')}
                                         >
                                             <Copy className="h-3 w-3" />
                                         </button>
@@ -152,7 +150,6 @@ export function HomeDashboard({
                                             }}
                                             className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                                             aria-label={t('common.delete', 'Delete')}
-                                            title={t('common.delete', 'Delete')}
                                         >
                                             <Trash2 className="h-3 w-3" />
                                         </button>
@@ -177,7 +174,7 @@ export function HomeDashboard({
                 )}
 
                 <p className="mt-6 text-xs text-slate-400">
-                    {t('home.localStorageHint', 'Autosaved in this browser on this device. Export JSON or DSL when you want a portable backup or handoff.')}
+                    {t('home.localStorageHint', 'Autosaved on this device. We do not upload your diagram data to our servers.')}
                 </p>
             </section>
         </div>

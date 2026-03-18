@@ -5,6 +5,9 @@ import type { FlowEdge, NodeData } from '@/lib/types';
 import { createMindmapEdge, DEFAULT_EDGE_OPTIONS } from '../constants';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../lib/analytics';
+import type { DomainLibraryItem } from '@/services/domainLibrary';
+import { createDomainLibraryNode } from '@/services/domainLibrary';
+import { createId } from '@/lib/id';
 import { assignSmartHandlesWithOptions, getSmartRoutingOptionsFromViewSettings } from '../services/smartEdgeRouting';
 import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { getPointerClientPosition, isPaneTarget, normalizeConnectionFromDragStart } from './edgeConnectInteractions';
@@ -196,6 +199,33 @@ export const useEdgeOperations = (
         }
     }, [recordHistory, setEdges, setNodes, setSelectedNodeId, t]);
 
+    const handleAddDomainLibraryItemAndConnect = useCallback((item: DomainLibraryItem, position: { x: number; y: number }, sourceId: string, sourceHandle: string | null) => {
+        recordHistory();
+        const state = useFlowStore.getState();
+        const sourceNode = state.nodes.find((node) => node.id === sourceId);
+        const id = createId('lib');
+        const newNode = createDomainLibraryNode(item, id, position, state.activeLayerId);
+        const { viewSettings } = state;
+
+        setNodes((nds) => nds.concat(newNode));
+        setEdges((eds) => {
+            const resolvedSourceHandle = normalizeNodeHandleId(sourceNode, sourceHandle) ?? null;
+            const resolvedTargetHandle = !viewSettings.smartRoutingEnabled && resolvedSourceHandle
+                ? getOppositeTargetHandle(newNode, resolvedSourceHandle)
+                : null;
+            const insertedEdges = eds.concat(buildConnectedEdge(sourceId, id, resolvedSourceHandle, resolvedTargetHandle));
+            if (!viewSettings.smartRoutingEnabled) {
+                return insertedEdges;
+            }
+            return assignSmartHandlesWithOptions(
+                useFlowStore.getState().nodes.concat(newNode),
+                insertedEdges,
+                getSmartRoutingOptionsFromViewSettings(viewSettings)
+            );
+        });
+        setSelectedNodeId(id);
+    }, [recordHistory, setEdges, setNodes, setSelectedNodeId]);
+
     const onConnectEnd = useCallback(
         (event: unknown) => {
             if (!connectingNodeId.current) return;
@@ -251,6 +281,7 @@ export const useEdgeOperations = (
         onConnectStart,
         onConnectEnd,
         onReconnect,
-        handleAddAndConnect
+        handleAddAndConnect,
+        handleAddDomainLibraryItemAndConnect,
     };
 };

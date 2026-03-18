@@ -1,11 +1,10 @@
 import { INITIAL_EDGES, INITIAL_NODES } from '@/constants';
 import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
+import { clonePlaybackState, sanitizePlaybackState } from '@/services/playback/model';
 import type { FlowTab } from '@/lib/types';
 import { isDiagramType } from '@/lib/types';
 import {
     DEFAULT_AI_SETTINGS,
-    DEFAULT_BRAND_CONFIG,
-    DEFAULT_BRAND_KIT,
     DEFAULT_DESIGN_SYSTEM,
     INITIAL_GLOBAL_EDGE_OPTIONS,
     INITIAL_LAYERS,
@@ -22,9 +21,6 @@ export type PersistedFlowStateSlice = Pick<
     | 'viewSettings'
     | 'globalEdgeOptions'
     | 'aiSettings'
-    | 'brandConfig'
-    | 'brandKits'
-    | 'activeBrandKitId'
     | 'layers'
     | 'activeLayerId'
 >;
@@ -37,6 +33,7 @@ function createFallbackTab(): FlowTab {
         updatedAt: new Date().toISOString(),
         nodes: INITIAL_NODES,
         edges: INITIAL_EDGES,
+        playback: undefined,
         history: { past: [], future: [] },
     };
 }
@@ -66,6 +63,7 @@ export function sanitizePersistedTab(tab: FlowTab): FlowTab {
         ...tab,
         nodes: tab.nodes.map(sanitizePersistedNode),
         edges: tab.edges.map(sanitizePersistedEdge),
+        playback: clonePlaybackState(tab.playback),
         history: {
             past: tab.history.past.map((entry) => ({
                 nodes: entry.nodes.map(sanitizePersistedNode),
@@ -107,6 +105,7 @@ export function normalizePersistedTab(rawTab: unknown): FlowTab | null {
         updatedAt: typeof tab.updatedAt === 'string' ? tab.updatedAt : new Date().toISOString(),
         nodes: Array.isArray(tab.nodes) ? tab.nodes : [],
         edges: Array.isArray(tab.edges) ? tab.edges : [],
+        playback: sanitizePlaybackState(tab.playback),
         history: {
             past: Array.isArray(tab.history?.past) ? tab.history.past : [],
             future: Array.isArray(tab.history?.future) ? tab.history.future : [],
@@ -177,9 +176,6 @@ export function partializePersistedFlowState(state: FlowState): PersistedFlowSta
         viewSettings: state.viewSettings,
         globalEdgeOptions: state.globalEdgeOptions,
         aiSettings: state.aiSettings,
-        brandConfig: state.brandConfig,
-        brandKits: state.brandKits,
-        activeBrandKitId: state.activeBrandKitId,
         layers: state.layers,
         activeLayerId: state.activeLayerId,
     };
@@ -196,9 +192,6 @@ export function createInitialFlowState(): Pick<
     | 'viewSettings'
     | 'globalEdgeOptions'
     | 'aiSettings'
-    | 'brandConfig'
-    | 'brandKits'
-    | 'activeBrandKitId'
     | 'layers'
     | 'activeLayerId'
     | 'selectedNodeId'
@@ -216,9 +209,6 @@ export function createInitialFlowState(): Pick<
         viewSettings: INITIAL_VIEW_SETTINGS,
         globalEdgeOptions: INITIAL_GLOBAL_EDGE_OPTIONS,
         aiSettings: DEFAULT_AI_SETTINGS,
-        brandConfig: DEFAULT_BRAND_CONFIG,
-        brandKits: [DEFAULT_BRAND_KIT],
-        activeBrandKitId: 'default',
         layers: INITIAL_LAYERS,
         activeLayerId: 'default',
         selectedNodeId: null,

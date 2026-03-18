@@ -64,13 +64,13 @@ export function useStudioCodePanelController({
     const [isApplying, setIsApplying] = useState(false);
     const [draftCodeByMode, setDraftCodeByMode] = useState<Partial<Record<StudioCodeMode, string>>>({});
     const [lastAppliedCode, setLastAppliedCode] = useState<Record<StudioCodeMode, string>>({
-        flowmind: '',
+        openflow: '',
         mermaid: '',
     });
 
     const generatedFlowMind = useMemo(() => toOpenFlowDSL(nodes, edges), [nodes, edges]);
     const generatedMermaid = useMemo(() => toMermaid(nodes, edges), [nodes, edges]);
-    const generatedCode = mode === 'flowmind' ? generatedFlowMind : generatedMermaid;
+    const generatedCode = mode === 'openflow' ? generatedFlowMind : generatedMermaid;
     const code = draftCodeByMode[mode] ?? generatedCode;
 
     const draftPreview = useMemo<DraftPreview>(() => {

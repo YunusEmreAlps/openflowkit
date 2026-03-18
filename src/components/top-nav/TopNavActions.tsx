@@ -28,6 +28,7 @@ interface CollaborationState {
 interface TopNavActionsProps {
     onPlay: () => void;
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
     onExportPlantUML: () => void;
@@ -92,6 +93,7 @@ function getCollaborationStatusDotClass(status: CollaborationState['status']): s
 export function TopNavActions({
     onPlay,
     onExportPNG,
+    onExportAnimated,
     onExportJSON,
     onExportMermaid,
     onExportPlantUML,
@@ -140,6 +142,7 @@ export function TopNavActions({
                                 variant="icon"
                                 size="icon"
                                 onClick={() => setIsShareModalOpen(true)}
+                                data-testid="topnav-share"
                                 className={`h-8 w-8 ml-1 rounded-[var(--radius-md)] border text-slate-600 transition-all ${isBeveled
                                     ? 'btn-beveled-secondary'
                                     : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm hover:shadow'
@@ -164,6 +167,7 @@ export function TopNavActions({
 
                 <ExportMenu
                     onExportPNG={onExportPNG}
+                    onExportAnimated={onExportAnimated}
                     onExportJSON={onExportJSON}
                     onExportMermaid={onExportMermaid}
                     onExportPlantUML={onExportPlantUML}
@@ -179,7 +183,6 @@ export function TopNavActions({
                         onClose={() => setIsShareModalOpen(false)}
                         onCopyInvite={collaboration.onCopyShareLink}
                         roomId={collaboration.roomId}
-                        cacheState={collaboration.cacheState}
                         status={collaboration.status}
                         viewerCount={viewerCount}
                     />

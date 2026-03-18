@@ -5,17 +5,16 @@ import {
 } from './domainLibrary';
 
 describe('domainLibrary', () => {
-    it('contains all required categories', () => {
+    it('contains the generic non-provider categories used by the static library', () => {
         const categories = new Set(DOMAIN_LIBRARY_ITEMS.map((item) => item.category));
-        expect(categories.has('aws')).toBe(true);
         expect(categories.has('azure')).toBe(true);
         expect(categories.has('gcp')).toBe(true);
-        expect(categories.has('kubernetes')).toBe(true);
+        expect(categories.has('cncf')).toBe(true);
         expect(categories.has('network')).toBe(true);
         expect(categories.has('security')).toBe(true);
     });
 
-    it('creates process nodes from library items', () => {
+    it('creates process nodes from generic library items', () => {
         const item = DOMAIN_LIBRARY_ITEMS.find((entry) => entry.id === 'sec-firewall');
         expect(item).toBeDefined();
         const node = createDomainLibraryNode(
@@ -28,5 +27,30 @@ describe('domainLibrary', () => {
         expect(node.data.label).toBe('Firewall');
         expect(node.data.color).toBe('red');
         expect(node.data.layerId).toBe('default');
+    });
+
+    it('creates icon-first custom nodes for provider svg assets', () => {
+        const node = createDomainLibraryNode(
+            {
+                id: 'aws-official-starter-v1:analytics-athena',
+                category: 'aws',
+                label: 'Analytics Athena',
+                description: 'AWS Analytics',
+                icon: 'Box',
+                color: 'amber',
+                nodeType: 'custom',
+                assetPresentation: 'icon',
+                previewUrl: '/mock/athena.svg',
+                archIconPackId: 'aws-official-starter-v1',
+                archIconShapeId: 'analytics-athena',
+            },
+            'lib-2',
+            { x: 120, y: 200 },
+            'default'
+        );
+
+        expect(node.type).toBe('custom');
+        expect(node.data.assetPresentation).toBe('icon');
+        expect(node.data.customIconUrl).toBe('/mock/athena.svg');
     });
 });

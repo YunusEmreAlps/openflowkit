@@ -20,7 +20,7 @@ interface ApplyOptions {
 }
 
 interface ApplyCodeChangesParams {
-  mode: 'mermaid' | 'flowmind';
+  mode: 'mermaid' | 'openflow';
   code: string;
   architectureStrictMode: boolean;
   onApply: (nodes: FlowNode[], edges: FlowEdge[]) => void;

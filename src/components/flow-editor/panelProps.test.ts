@@ -45,6 +45,7 @@ describe('buildFlowEditorPanelsProps', () => {
       handleInsertTemplate: vi.fn(),
       openStudioAI: vi.fn(),
       openStudioCode,
+      openStudioPlayback: vi.fn(),
       commandBarView: 'assets',
       handleAddAnnotation: vi.fn(),
       handleAddSection: vi.fn(),
@@ -91,8 +92,21 @@ describe('buildFlowEditorPanelsProps', () => {
       clearChat: vi.fn(),
       studioTab: 'ai',
       setStudioTab: vi.fn(),
-      studioCodeMode: 'flowmind',
+      studioCodeMode: 'openflow',
       setStudioCodeMode: vi.fn(),
+      playback: {
+        currentStepIndex: -1,
+        totalSteps: 0,
+        isPlaying: false,
+        onStartPlayback: vi.fn(),
+        onPlayPause: vi.fn(),
+        onStop: vi.fn(),
+        onScrubToStep: vi.fn(),
+        onNext: vi.fn(),
+        onPrev: vi.fn(),
+        playbackSpeed: 2000,
+        onPlaybackSpeedChange: vi.fn(),
+      },
       editorMode: 'studio',
     });
 
@@ -102,7 +116,7 @@ describe('buildFlowEditorPanelsProps', () => {
     expect(result.studio.activeTab).toBe('ai');
 
     result.commandBar.onOpenStudioFlowMind();
-    expect(openStudioCode).toHaveBeenCalledWith('flowmind');
+    expect(openStudioCode).toHaveBeenCalledWith('openflow');
 
     result.snapshots.onSaveSnapshot('Snapshot 1');
     expect(saveSnapshot).toHaveBeenCalledWith('Snapshot 1', nodes, edges);

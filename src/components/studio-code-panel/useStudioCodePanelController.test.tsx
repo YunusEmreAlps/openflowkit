@@ -41,7 +41,7 @@ function createBaseProps(overrides: Partial<Parameters<typeof useStudioCodePanel
   return {
     nodes: [],
     edges: [],
-    mode: 'flowmind' as const,
+    mode: 'openflow' as const,
     onApply: vi.fn(),
     onModeChange: vi.fn(),
     activeTabId: 'tab-1',

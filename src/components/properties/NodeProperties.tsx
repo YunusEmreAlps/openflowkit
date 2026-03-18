@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Node } from '@/lib/reactflowCompat';
 import { NodeData } from '@/lib/types';
 import { Box, Palette, Star, Image as ImageStart } from 'lucide-react';
@@ -15,6 +15,13 @@ import { NodeImageSettingsSection } from './NodeImageSettingsSection';
 import { NodeTextStyleSection } from './NodeTextStyleSection';
 import { NodeWireframeVariantSection } from './NodeWireframeVariantSection';
 import { InspectorSectionDivider } from './InspectorPrimitives';
+import { Input } from '../ui/Input';
+import { Tooltip } from '../Tooltip';
+import { Select } from '../ui/Select';
+import type { DomainLibraryCategory, DomainLibraryItem } from '@/services/domainLibrary';
+import { loadProviderCatalog, loadProviderShapePreview } from '@/services/shapeLibrary/providerCatalog';
+import { loadIconAssetCatalog } from '@/services/iconAssetCatalog';
+import { NamedIcon } from '../IconMap';
 
 interface NodePropertiesProps {
     selectedNode: Node<NodeData>;
@@ -35,10 +42,22 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
     const isImage = selectedNode.type === 'image';
     const isSection = selectedNode.type === 'section';
     const isWireframeApp = selectedNode.type === 'browser' || selectedNode.type === 'mobile';
+    const isIconAssetNode = selectedNode.data?.assetPresentation === 'icon';
+    const assetProvider = (selectedNode.data?.assetProvider || '') as DomainLibraryCategory;
     const supportsAdvancedColorTheme = ['process', 'start', 'end', 'decision', 'custom'].includes(selectedNode.type || '');
+    const iconAssetCatalog = useMemo(() => loadIconAssetCatalog(), []);
+    const assetItemsKey = isIconAssetNode && assetProvider ? assetProvider : null;
+    const [assetItemsState, setAssetItemsState] = useState<{ key: string | null; items: DomainLibraryItem[] }>({ key: null, items: [] });
+    const [assetPreviewUrls, setAssetPreviewUrls] = useState<Record<string, string>>({});
+    const [assetSearchState, setAssetSearchState] = useState<{ nodeId: string; query: string; category: string }>({
+        nodeId: selectedNode.id,
+        query: '',
+        category: 'all',
+    });
 
     function getDefaultSection(): string {
         if (isWireframeApp) return 'variant';
+        if (isIconAssetNode) return 'asset';
         if (isSection) return 'content';
         if (isText || isAnnotation) return 'content';
         return 'shape';
@@ -68,6 +87,99 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
 
     const labelEditor = useMarkdownEditor(labelInputRef, (val) => onChange(selectedNode.id, { label: val }), selectedNode.data?.label || '');
     const descEditor = useMarkdownEditor(descInputRef, (val) => onChange(selectedNode.id, { subLabel: val }), selectedNode.data?.subLabel || '');
+
+    useEffect(() => {
+        if (!isIconAssetNode || !assetProvider) {
+            return;
+        }
+
+        if (assetProvider === 'icons') {
+            return;
+        }
+
+        let cancelled = false;
+        loadProviderCatalog(assetProvider)
+            .then((items) => {
+                if (!cancelled) {
+                    setAssetItemsState({ key: assetItemsKey, items });
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setAssetItemsState({ key: assetItemsKey, items: [] });
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [assetItemsKey, assetProvider, isIconAssetNode]);
+
+    const assetItems = useMemo(() => {
+        if (assetItemsKey === 'icons') {
+            return iconAssetCatalog;
+        }
+        return assetItemsState.key === assetItemsKey ? assetItemsState.items : [];
+    }, [assetItemsKey, assetItemsState, iconAssetCatalog]);
+    const assetQuery = assetSearchState.nodeId === selectedNode.id ? assetSearchState.query : '';
+    const assetFilterCategory = assetSearchState.nodeId === selectedNode.id ? assetSearchState.category : 'all';
+
+    const assetCategories = useMemo(() => Array.from(new Set(
+        assetItems
+            .map((item) => item.providerShapeCategory)
+            .filter((value): value is string => Boolean(value))
+    )).sort((left, right) => left.localeCompare(right)), [assetItems]);
+
+    const filteredAssetItems = useMemo(() => {
+        const normalizedQuery = assetQuery.trim().toLowerCase();
+        return assetItems
+            .filter((item) => {
+                if (assetFilterCategory !== 'all' && item.providerShapeCategory !== assetFilterCategory) {
+                    return false;
+                }
+                if (!normalizedQuery) {
+                    return true;
+                }
+                return item.label.toLowerCase().includes(normalizedQuery)
+                    || item.description.toLowerCase().includes(normalizedQuery)
+                    || (item.providerShapeCategory || '').toLowerCase().includes(normalizedQuery);
+            })
+            .slice(0, 24);
+    }, [assetFilterCategory, assetItems, assetQuery]);
+
+    useEffect(() => {
+        if (filteredAssetItems.length === 0) {
+            return;
+        }
+
+        let cancelled = false;
+        Promise.all(filteredAssetItems.map(async (item) => {
+            if (!item.archIconPackId || !item.archIconShapeId || assetPreviewUrls[item.id]) {
+                return null;
+            }
+            const preview = await loadProviderShapePreview(item.archIconPackId, item.archIconShapeId);
+            return preview ? [item.id, preview.previewUrl] as const : null;
+        })).then((entries) => {
+            if (cancelled) {
+                return;
+            }
+            const loadedEntries = entries.filter((entry): entry is readonly [string, string] => entry !== null);
+            if (loadedEntries.length === 0) {
+                return;
+            }
+            setAssetPreviewUrls((current) => {
+                const next = { ...current };
+                loadedEntries.forEach(([itemId, previewUrl]) => {
+                    next[itemId] = previewUrl;
+                });
+                return next;
+            });
+        }).catch(() => undefined);
+
+        return () => {
+            cancelled = true;
+        };
+    }, [assetPreviewUrls, filteredAssetItems]);
 
     const handleStyleAction = (action: 'bold' | 'italic') => {
         if (activeField === 'label') {
@@ -101,7 +213,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
             )}
 
             {/* Shape Section */}
-            {!isWireframeApp && !isAnnotation && !isText && !isImage && !isSection && (
+            {!isWireframeApp && !isAnnotation && !isText && !isImage && !isSection && !isIconAssetNode && (
                 <CollapsibleSection
                     title={t('properties.shape', 'Shape')}
                     icon={<Box className="w-3.5 h-3.5" />}
@@ -123,6 +235,73 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                     onToggle={() => toggleSection('image')}
                     onChange={onChange}
                 />
+            )}
+
+            {isIconAssetNode && (
+                <CollapsibleSection
+                    title="Asset"
+                    icon={<ImageStart className="w-3.5 h-3.5" />}
+                    isOpen={activeSection === 'asset' || activeSection === 'shape'}
+                    onToggle={() => toggleSection('asset')}
+                >
+                    <div className="mt-4 space-y-3">
+                        <Input
+                            value={assetQuery}
+                            onChange={(event) => setAssetSearchState({ nodeId: selectedNode.id, query: event.target.value, category: assetFilterCategory })}
+                            placeholder={`Search ${String(assetProvider || 'asset')} icons`}
+                        />
+                        {assetCategories.length > 1 ? (
+                            <Select
+                                value={assetFilterCategory}
+                                onChange={(value) => setAssetSearchState({ nodeId: selectedNode.id, query: assetQuery, category: value })}
+                                options={[
+                                    { value: 'all', label: 'All categories' },
+                                    ...assetCategories.map((category) => ({ value: category, label: category })),
+                                ]}
+                                placeholder="All categories"
+                            />
+                        ) : null}
+                        <div className="max-h-[20rem] overflow-y-auto pr-1 custom-scrollbar">
+                        <div className="grid grid-cols-6 gap-2">
+                            {filteredAssetItems.map((item) => (
+                                <Tooltip key={item.id} text={item.label}>
+                                    <button
+                                        type="button"
+                                        aria-label={item.label}
+                                        className={`flex aspect-square items-center justify-center rounded-[var(--radius-md)] border p-2 transition-all ${
+                                            selectedNode.data?.archIconShapeId === item.archIconShapeId
+                                                ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-50)]'
+                                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                                        }`}
+                                        onClick={async () => {
+                                            const preview = item.archIconPackId && item.archIconShapeId
+                                                ? await loadProviderShapePreview(item.archIconPackId, item.archIconShapeId)
+                                                : null;
+                                            onChange(selectedNode.id, {
+                                                label: item.label,
+                                                icon: item.icon,
+                                                customIconUrl: preview?.previewUrl,
+                                                archIconPackId: item.archIconPackId,
+                                                archIconShapeId: item.archIconShapeId,
+                                                assetProvider: item.category,
+                                                assetCategory: item.providerShapeCategory,
+                                            });
+                                        }}
+                                    >
+                                        {assetPreviewUrls[item.id] ? (
+                                            <img src={assetPreviewUrls[item.id]} alt="" className="h-10 w-10 object-contain" />
+                                        ) : (
+                                            item.category === 'icons'
+                                                ? <NamedIcon name={item.icon} fallbackName="Box" className="h-5 w-5 text-slate-400" />
+                                                : <ImageStart className="h-5 w-5 text-slate-400" />
+                                        )}
+                                    </button>
+                                </Tooltip>
+                            ))}
+                        </div>
+                        </div>
+                    </div>
+                </CollapsibleSection>
             )}
 
             {/* Content Section: Refined Design */}
@@ -157,7 +336,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                 />
             )}
 
-            {!isImage && !isWireframeApp && (
+            {!isImage && !isWireframeApp && !isIconAssetNode && (
                 <CollapsibleSection
                     title={t('properties.color', 'Color')}
                     icon={<Palette className="w-3.5 h-3.5" />}
@@ -184,7 +363,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                 </CollapsibleSection>
             )}
 
-            {!isAnnotation && !isText && !isImage && !isWireframeApp && (
+            {!isAnnotation && !isText && !isImage && !isWireframeApp && !isIconAssetNode && (
                 <CollapsibleSection
                     title={t('properties.icon', 'Icon')}
                     icon={<Star className="w-3.5 h-3.5" />}
@@ -200,7 +379,7 @@ export const NodeProperties: React.FC<NodePropertiesProps> = ({
                 </CollapsibleSection>
             )}
 
-            {!isText && !isWireframeApp && (
+            {!isText && !isWireframeApp && !isIconAssetNode && (
                 <CollapsibleSection
                     title="Custom Image"
                     icon={<ImageStart className="w-3.5 h-3.5" />}

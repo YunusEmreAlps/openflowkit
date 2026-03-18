@@ -1,9 +1,7 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { useFlowStore } from '../store';
-import { useBrandConfig } from '@/store/brandHooks';
 import { useTabActions, useTabsState } from '@/store/tabHooks';
 import { FlowSnapshot } from '@/lib/types';
-import { WelcomeModal } from './WelcomeModal';
 import { trackEvent } from '../lib/analytics';
 import { HomeDashboard, type HomeFlowCard } from './home/HomeDashboard';
 import { HomeFlowDeleteDialog, HomeFlowRenameDialog } from './home/HomeFlowDialogs';
@@ -33,15 +31,14 @@ export const HomePage: React.FC<HomePageProps> = ({
     activeTab: propActiveTab,
     onSwitchTab
 }) => {
-    const brandConfig = useBrandConfig();
     const { tabs, activeTabId } = useTabsState();
     const { updateTab, closeTab, duplicateTab } = useTabActions();
     const { nodes, edges } = useFlowStore();
     const [internalActiveTab, setInternalActiveTab] = useState<'home' | 'settings'>('home');
-    const [activeSettingsTab, setActiveSettingsTab] = useState<'brand' | 'general' | 'shortcuts' | 'privacy' | 'ai'>('brand');
+    const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'shortcuts' | 'privacy' | 'ai'>('general');
     const [flowPendingRename, setFlowPendingRename] = useState<HomeFlowCard | null>(null);
     const [flowPendingDelete, setFlowPendingDelete] = useState<HomeFlowCard | null>(null);
-    const [showWelcomeModal] = useState(() => shouldShowWelcomeModal());
+    const showWelcomeModal = shouldShowWelcomeModal();
 
     const activeTab = propActiveTab || internalActiveTab;
     const flows: HomeFlowCard[] = tabs.map((tab) => {
@@ -123,7 +120,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     return (
         <div className="min-h-screen bg-[var(--brand-background)] flex text-[var(--brand-text)]">
             <HomeSidebar
-                brandConfig={brandConfig}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
             />

@@ -12,7 +12,6 @@ type InlineTextEditSurfaceProps = {
   inputClassName?: string;
   style?: React.CSSProperties;
   inputStyle?: React.CSSProperties;
-  title?: string;
   inputMode?: 'single-line' | 'multiline';
   isSelected?: boolean;
 };
@@ -35,11 +34,11 @@ export function InlineTextEditSurface({
   inputClassName,
   style,
   inputStyle,
-  title,
   inputMode = 'single-line',
   isSelected = false,
 }: InlineTextEditSurfaceProps): React.ReactElement {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const blurCommitTimerRef = useRef<number | null>(null);
   const pointerDownPositionRef = useRef<{ x: number; y: number } | null>(null);
@@ -65,7 +64,26 @@ export function InlineTextEditSurface({
     if (!isEditing || !isMultiline || !textareaRef.current) return;
     textareaRef.current.style.height = '0px';
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-  }, [draft, isEditing, isMultiline]);
+  }, [isEditing, isMultiline]);
+
+  useLayoutEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+
+    const activeInput = isMultiline ? textareaRef.current : inputRef.current;
+    if (!activeInput) {
+      return;
+    }
+
+    const caretPosition = activeInput.value.length;
+    activeInput.focus();
+    activeInput.setSelectionRange(caretPosition, caretPosition);
+  }, [isEditing, isMultiline]);
+
+  function stopEditingPointerPropagation(event: React.PointerEvent<HTMLInputElement | HTMLTextAreaElement>): void {
+    event.stopPropagation();
+  }
 
   function handleBlur(): void {
     if (blurCommitTimerRef.current !== null) {
@@ -105,9 +123,8 @@ export function InlineTextEditSurface({
   return (
     <div
       ref={rootRef}
-      className={joinClassNames(className, affordanceClasses)}
+      className={joinClassNames(className, affordanceClasses, isEditing ? 'nodrag nopan nowheel' : undefined)}
       style={style}
-      title={title}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={clearPointerIntent}
@@ -133,18 +150,23 @@ export function InlineTextEditSurface({
             onBlur={handleBlur}
             onKeyDown={onKeyDown}
             onMouseDown={(event) => event.stopPropagation()}
-            className={joinClassNames(inputClasses, 'resize-none overflow-hidden')}
+            onPointerDown={stopEditingPointerPropagation}
+            onPointerMove={stopEditingPointerPropagation}
+            className={joinClassNames(inputClasses, 'nodrag nopan nowheel resize-none overflow-hidden')}
             style={inputStyle}
           />
         ) : (
         <input
+          ref={inputRef}
           autoFocus
           value={draft}
           onChange={(event) => onDraftChange(event.target.value)}
           onBlur={handleBlur}
           onKeyDown={onKeyDown}
           onMouseDown={(event) => event.stopPropagation()}
-          className={inputClasses}
+          onPointerDown={stopEditingPointerPropagation}
+          onPointerMove={stopEditingPointerPropagation}
+          className={joinClassNames(inputClasses, 'nodrag nopan nowheel')}
           style={inputStyle}
         />
         )

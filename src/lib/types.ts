@@ -78,6 +78,11 @@ export interface NodeData {
   archBoundaryId?: string;
   archZone?: string;
   archTrustDomain?: string;
+  archIconPackId?: string;
+  archIconShapeId?: string;
+  assetPresentation?: 'icon';
+  assetProvider?: string;
+  assetCategory?: string;
 }
 
 export interface AIRequestParams {
@@ -119,6 +124,7 @@ export interface EdgeData {
     x: number;
     y: number;
   }[];
+  animation?: EdgeAnimationConfig;
 }
 
 export interface GlobalEdgeOptions {
@@ -129,6 +135,37 @@ export interface GlobalEdgeOptions {
 }
 
 export type FlowEdge = LegacyEdge<EdgeData>;
+
+export interface EdgeAnimationConfig {
+  enabled?: boolean;
+  state?: 'idle' | 'active';
+  style?: 'flow';
+  durationMs?: number;
+  dashArray?: string;
+}
+
+export interface PlaybackScene {
+  id: string;
+  name: string;
+  stepIds: string[];
+  mode?: 'auto' | 'manual';
+}
+
+export interface PlaybackTimelineStep {
+  id: string;
+  nodeId: string;
+  durationMs?: number;
+  sceneId?: string;
+  emphasis?: 'focus';
+}
+
+export interface PlaybackState {
+  version: 1;
+  scenes: PlaybackScene[];
+  timeline: PlaybackTimelineStep[];
+  selectedSceneId: string | null;
+  defaultStepDurationMs: number;
+}
 
 export interface GeneratedFlowData {
   nodes: {
@@ -159,6 +196,7 @@ export interface FlowTab {
   updatedAt?: string;
   nodes: FlowNode[];
   edges: FlowEdge[];
+  playback?: PlaybackState;
   history: {
     past: FlowHistoryState[];
     future: FlowHistoryState[];

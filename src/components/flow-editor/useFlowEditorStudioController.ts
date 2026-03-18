@@ -4,6 +4,7 @@ import type { FlowEditorMode, StudioCodeMode, StudioTab } from '@/hooks/useFlowE
 
 interface UseFlowEditorStudioControllerParams {
     editorMode: FlowEditorMode;
+    studioTab: StudioTab;
     selectedNodeId: string | null;
     selectedEdgeId: string | null;
     setStudioTab: (tab: StudioTab) => void;
@@ -24,6 +25,7 @@ interface UseFlowEditorStudioControllerResult {
     openStudioPanel: (tab: StudioTab, options?: OpenStudioPanelOptions) => void;
     openStudioAI: () => void;
     openStudioCode: (codeMode: StudioCodeMode) => void;
+    openStudioPlayback: () => void;
     toggleStudioPanel: () => void;
     closeStudioPanel: () => void;
     handleCanvasEntityIntent: () => void;
@@ -31,6 +33,7 @@ interface UseFlowEditorStudioControllerResult {
 
 export function useFlowEditorStudioController({
     editorMode,
+    studioTab,
     selectedNodeId,
     selectedEdgeId,
     setStudioTab,
@@ -82,6 +85,10 @@ export function useFlowEditorStudioController({
         openStudioPanel('code', { codeMode, closeLauncher: true });
     }, [openStudioPanel]);
 
+    const openStudioPlayback = useCallback(() => {
+        openStudioPanel('playback', { closeLauncher: true });
+    }, [openStudioPanel]);
+
     const toggleStudioPanel = useCallback(() => {
         if (editorMode === 'studio') {
             clearSelectionAndSetCanvasMode();
@@ -106,6 +113,7 @@ export function useFlowEditorStudioController({
     useEffect(() => {
         if (!shouldExitStudioOnSelection({
             editorMode,
+            studioTab,
             studioSelectionSnapshot: studioSelectionSnapshotRef.current,
             selectedNodeId,
             selectedEdgeId,
@@ -114,12 +122,13 @@ export function useFlowEditorStudioController({
         }
 
         setCanvasMode();
-    }, [editorMode, selectedEdgeId, selectedNodeId, setCanvasMode]);
+    }, [editorMode, selectedEdgeId, selectedNodeId, setCanvasMode, studioTab]);
 
     return {
         openStudioPanel,
         openStudioAI,
         openStudioCode,
+        openStudioPlayback,
         toggleStudioPanel,
         closeStudioPanel,
         handleCanvasEntityIntent,

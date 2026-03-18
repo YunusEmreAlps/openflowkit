@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.1",
   "type": "module",
+  "workspaces": [
+    "web",
+    "docs-site"
+  ],
   "homepage": "https://openflowkit.com",
   "engines": {
     "node": ">=18.0.0"
@@ -26,19 +30,21 @@
     "test": "vitest",
     "build:lib": "vite build -c vite.lib.config.ts",
     "build:lib:watch": "vite build -c vite.lib.config.ts --watch",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext ts,tsx --ignore-pattern 'web/**' --ignore-pattern 'docs-site/**' --report-unused-disable-directives --max-warnings 0",
+    "build:web": "npm run build --workspace=web",
+    "build:docs": "npm run build --workspace=docs-site",
     "bench:harness": "node scripts/benchmark-harness.mjs",
     "bench:summary": "node scripts/benchmark-summary.mjs",
     "bench:check": "node scripts/check-benchmark-results.mjs",
     "audit:reactflow-v12": "node scripts/audit-reactflow-v12.mjs",
     "shape-pack:manifest": "node scripts/shape-pack/generate-shape-pack-manifest.mjs",
     "shape-pack:validate": "node scripts/shape-pack/validate-shape-pack-manifests.mjs",
-    "shape-pack:intake-check": "node scripts/shape-pack/check-provider-intake.mjs"
+    "shape-pack:intake-check": "node scripts/shape-pack/check-provider-intake.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/genai": "^1.40.0",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@types/tinycolor2": "^1.4.6",
     "@xyflow/react": "^12.10.1",
     "dagre": "0.8.5",
     "elkjs": "^0.11.0",
@@ -60,7 +66,6 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "4.0.0",
     "remark-slug": "^7.0.1",
-    "tinycolor2": "^1.6.0",
     "y-indexeddb": "^9.0.12",
     "y-webrtc": "^10.3.0",
     "y-websocket": "^3.0.0",
@@ -85,7 +90,9 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "gh-pages": "^6.3.0",
+    "husky": "^9.1.7",
     "jsdom": "^28.0.0",
+    "lint-staged": "^15.5.2",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
     "tailwind-merge": "^3.4.1",
@@ -95,5 +102,13 @@
     "vite": "^6.2.0",
     "vite-plugin-dts": "^3.9.1",
     "vitest": "^4.0.18"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings 0"
+    ]
+  },
+  "overrides": {
+    "zod": "3"
   }
 }

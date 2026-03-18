@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { StudioCodePanel } from './StudioCodePanel';
 import { useFlowStore } from '@/store';
-import { DEFAULT_BRAND_CONFIG } from '@/store';
 
 const applyCodeChangesMock = vi.fn();
 const parseOpenFlowDSLMock = vi.fn();
@@ -61,7 +60,6 @@ describe('StudioCodePanel', () => {
     toMermaidMock.mockReset();
 
     useFlowStore.setState({
-      brandConfig: DEFAULT_BRAND_CONFIG,
       activeTabId: 'tab-1',
       viewSettings: {
         ...useFlowStore.getState().viewSettings,
@@ -89,7 +87,7 @@ describe('StudioCodePanel', () => {
   });
 
   it('disables apply when the draft is invalid', () => {
-    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="flowmind" onModeChange={vi.fn()} />);
+    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="openflow" onModeChange={vi.fn()} />);
 
     const textbox = screen.getByRole('textbox');
     fireEvent.change(textbox, { target: { value: 'broken dsl' } });
@@ -99,7 +97,7 @@ describe('StudioCodePanel', () => {
   });
 
   it('applies valid changed drafts and marks them applied', async () => {
-    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="flowmind" onModeChange={vi.fn()} />);
+    render(<StudioCodePanel nodes={[]} edges={[]} onApply={vi.fn()} mode="openflow" onModeChange={vi.fn()} />);
 
     const textbox = screen.getByRole('textbox');
     fireEvent.change(textbox, { target: { value: 'flow: "Updated"\ndirection: TB' } });

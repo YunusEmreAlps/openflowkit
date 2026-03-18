@@ -82,6 +82,8 @@ describe('layoutHandlers', () => {
       description: '',
       icon: vi.fn() as unknown as FlowTemplate['icon'],
       msg: 'general',
+      category: 'flowchart',
+      tags: ['test'],
       nodes: [{
         id: 'node-a',
         type: 'process',

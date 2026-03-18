@@ -31,4 +31,4 @@ Ready to get started?
 
 *   Check out the [Quick Start](/docs/quick-start) guide to build your first flow.
 *   Learn about the [Canvas Basics](/docs/canvas-basics).
-*   Master the [FlowMind DSL](/docs/flowmind-dsl).
+*   Master the [OpenFlow DSL](/docs/openflow-dsl).

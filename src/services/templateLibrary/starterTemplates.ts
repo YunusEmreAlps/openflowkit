@@ -1,16 +1,25 @@
 import { createDefaultEdge } from '@/constants';
-import { NodeType, type FlowNode } from '@/lib/types';
+import { NodeType, type FlowNode, type NodeData } from '@/lib/types';
 import { createTemplateRegistry, type TemplateRegistry } from './registry';
 import type { TemplateManifest } from './types';
 
-function createNode(
+type TemplateCategory = 'flowchart' | 'aws' | 'azure' | 'cncf' | 'mindmap' | 'journey' | 'wireframe';
+type ProviderKey = 'aws' | 'azure' | 'cncf';
+
+const PROVIDER_PACK_IDS: Record<ProviderKey, string> = {
+    aws: 'aws-official-starter-v1',
+    azure: 'azure-official-icons-v20',
+    cncf: 'cncf-artwork-icons-v1',
+};
+
+function createFlowNode(
     id: string,
     type: NodeType,
     label: string,
     x: number,
     y: number,
     color: string,
-    subLabel = '',
+    options: Partial<NodeData> = {},
 ): FlowNode {
     return {
         id,
@@ -18,58 +27,584 @@ function createNode(
         position: { x, y },
         data: {
             label,
-            subLabel,
             color,
+            ...options,
         },
     };
 }
 
-const FLOWCHART_TEMPLATE: TemplateManifest = {
-    id: 'starter-flowchart-checkout',
-    name: 'Checkout Flow (Starter)',
-    description: 'Baseline checkout decision flow template.',
-    category: 'flowchart',
-    tags: ['starter', 'flowchart', 'business'],
-    graph: {
-        nodes: [
-            createNode('fc-1', NodeType.START, 'Session Start', 0, 0, 'blue'),
-            createNode('fc-2', NodeType.PROCESS, 'Cart Review', 0, 160, 'slate'),
-            createNode('fc-3', NodeType.DECISION, 'Payment Success?', 0, 320, 'amber'),
-            createNode('fc-4', NodeType.END, 'Order Confirmed', 220, 480, 'emerald'),
-            createNode('fc-5', NodeType.END, 'Retry Payment', -220, 480, 'red'),
-        ],
-        edges: [
-            createDefaultEdge('fc-1', 'fc-2'),
-            createDefaultEdge('fc-2', 'fc-3'),
-            createDefaultEdge('fc-3', 'fc-4', 'Yes'),
-            createDefaultEdge('fc-3', 'fc-5', 'No'),
-        ],
-    },
-};
+function createAssetNode(
+    id: string,
+    provider: ProviderKey,
+    label: string,
+    category: string,
+    shapeId: string,
+    x: number,
+    y: number,
+): FlowNode {
+    return {
+        id,
+        type: NodeType.CUSTOM,
+        position: { x, y },
+        data: {
+            label,
+            color: 'custom',
+            customColor: '#ffffff',
+            assetPresentation: 'icon',
+            assetProvider: provider,
+            assetCategory: category,
+            archIconPackId: PROVIDER_PACK_IDS[provider],
+            archIconShapeId: shapeId,
+        },
+    };
+}
 
-const ARCHITECTURE_TEMPLATE: TemplateManifest = {
-    id: 'starter-architecture-api',
-    name: 'API Platform (Starter)',
-    description: 'Starter architecture flow with gateway, service, and storage tiers.',
-    category: 'architecture',
-    tags: ['starter', 'architecture', 'infra'],
-    graph: {
-        nodes: [
-            createNode('arch-1', NodeType.ARCHITECTURE, 'API Gateway', 0, 0, 'blue', 'Ingress'),
-            createNode('arch-2', NodeType.ARCHITECTURE, 'Auth Service', -220, 180, 'violet', 'Token'),
-            createNode('arch-3', NodeType.ARCHITECTURE, 'Billing Service', 220, 180, 'emerald', 'Charge'),
-            createNode('arch-4', NodeType.ARCHITECTURE, 'Primary DB', 0, 360, 'cyan', 'PostgreSQL'),
-        ],
-        edges: [
-            createDefaultEdge('arch-1', 'arch-2'),
-            createDefaultEdge('arch-1', 'arch-3'),
-            createDefaultEdge('arch-2', 'arch-4'),
-            createDefaultEdge('arch-3', 'arch-4'),
-        ],
-    },
-};
+function createMindmapNode(
+    id: string,
+    label: string,
+    x: number,
+    y: number,
+    options: Partial<NodeData> = {},
+): FlowNode {
+    return {
+        id,
+        type: NodeType.MINDMAP,
+        position: { x, y },
+        data: {
+            label,
+            color: 'slate',
+            shape: 'rounded',
+            mindmapBranchStyle: 'curved',
+            ...options,
+        },
+    };
+}
 
-export const STARTER_TEMPLATE_MANIFESTS: TemplateManifest[] = [FLOWCHART_TEMPLATE, ARCHITECTURE_TEMPLATE];
+function createJourneyNode(
+    id: string,
+    label: string,
+    actor: string,
+    section: string,
+    score: number,
+    x: number,
+    y: number,
+): FlowNode {
+    return {
+        id,
+        type: NodeType.JOURNEY,
+        position: { x, y },
+        data: {
+            label,
+            subLabel: actor,
+            color: 'violet',
+            journeySection: section,
+            journeyTask: label,
+            journeyActor: actor,
+            journeyScore: score,
+        },
+    };
+}
+
+function createWireframeNode(
+    id: string,
+    type: 'browser' | 'mobile',
+    label: string,
+    variant: string,
+    x: number,
+    y: number,
+): FlowNode {
+    return {
+        id,
+        type,
+        position: { x, y },
+        data: {
+            label,
+            color: 'slate',
+            variant,
+        },
+    };
+}
+
+function createTemplate(
+    id: string,
+    name: string,
+    description: string,
+    category: TemplateCategory,
+    tags: string[],
+    nodes: FlowNode[],
+    edges = [] as ReturnType<typeof createDefaultEdge>[],
+): TemplateManifest {
+    return {
+        id,
+        name,
+        description,
+        category,
+        tags,
+        graph: { nodes, edges },
+    };
+}
+
+export const STARTER_TEMPLATE_MANIFESTS: TemplateManifest[] = [
+    createTemplate(
+        'flow-subscription-upgrade',
+        'Subscription Upgrade Workflow',
+        'Lead capture, trial qualification, payment, and provisioning in one flow.',
+        'flowchart',
+        ['revenue', 'saas', 'starter'],
+        [
+            createFlowNode('sub-1', NodeType.START, 'Lead Captured', 0, 0, 'blue', { subLabel: 'Signup form' }),
+            createFlowNode('sub-2', NodeType.PROCESS, 'Start Trial', 0, 150, 'slate', { subLabel: 'Provision workspace' }),
+            createFlowNode('sub-3', NodeType.DECISION, 'Usage Threshold Reached?', 0, 320, 'amber', { subLabel: 'Activation signal' }),
+            createFlowNode('sub-4', NodeType.PROCESS, 'Send Upgrade Offer', -220, 500, 'violet', { subLabel: 'Lifecycle email' }),
+            createFlowNode('sub-5', NodeType.PROCESS, 'Charge Payment Method', 220, 500, 'emerald', { subLabel: 'Billing provider' }),
+            createFlowNode('sub-6', NodeType.END, 'Customer Upgraded', 220, 680, 'emerald', { subLabel: 'Unlock premium plan' }),
+            createFlowNode('sub-7', NodeType.END, 'Stay on Trial', -220, 680, 'slate', { subLabel: 'Nurture sequence' }),
+        ],
+        [
+            createDefaultEdge('sub-1', 'sub-2'),
+            createDefaultEdge('sub-2', 'sub-3'),
+            createDefaultEdge('sub-3', 'sub-4', 'Not yet'),
+            createDefaultEdge('sub-3', 'sub-5', 'Ready'),
+            createDefaultEdge('sub-4', 'sub-7'),
+            createDefaultEdge('sub-5', 'sub-6'),
+        ],
+    ),
+    createTemplate(
+        'flow-incident-escalation',
+        'Incident Escalation Runbook',
+        'A practical response chain from alert trigger to mitigation and review.',
+        'flowchart',
+        ['sre', 'ops', 'incident'],
+        [
+            createFlowNode('inc-1', NodeType.START, 'Alert Fired', 0, 0, 'red', { subLabel: 'Latency spike' }),
+            createFlowNode('inc-2', NodeType.PROCESS, 'Assess Blast Radius', 0, 150, 'slate', { subLabel: 'Dashboards + logs' }),
+            createFlowNode('inc-3', NodeType.DECISION, 'Customer Impact?', 0, 320, 'amber', { subLabel: 'Severity gate' }),
+            createFlowNode('inc-4', NodeType.PROCESS, 'Page Incident Commander', -220, 500, 'red', { subLabel: 'SEV-1 bridge' }),
+            createFlowNode('inc-5', NodeType.PROCESS, 'Mitigate in Service', 220, 500, 'blue', { subLabel: 'Rollback / failover' }),
+            createFlowNode('inc-6', NodeType.PROCESS, 'Publish Status Update', -220, 680, 'violet', { subLabel: 'External comms' }),
+            createFlowNode('inc-7', NodeType.END, 'Postmortem Scheduled', 0, 860, 'emerald', { subLabel: 'Action items logged' }),
+        ],
+        [
+            createDefaultEdge('inc-1', 'inc-2'),
+            createDefaultEdge('inc-2', 'inc-3'),
+            createDefaultEdge('inc-3', 'inc-4', 'High'),
+            createDefaultEdge('inc-3', 'inc-5', 'Low'),
+            createDefaultEdge('inc-4', 'inc-6'),
+            createDefaultEdge('inc-6', 'inc-7'),
+            createDefaultEdge('inc-5', 'inc-7'),
+        ],
+    ),
+    createTemplate(
+        'flow-release-train',
+        'CI/CD Release Train',
+        'A deployment flow from merge to staging verification and production release.',
+        'flowchart',
+        ['devops', 'delivery', 'engineering'],
+        [
+            createFlowNode('rel-1', NodeType.START, 'Merge to Main', 0, 0, 'slate', { subLabel: 'Protected branch' }),
+            createFlowNode('rel-2', NodeType.PROCESS, 'Run Test Suite', 0, 150, 'blue', { subLabel: 'Unit + integration' }),
+            createFlowNode('rel-3', NodeType.DECISION, 'Build Healthy?', 0, 320, 'amber', { subLabel: 'Gate release' }),
+            createFlowNode('rel-4', NodeType.PROCESS, 'Build Artifact', 220, 500, 'violet', { subLabel: 'Versioned image' }),
+            createFlowNode('rel-5', NodeType.PROCESS, 'Deploy to Staging', 220, 680, 'blue', { subLabel: 'Canary checks' }),
+            createFlowNode('rel-6', NodeType.PROCESS, 'Promote to Production', 220, 860, 'emerald', { subLabel: 'Progressive rollout' }),
+            createFlowNode('rel-7', NodeType.END, 'Notify Failure', -220, 500, 'red', { subLabel: 'Slack + issue' }),
+        ],
+        [
+            createDefaultEdge('rel-1', 'rel-2'),
+            createDefaultEdge('rel-2', 'rel-3'),
+            createDefaultEdge('rel-3', 'rel-4', 'Yes'),
+            createDefaultEdge('rel-3', 'rel-7', 'No'),
+            createDefaultEdge('rel-4', 'rel-5'),
+            createDefaultEdge('rel-5', 'rel-6'),
+        ],
+    ),
+    createTemplate(
+        'flow-payment-recovery',
+        'Payment Recovery Loop',
+        'Retry, review, and customer messaging for failed subscription charges.',
+        'flowchart',
+        ['payments', 'ops', 'saas'],
+        [
+            createFlowNode('pay-1', NodeType.START, 'Invoice Due', 0, 0, 'blue', { subLabel: 'Renewal window' }),
+            createFlowNode('pay-2', NodeType.PROCESS, 'Attempt Charge', 0, 150, 'emerald', { subLabel: 'Primary card' }),
+            createFlowNode('pay-3', NodeType.DECISION, 'Charge Successful?', 0, 320, 'amber', { subLabel: 'Gateway response' }),
+            createFlowNode('pay-4', NodeType.PROCESS, 'Retry Sequence', -220, 500, 'violet', { subLabel: '3 smart retries' }),
+            createFlowNode('pay-5', NodeType.PROCESS, 'Request Card Update', -220, 680, 'blue', { subLabel: 'In-app prompt' }),
+            createFlowNode('pay-6', NodeType.PROCESS, 'Open Manual Review', 220, 500, 'slate', { subLabel: 'Risk / fraud check' }),
+            createFlowNode('pay-7', NodeType.END, 'Subscription Active', 220, 680, 'emerald', { subLabel: 'Invoice paid' }),
+            createFlowNode('pay-8', NodeType.END, 'Downgrade Account', -220, 860, 'red', { subLabel: 'Grace period ended' }),
+        ],
+        [
+            createDefaultEdge('pay-1', 'pay-2'),
+            createDefaultEdge('pay-2', 'pay-3'),
+            createDefaultEdge('pay-3', 'pay-7', 'Yes'),
+            createDefaultEdge('pay-3', 'pay-4', 'Retry'),
+            createDefaultEdge('pay-3', 'pay-6', 'Manual'),
+            createDefaultEdge('pay-4', 'pay-5'),
+            createDefaultEdge('pay-5', 'pay-8'),
+            createDefaultEdge('pay-6', 'pay-7'),
+        ],
+    ),
+    createTemplate(
+        'flow-support-escalation',
+        'AI Support Escalation',
+        'Ticket intake, intent classification, routing, and human fallback.',
+        'flowchart',
+        ['support', 'ai', 'operations'],
+        [
+            createFlowNode('sup-1', NodeType.START, 'Ticket Submitted', 0, 0, 'blue', { subLabel: 'Email or chat' }),
+            createFlowNode('sup-2', NodeType.PROCESS, 'Intent Classification', 0, 150, 'violet', { subLabel: 'LLM + rules' }),
+            createFlowNode('sup-3', NodeType.DECISION, 'Confidence High?', 0, 320, 'amber', { subLabel: 'Routing threshold' }),
+            createFlowNode('sup-4', NodeType.PROCESS, 'Auto-Resolve with KB', -220, 500, 'emerald', { subLabel: 'Suggested article' }),
+            createFlowNode('sup-5', NodeType.PROCESS, 'Route to Specialist', 220, 500, 'blue', { subLabel: 'Billing / product / infra' }),
+            createFlowNode('sup-6', NodeType.PROCESS, 'Human Triage Queue', 220, 680, 'slate', { subLabel: 'Low confidence' }),
+            createFlowNode('sup-7', NodeType.END, 'Case Closed', 0, 860, 'emerald', { subLabel: 'CSAT requested' }),
+        ],
+        [
+            createDefaultEdge('sup-1', 'sup-2'),
+            createDefaultEdge('sup-2', 'sup-3'),
+            createDefaultEdge('sup-3', 'sup-4', 'Yes'),
+            createDefaultEdge('sup-3', 'sup-5', 'Specialist'),
+            createDefaultEdge('sup-5', 'sup-6', 'Needs review'),
+            createDefaultEdge('sup-4', 'sup-7'),
+            createDefaultEdge('sup-6', 'sup-7'),
+        ],
+    ),
+    createTemplate(
+        'aws-event-api',
+        'AWS Event-Driven API',
+        'API Gateway, Lambda, queues, and storage for an async platform entrypoint.',
+        'aws',
+        ['aws', 'serverless', 'api'],
+        [
+            createAssetNode('aws-api-1', 'aws', 'API Gateway', 'App Integration', 'app-integration-api-gateway', 0, 0),
+            createAssetNode('aws-api-2', 'aws', 'Lambda Router', 'Compute', 'compute-lambda', 0, 200),
+            createAssetNode('aws-api-3', 'aws', 'EventBridge', 'App Integration', 'app-integration-eventbridge', -220, 400),
+            createAssetNode('aws-api-4', 'aws', 'SQS Buffer', 'App Integration', 'app-integration-simple-queue-service', 220, 400),
+            createAssetNode('aws-api-5', 'aws', 'DynamoDB', 'Database', 'database-dynamodb', -220, 620),
+            createAssetNode('aws-api-6', 'aws', 'Step Functions', 'App Integration', 'app-integration-step-functions', 220, 620),
+            createAssetNode('aws-api-7', 'aws', 'SES Notifications', 'Business Applications', 'business-applications-simple-email-service', 220, 840),
+        ],
+        [
+            createDefaultEdge('aws-api-1', 'aws-api-2'),
+            createDefaultEdge('aws-api-2', 'aws-api-3'),
+            createDefaultEdge('aws-api-2', 'aws-api-4'),
+            createDefaultEdge('aws-api-3', 'aws-api-5'),
+            createDefaultEdge('aws-api-4', 'aws-api-6'),
+            createDefaultEdge('aws-api-6', 'aws-api-7'),
+        ],
+    ),
+    createTemplate(
+        'aws-data-lake',
+        'AWS Data Lake Analytics',
+        'Ingestion, storage, ETL, catalog, and query layers for analytics teams.',
+        'aws',
+        ['aws', 'analytics', 'data'],
+        [
+            createAssetNode('aws-data-1', 'aws', 'Simple Storage Service', 'Storage', 'storage-simple-storage-service', 0, 0),
+            createAssetNode('aws-data-2', 'aws', 'Glue DataBrew', 'Analytics', 'analytics-glue-databrew', -220, 220),
+            createAssetNode('aws-data-3', 'aws', 'Glue Elastic Views', 'Analytics', 'analytics-glue-elastic-views', 220, 220),
+            createAssetNode('aws-data-4', 'aws', 'DataZone', 'Analytics', 'analytics-datazone', -220, 460),
+            createAssetNode('aws-data-5', 'aws', 'Athena', 'Analytics', 'analytics-athena', 220, 460),
+            createAssetNode('aws-data-6', 'aws', 'Redshift', 'Analytics', 'analytics-redshift', 0, 700),
+        ],
+        [
+            createDefaultEdge('aws-data-1', 'aws-data-2'),
+            createDefaultEdge('aws-data-1', 'aws-data-3'),
+            createDefaultEdge('aws-data-2', 'aws-data-4'),
+            createDefaultEdge('aws-data-3', 'aws-data-5'),
+            createDefaultEdge('aws-data-4', 'aws-data-6'),
+            createDefaultEdge('aws-data-5', 'aws-data-6'),
+        ],
+    ),
+    createTemplate(
+        'aws-container-platform',
+        'AWS Container Delivery Platform',
+        'A simple ECS-style delivery flow with CI, registry, runtime, and cache.',
+        'aws',
+        ['aws', 'containers', 'delivery'],
+        [
+            createAssetNode('aws-cont-1', 'aws', 'CodeBuild', 'Developer Tools', 'developer-tools-codebuild', -220, 0),
+            createAssetNode('aws-cont-2', 'aws', 'ECR', 'Containers', 'containers-elastic-container-registry', 0, 0),
+            createAssetNode('aws-cont-3', 'aws', 'ECS', 'Containers', 'containers-elastic-container-service', 220, 0),
+            createAssetNode('aws-cont-4', 'aws', 'Application Load Balancer', 'Networking Content Delivery', 'networking-content-delivery-elastic-load-balancing', 220, 240),
+            createAssetNode('aws-cont-5', 'aws', 'CloudWatch', 'Management Governance', 'management-governance-cloudwatch', 0, 240),
+            createAssetNode('aws-cont-6', 'aws', 'ElastiCache', 'Database', 'database-elasticache', 440, 240),
+        ],
+        [
+            createDefaultEdge('aws-cont-1', 'aws-cont-2'),
+            createDefaultEdge('aws-cont-2', 'aws-cont-3'),
+            createDefaultEdge('aws-cont-3', 'aws-cont-4'),
+            createDefaultEdge('aws-cont-3', 'aws-cont-5'),
+            createDefaultEdge('aws-cont-3', 'aws-cont-6'),
+        ],
+    ),
+    createTemplate(
+        'aws-security-lake',
+        'AWS Security Operations Loop',
+        'Log collection, inspection, policy, and detection using security services.',
+        'aws',
+        ['aws', 'security', 'soc'],
+        [
+            createAssetNode('aws-sec-1', 'aws', 'Security Lake', 'Security Identity Compliance', 'security-identity-compliance-security-lake', 0, 0),
+            createAssetNode('aws-sec-2', 'aws', 'WAF', 'Security Identity Compliance', 'security-identity-compliance-waf', -220, 220),
+            createAssetNode('aws-sec-3', 'aws', 'Inspector', 'Security Identity Compliance', 'security-identity-compliance-inspector', 220, 220),
+            createAssetNode('aws-sec-4', 'aws', 'Detective', 'Security Identity Compliance', 'security-identity-compliance-detective', -220, 460),
+            createAssetNode('aws-sec-5', 'aws', 'Macie', 'Security Identity Compliance', 'security-identity-compliance-macie', 220, 460),
+            createAssetNode('aws-sec-6', 'aws', 'Security Hub', 'Security Identity Compliance', 'security-identity-compliance-security-hub', 0, 700),
+        ],
+        [
+            createDefaultEdge('aws-sec-2', 'aws-sec-1'),
+            createDefaultEdge('aws-sec-3', 'aws-sec-1'),
+            createDefaultEdge('aws-sec-1', 'aws-sec-4'),
+            createDefaultEdge('aws-sec-1', 'aws-sec-5'),
+            createDefaultEdge('aws-sec-4', 'aws-sec-6'),
+            createDefaultEdge('aws-sec-5', 'aws-sec-6'),
+        ],
+    ),
+    createTemplate(
+        'azure-ai-platform',
+        'Azure AI Application Platform',
+        'An AI product stack with OpenAI, app services, search, and observability.',
+        'azure',
+        ['azure', 'ai', 'app'],
+        [
+            createAssetNode('az-ai-1', 'azure', 'Azure OpenAI', 'Ai Plus Machine Learning', 'ai-plus-machine-learning-azure-openai', 0, 0),
+            createAssetNode('az-ai-2', 'azure', 'Azure AI Studio', 'Ai Plus Machine Learning', 'ai-plus-machine-learning-ai-studio', -220, 220),
+            createAssetNode('az-ai-3', 'azure', 'App Services', 'App Services', 'app-services-app-services', 220, 220),
+            createAssetNode('az-ai-4', 'azure', 'Cognitive Search', 'Ai Plus Machine Learning', 'ai-plus-machine-learning-cognitive-search', 0, 440),
+            createAssetNode('az-ai-5', 'azure', 'Application Insights', 'Management Plus Governance', 'management-plus-governance-application-insights', 220, 660),
+        ],
+        [
+            createDefaultEdge('az-ai-2', 'az-ai-1'),
+            createDefaultEdge('az-ai-1', 'az-ai-3'),
+            createDefaultEdge('az-ai-3', 'az-ai-4'),
+            createDefaultEdge('az-ai-3', 'az-ai-5'),
+        ],
+    ),
+    createTemplate(
+        'azure-landing-zone',
+        'Azure Landing Zone Operations',
+        'Identity, network, monitoring, and policy services for a platform team baseline.',
+        'azure',
+        ['azure', 'platform', 'ops'],
+        [
+            createAssetNode('az-lz-1', 'azure', 'Management Groups', 'General', 'general-management-groups', 0, 0),
+            createAssetNode('az-lz-2', 'azure', 'Virtual Networks', 'Networking', 'networking-virtual-networks', -220, 220),
+            createAssetNode('az-lz-3', 'azure', 'Monitor', 'Monitor', 'monitor-monitor', 220, 220),
+            createAssetNode('az-lz-4', 'azure', 'Identity Governance', 'Identity', 'identity-identity-governance', -220, 460),
+            createAssetNode('az-lz-5', 'azure', 'Policy', 'Management Plus Governance', 'management-plus-governance-policy', 220, 460),
+            createAssetNode('az-lz-6', 'azure', 'Log Analytics', 'Monitor', 'monitor-log-analytics-workspaces', 220, 700),
+        ],
+        [
+            createDefaultEdge('az-lz-1', 'az-lz-2'),
+            createDefaultEdge('az-lz-1', 'az-lz-3'),
+            createDefaultEdge('az-lz-2', 'az-lz-4'),
+            createDefaultEdge('az-lz-3', 'az-lz-5'),
+            createDefaultEdge('az-lz-5', 'az-lz-6'),
+        ],
+    ),
+    createTemplate(
+        'azure-data-estate',
+        'Azure Data Estate',
+        'Core analytics path across data factory, storage, Synapse, and reporting.',
+        'azure',
+        ['azure', 'data', 'analytics'],
+        [
+            createAssetNode('az-data-1', 'azure', 'Data Factory', 'Databases', 'databases-data-factories', 0, 0),
+            createAssetNode('az-data-2', 'azure', 'Storage Account', 'Storage', 'storage-storage-accounts', -220, 220),
+            createAssetNode('az-data-3', 'azure', 'Synapse Analytics', 'Databases', 'databases-azure-synapse-analytics', 220, 220),
+            createAssetNode('az-data-4', 'azure', 'Data Explorer', 'Databases', 'databases-azure-data-explorer-clusters', 220, 460),
+            createAssetNode('az-data-5', 'azure', 'Power BI Embedded', 'Analytics', 'analytics-power-bi-embedded', 440, 680),
+        ],
+        [
+            createDefaultEdge('az-data-1', 'az-data-2'),
+            createDefaultEdge('az-data-1', 'az-data-3'),
+            createDefaultEdge('az-data-3', 'az-data-4'),
+            createDefaultEdge('az-data-4', 'az-data-5'),
+        ],
+    ),
+    createTemplate(
+        'azure-identity-hub',
+        'Azure Identity Access Hub',
+        'Identity entrypoints, federation, and app controls for enterprise access.',
+        'azure',
+        ['azure', 'identity', 'security'],
+        [
+            createAssetNode('az-id-1', 'azure', 'Entra Connect', 'Identity', 'identity-entra-connect', 0, 0),
+            createAssetNode('az-id-2', 'azure', 'Managed Identities', 'Identity', 'identity-managed-identities', -220, 220),
+            createAssetNode('az-id-3', 'azure', 'External Identities', 'Identity', 'identity-external-identities', 220, 220),
+            createAssetNode('az-id-4', 'azure', 'App Registrations', 'Identity', 'identity-app-registrations', -220, 460),
+            createAssetNode('az-id-5', 'azure', 'Conditional Access', 'Security', 'security-conditional-access', 220, 460),
+            createAssetNode('az-id-6', 'azure', 'Entra ID Protection', 'Identity', 'identity-entra-id-protection', 220, 700),
+        ],
+        [
+            createDefaultEdge('az-id-1', 'az-id-2'),
+            createDefaultEdge('az-id-1', 'az-id-3'),
+            createDefaultEdge('az-id-2', 'az-id-4'),
+            createDefaultEdge('az-id-3', 'az-id-5'),
+            createDefaultEdge('az-id-5', 'az-id-6'),
+        ],
+    ),
+    createTemplate(
+        'cncf-gitops',
+        'CNCF GitOps Platform',
+        'A clean GitOps loop across source control, policy, rollout, and cost signals.',
+        'cncf',
+        ['cncf', 'gitops', 'platform'],
+        [
+            createAssetNode('cncf-go-1', 'cncf', 'Backstage', 'Projects', 'projects-backstage', 0, 0),
+            createAssetNode('cncf-go-2', 'cncf', 'Helm', 'Projects', 'projects-helm', -220, 220),
+            createAssetNode('cncf-go-3', 'cncf', 'OpenCost', 'Projects', 'projects-opencost', 220, 220),
+            createAssetNode('cncf-go-4', 'cncf', 'Cilium', 'Projects', 'projects-cilium', -220, 460),
+            createAssetNode('cncf-go-5', 'cncf', 'SPIRE', 'Projects', 'projects-spire', 220, 460),
+            createAssetNode('cncf-go-6', 'cncf', 'Artifact Hub', 'Projects', 'projects-artifacthub', 0, 700),
+        ],
+        [
+            createDefaultEdge('cncf-go-1', 'cncf-go-2'),
+            createDefaultEdge('cncf-go-2', 'cncf-go-4'),
+            createDefaultEdge('cncf-go-2', 'cncf-go-5'),
+            createDefaultEdge('cncf-go-4', 'cncf-go-3'),
+            createDefaultEdge('cncf-go-5', 'cncf-go-6'),
+        ],
+    ),
+    createTemplate(
+        'cncf-service-mesh',
+        'CNCF Service Mesh Security',
+        'Traffic, workload identity, and policy in a mesh-oriented platform slice.',
+        'cncf',
+        ['cncf', 'mesh', 'security'],
+        [
+            createAssetNode('cncf-mesh-1', 'cncf', 'Istio', 'Projects', 'projects-istio', 0, 0),
+            createAssetNode('cncf-mesh-2', 'cncf', 'gRPC', 'Projects', 'projects-grpc', -220, 220),
+            createAssetNode('cncf-mesh-3', 'cncf', 'SPIRE', 'Projects', 'projects-spire', 220, 220),
+            createAssetNode('cncf-mesh-4', 'cncf', 'OpenFGA', 'Projects', 'projects-openfga', -220, 460),
+            createAssetNode('cncf-mesh-5', 'cncf', 'Kuadrant', 'Projects', 'projects-kuadrant', 220, 460),
+            createAssetNode('cncf-mesh-6', 'cncf', 'Contour', 'Projects', 'projects-contour', 0, 700),
+        ],
+        [
+            createDefaultEdge('cncf-mesh-2', 'cncf-mesh-1'),
+            createDefaultEdge('cncf-mesh-3', 'cncf-mesh-1'),
+            createDefaultEdge('cncf-mesh-1', 'cncf-mesh-4'),
+            createDefaultEdge('cncf-mesh-1', 'cncf-mesh-5'),
+            createDefaultEdge('cncf-mesh-5', 'cncf-mesh-6'),
+        ],
+    ),
+    createTemplate(
+        'cncf-observability',
+        'CNCF Observability Stack',
+        'Logs, traces, metrics, storage, and dashboards for cluster-level insight.',
+        'cncf',
+        ['cncf', 'observability', 'sre'],
+        [
+            createAssetNode('cncf-ob-1', 'cncf', 'Thanos', 'Projects', 'projects-thanos', 0, 0),
+            createAssetNode('cncf-ob-2', 'cncf', 'Cortex', 'Projects', 'projects-cortex', -220, 220),
+            createAssetNode('cncf-ob-3', 'cncf', 'OpenEBS', 'Projects', 'projects-openebs', 220, 220),
+            createAssetNode('cncf-ob-4', 'cncf', 'KubeVirt', 'Projects', 'projects-kubevirt', -220, 460),
+            createAssetNode('cncf-ob-5', 'cncf', 'Dragonfly', 'Projects', 'projects-dragonfly', 220, 460),
+            createAssetNode('cncf-ob-6', 'cncf', 'Artifact Hub', 'Projects', 'projects-artifacthub', 0, 700),
+        ],
+        [
+            createDefaultEdge('cncf-ob-2', 'cncf-ob-1'),
+            createDefaultEdge('cncf-ob-3', 'cncf-ob-1'),
+            createDefaultEdge('cncf-ob-4', 'cncf-ob-2'),
+            createDefaultEdge('cncf-ob-5', 'cncf-ob-3'),
+            createDefaultEdge('cncf-ob-1', 'cncf-ob-6'),
+        ],
+    ),
+    createTemplate(
+        'mindmap-product-discovery',
+        'Product Discovery Mindmap',
+        'A workshop-ready structure for goals, users, problems, and experiments.',
+        'mindmap',
+        ['mindmap', 'product', 'workshop'],
+        [
+            createMindmapNode('mm-prod-root', 'Discovery Sprint', 0, 0, { mindmapDepth: 0, color: 'slate' }),
+            createMindmapNode('mm-prod-left-1', 'User Problems', -260, -160, { mindmapParentId: 'mm-prod-root', mindmapSide: 'left', mindmapDepth: 1 }),
+            createMindmapNode('mm-prod-left-2', 'Signals & Data', -260, 120, { mindmapParentId: 'mm-prod-root', mindmapSide: 'left', mindmapDepth: 1 }),
+            createMindmapNode('mm-prod-right-1', 'Value Props', 260, -160, { mindmapParentId: 'mm-prod-root', mindmapSide: 'right', mindmapDepth: 1 }),
+            createMindmapNode('mm-prod-right-2', 'Experiments', 260, 120, { mindmapParentId: 'mm-prod-root', mindmapSide: 'right', mindmapDepth: 1 }),
+            createMindmapNode('mm-prod-leaf-1', 'Top 3 pains', -520, -240, { mindmapParentId: 'mm-prod-left-1', mindmapSide: 'left', mindmapDepth: 2 }),
+            createMindmapNode('mm-prod-leaf-2', 'Activation events', -520, 80, { mindmapParentId: 'mm-prod-left-2', mindmapSide: 'left', mindmapDepth: 2 }),
+            createMindmapNode('mm-prod-leaf-3', 'Differentiators', 520, -240, { mindmapParentId: 'mm-prod-right-1', mindmapSide: 'right', mindmapDepth: 2 }),
+            createMindmapNode('mm-prod-leaf-4', '5-day prototype', 520, 80, { mindmapParentId: 'mm-prod-right-2', mindmapSide: 'right', mindmapDepth: 2 }),
+        ],
+        [
+            createDefaultEdge('mm-prod-root', 'mm-prod-left-1'),
+            createDefaultEdge('mm-prod-root', 'mm-prod-left-2'),
+            createDefaultEdge('mm-prod-root', 'mm-prod-right-1'),
+            createDefaultEdge('mm-prod-root', 'mm-prod-right-2'),
+            createDefaultEdge('mm-prod-left-1', 'mm-prod-leaf-1'),
+            createDefaultEdge('mm-prod-left-2', 'mm-prod-leaf-2'),
+            createDefaultEdge('mm-prod-right-1', 'mm-prod-leaf-3'),
+            createDefaultEdge('mm-prod-right-2', 'mm-prod-leaf-4'),
+        ],
+    ),
+    createTemplate(
+        'mindmap-platform-strategy',
+        'Engineering Strategy Mindmap',
+        'A leadership planning map across reliability, delivery, governance, and hiring.',
+        'mindmap',
+        ['mindmap', 'strategy', 'engineering'],
+        [
+            createMindmapNode('mm-eng-root', 'Platform Strategy', 0, 0, { mindmapDepth: 0, color: 'slate' }),
+            createMindmapNode('mm-eng-left-1', 'Reliability', -260, -180, { mindmapParentId: 'mm-eng-root', mindmapSide: 'left', mindmapDepth: 1 }),
+            createMindmapNode('mm-eng-left-2', 'Security', -260, 140, { mindmapParentId: 'mm-eng-root', mindmapSide: 'left', mindmapDepth: 1 }),
+            createMindmapNode('mm-eng-right-1', 'Developer Experience', 260, -180, { mindmapParentId: 'mm-eng-root', mindmapSide: 'right', mindmapDepth: 1 }),
+            createMindmapNode('mm-eng-right-2', 'Capacity Plan', 260, 140, { mindmapParentId: 'mm-eng-root', mindmapSide: 'right', mindmapDepth: 1 }),
+            createMindmapNode('mm-eng-leaf-1', 'Error budgets', -520, -260, { mindmapParentId: 'mm-eng-left-1', mindmapSide: 'left', mindmapDepth: 2 }),
+            createMindmapNode('mm-eng-leaf-2', 'Policy baselines', -520, 100, { mindmapParentId: 'mm-eng-left-2', mindmapSide: 'left', mindmapDepth: 2 }),
+            createMindmapNode('mm-eng-leaf-3', 'Golden paths', 520, -260, { mindmapParentId: 'mm-eng-right-1', mindmapSide: 'right', mindmapDepth: 2 }),
+            createMindmapNode('mm-eng-leaf-4', 'Hiring bets', 520, 100, { mindmapParentId: 'mm-eng-right-2', mindmapSide: 'right', mindmapDepth: 2 }),
+        ],
+        [
+            createDefaultEdge('mm-eng-root', 'mm-eng-left-1'),
+            createDefaultEdge('mm-eng-root', 'mm-eng-left-2'),
+            createDefaultEdge('mm-eng-root', 'mm-eng-right-1'),
+            createDefaultEdge('mm-eng-root', 'mm-eng-right-2'),
+            createDefaultEdge('mm-eng-left-1', 'mm-eng-leaf-1'),
+            createDefaultEdge('mm-eng-left-2', 'mm-eng-leaf-2'),
+            createDefaultEdge('mm-eng-right-1', 'mm-eng-leaf-3'),
+            createDefaultEdge('mm-eng-right-2', 'mm-eng-leaf-4'),
+        ],
+    ),
+    createTemplate(
+        'journey-customer-onboarding',
+        'Customer Onboarding Journey',
+        'A practical experience map from signup through activation and expansion.',
+        'journey',
+        ['journey', 'customer', 'onboarding'],
+        [
+            createJourneyNode('jour-1', 'Create account', 'Buyer', 'Acquisition', 4, 0, 0),
+            createJourneyNode('jour-2', 'Invite team', 'Admin', 'Setup', 3, 260, 0),
+            createJourneyNode('jour-3', 'Connect data source', 'Ops', 'Activation', 2, 520, 0),
+            createJourneyNode('jour-4', 'First value moment', 'Analyst', 'Activation', 5, 780, 0),
+            createJourneyNode('jour-5', 'Quarterly review', 'CSM', 'Expansion', 4, 1040, 0),
+        ],
+        [
+            createDefaultEdge('jour-1', 'jour-2'),
+            createDefaultEdge('jour-2', 'jour-3'),
+            createDefaultEdge('jour-3', 'jour-4'),
+            createDefaultEdge('jour-4', 'jour-5'),
+        ],
+    ),
+    createTemplate(
+        'wireframe-saas-starter',
+        'Cross-Platform SaaS Starter',
+        'A browser dashboard and mobile companion layout to kick off product flows.',
+        'wireframe',
+        ['wireframe', 'product', 'ux'],
+        [
+            createWireframeNode('wf-1', 'browser', 'Admin Dashboard', 'dashboard', 0, 0),
+            createWireframeNode('wf-2', 'mobile', 'Inbox Companion', 'chat', 420, 20),
+            createFlowNode('wf-3', NodeType.ANNOTATION, 'Primary metrics live here', 0, 260, 'yellow', { subLabel: 'Use this for KPI and feed widgets' }),
+            createFlowNode('wf-4', NodeType.ANNOTATION, 'Mobile focuses on alerts + approvals', 420, 520, 'yellow', { subLabel: 'Good starter for field workflows' }),
+        ],
+        [
+            createDefaultEdge('wf-1', 'wf-2'),
+        ],
+    ),
+];
 
 export function createStarterTemplateRegistry(): TemplateRegistry {
     return createTemplateRegistry(STARTER_TEMPLATE_MANIFESTS);
