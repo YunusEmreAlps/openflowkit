@@ -4,6 +4,7 @@ import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import type { ChatMessage } from '@/services/aiService';
 import type { StudioCodeMode, StudioTab } from '@/hooks/useFlowEditorUIState';
+import type { SupportedLanguage } from '@/hooks/ai-generation/codeToArchitecture';
 import { SidebarBody, SidebarHeader, SidebarSegmentedTabs, SidebarShell } from './SidebarShell';
 
 const LazyStudioAIPanel = lazy(async () => {
@@ -26,6 +27,7 @@ interface StudioPanelProps {
     edges: FlowEdge[];
     onApply: (nodes: FlowNode[], edges: FlowEdge[]) => void;
     onAIGenerate: (prompt: string, imageBase64?: string) => Promise<void>;
+    onCodeAnalysis?: (code: string, language: SupportedLanguage) => Promise<void>;
     isGenerating: boolean;
     chatMessages: ChatMessage[];
     onClearChat: () => void;
@@ -54,6 +56,7 @@ export function StudioPanel({
     edges,
     onApply,
     onAIGenerate,
+    onCodeAnalysis,
     isGenerating,
     chatMessages,
     onClearChat,
@@ -93,6 +96,7 @@ export function StudioPanel({
                     <Suspense fallback={null}>
                         <LazyStudioAIPanel
                             onAIGenerate={onAIGenerate}
+                            onCodeAnalysis={onCodeAnalysis}
                             isGenerating={isGenerating}
                             chatMessages={chatMessages}
                             onClearChat={onClearChat}

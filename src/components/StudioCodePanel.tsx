@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { AlertCircle, BookOpen, CheckCircle2, Play, RotateCcw } from 'lucide-react';
+import { AlertCircle, BookOpen, CheckCircle2, Play, RotateCcw, Zap } from 'lucide-react';
+import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { useTranslation } from 'react-i18next';
 import { Button } from './ui/Button';
 import { Textarea } from './ui/Textarea';
@@ -59,6 +60,8 @@ export function StudioCodePanel({
         isApplying,
         draftPreview,
         hasDraftChanges,
+        liveSync,
+        setLiveSync,
         handleCodeChange,
         handleApply,
         handleReset,
@@ -159,7 +162,7 @@ export function StudioCodePanel({
 
                         {mode === 'openflow' ? (
                             <a
-                                href="#/docs/openflow-dsl"
+                                href="https://docs.openflowkit.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center justify-self-end gap-1 font-medium text-[var(--brand-primary)] transition-colors hover:text-[var(--brand-primary-700)]"
@@ -173,6 +176,20 @@ export function StudioCodePanel({
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {ROLLOUT_FLAGS.mermaidSyncV1 && (
+                            <button
+                                onClick={() => setLiveSync(!liveSync)}
+                                title={liveSync ? 'Live sync on — auto-applies valid changes' : 'Enable live sync'}
+                                className={`flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all ${
+                                    liveSync
+                                        ? 'border-[var(--brand-primary-200)] bg-[var(--brand-primary-50)] text-[var(--brand-primary)]'
+                                        : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                                }`}
+                            >
+                                <Zap className="h-3 w-3" />
+                                Live
+                            </button>
+                        )}
                         <Button
                             onClick={handleReset}
                             disabled={!hasDraftChanges && !error}

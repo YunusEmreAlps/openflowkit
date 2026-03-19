@@ -87,6 +87,7 @@ describe('buildFlowEditorPanelsProps', () => {
       closeStudioPanel: vi.fn(),
       handleCommandBarApply: vi.fn(),
       handleAIRequest: vi.fn(async () => undefined),
+      handleCodeAnalysis: vi.fn(async () => undefined),
       isGenerating: false,
       chatMessages: [],
       clearChat: vi.fn(),

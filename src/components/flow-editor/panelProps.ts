@@ -5,6 +5,7 @@ import type { LayoutAlgorithm } from '@/services/elkLayout';
 import type { FlowTemplate } from '@/services/templates';
 import type { DomainLibraryItem } from '@/services/domainLibrary';
 import type { ChatMessage } from '@/services/aiService';
+import type { SupportedLanguage } from '@/hooks/ai-generation/codeToArchitecture';
 
 interface BuildFlowEditorPanelsPropsParams {
     isCommandBarOpen: boolean;
@@ -63,6 +64,7 @@ interface BuildFlowEditorPanelsPropsParams {
     closeStudioPanel: () => void;
     handleCommandBarApply: (nodes: FlowNode[], edges: FlowEdge[]) => void;
     handleAIRequest: (prompt: string, imageBase64?: string) => Promise<void>;
+    handleCodeAnalysis: (code: string, language: SupportedLanguage) => Promise<void>;
     isGenerating: boolean;
     chatMessages: ChatMessage[];
     clearChat: () => void;
@@ -127,6 +129,7 @@ export function buildFlowEditorPanelsProps({
     closeStudioPanel,
     handleCommandBarApply,
     handleAIRequest,
+    handleCodeAnalysis,
     isGenerating,
     chatMessages,
     clearChat,
@@ -199,6 +202,7 @@ export function buildFlowEditorPanelsProps({
             onClose: closeStudioPanel,
             onApply: handleCommandBarApply,
             onAIGenerate: handleAIRequest,
+            onCodeAnalysis: handleCodeAnalysis,
             isGenerating,
             chatMessages,
             onClearChat: clearChat,

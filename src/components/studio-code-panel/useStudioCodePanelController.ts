@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { parseOpenFlowDSL, type ParseDiagnostic } from '@/lib/openFlowDSLParser';
 import { toMermaid } from '@/services/exportService';
@@ -29,7 +29,7 @@ interface UseStudioCodePanelControllerParams {
     setMermaidDiagnostics: (snapshot: MermaidDiagnosticsSnapshot | null) => void;
     clearMermaidDiagnostics: () => void;
     addToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning', duration?: number) => void;
-    t: TFunction;
+    t: TFunction; // kept for future i18n use
 }
 
 interface UseStudioCodePanelControllerResult {
@@ -39,6 +39,8 @@ interface UseStudioCodePanelControllerResult {
     isApplying: boolean;
     draftPreview: DraftPreview;
     hasDraftChanges: boolean;
+    liveSync: boolean;
+    setLiveSync: (value: boolean) => void;
     handleCodeChange: (value: string) => void;
     handleApply: () => Promise<void>;
     handleReset: () => void;
@@ -57,11 +59,12 @@ export function useStudioCodePanelController({
     setMermaidDiagnostics,
     clearMermaidDiagnostics,
     addToast,
-    t,
+    t: _t,
 }: UseStudioCodePanelControllerParams): UseStudioCodePanelControllerResult {
     const [error, setError] = useState<string | null>(null);
     const [diagnostics, setDiagnostics] = useState<ParseDiagnostic[]>([]);
     const [isApplying, setIsApplying] = useState(false);
+    const [liveSync, setLiveSync] = useState(false);
     const [draftCodeByMode, setDraftCodeByMode] = useState<Partial<Record<StudioCodeMode, string>>>({});
     const [lastAppliedCode, setLastAppliedCode] = useState<Record<StudioCodeMode, string>>({
         openflow: '',
@@ -176,6 +179,12 @@ export function useStudioCodePanelController({
         onModeChange(nextMode);
     }, [onModeChange]);
 
+    useEffect(() => {
+        if (!liveSync || !hasDraftChanges || draftPreview.state !== 'ready' || isApplying) return;
+        const timer = setTimeout(() => { void handleApply(); }, 800);
+        return () => clearTimeout(timer);
+    }, [liveSync, hasDraftChanges, draftPreview.state, isApplying, handleApply]);
+
     const handleCodeChange = useCallback((value: string) => {
         setDraftCodeByMode((current) => ({
             ...current,
@@ -192,6 +201,8 @@ export function useStudioCodePanelController({
         isApplying,
         draftPreview,
         hasDraftChanges,
+        liveSync,
+        setLiveSync,
         handleCodeChange,
         handleApply,
         handleReset,

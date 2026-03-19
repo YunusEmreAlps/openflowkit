@@ -207,7 +207,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
     });
 
     // --- AI ---
-    const { isGenerating, handleAIRequest, chatMessages, clearChat } = useAIGeneration(
+    const { isGenerating, handleAIRequest, handleCodeAnalysis, chatMessages, clearChat } = useAIGeneration(
         recordHistory,
         handleCommandBarApply
     );
@@ -388,6 +388,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         closeStudioPanel,
         handleCommandBarApply,
         handleAIRequest,
+        handleCodeAnalysis,
         isGenerating,
         chatMessages,
         clearChat,
@@ -462,6 +463,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
         closeStudioPanel,
         handleCommandBarApply,
         handleAIRequest,
+        handleCodeAnalysis,
         isGenerating,
         chatMessages,
         clearChat,

@@ -1,6 +1,7 @@
 export type RolloutFlagKey =
     | 'visualQualityV2'
     | 'mermaidSyncV1'
+    | 'codeToArchitectureV1'
     | 'familyPluginV1'
     | 'connectorModelV1'
     | 'relationSemanticsV1'
@@ -37,8 +38,14 @@ const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = 
     mermaidSyncV1: {
         key: 'mermaidSyncV1',
         envVar: 'VITE_MERMAID_SYNC_V1',
-        defaultEnabled: false,
+        defaultEnabled: true,
         description: 'Bidirectional Mermaid code panel and diagnostics',
+    },
+    codeToArchitectureV1: {
+        key: 'codeToArchitectureV1',
+        envVar: 'VITE_CODE_TO_ARCHITECTURE_V1',
+        defaultEnabled: true,
+        description: 'Generate architecture diagrams from pasted source code',
     },
     familyPluginV1: {
         key: 'familyPluginV1',
@@ -169,6 +176,7 @@ export function isRolloutFlagEnabled(key: RolloutFlagKey): boolean {
 export const ROLLOUT_FLAGS: Record<RolloutFlagKey, boolean> = {
     visualQualityV2: isRolloutFlagEnabled('visualQualityV2'),
     mermaidSyncV1: isRolloutFlagEnabled('mermaidSyncV1'),
+    codeToArchitectureV1: isRolloutFlagEnabled('codeToArchitectureV1'),
     familyPluginV1: isRolloutFlagEnabled('familyPluginV1'),
     connectorModelV1: isRolloutFlagEnabled('connectorModelV1'),
     relationSemanticsV1: isRolloutFlagEnabled('relationSemanticsV1'),

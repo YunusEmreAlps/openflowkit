@@ -8,6 +8,7 @@ import {
   appendChatExchange,
   generateAIFlowResult,
 } from './ai-generation/requestLifecycle';
+import { buildCodeToArchitecturePrompt, type SupportedLanguage } from './ai-generation/codeToArchitecture';
 
 export function useAIGeneration(
   recordHistory: () => void,
@@ -83,5 +84,10 @@ export function useAIGeneration(
     applyComposedGraph,
   ]);
 
-  return { isGenerating, handleAIRequest, chatMessages, clearChat };
+  const handleCodeAnalysis = useCallback(async (code: string, language: SupportedLanguage) => {
+    const prompt = buildCodeToArchitecturePrompt({ code, language });
+    await handleAIRequest(prompt);
+  }, [handleAIRequest]);
+
+  return { isGenerating, handleAIRequest, handleCodeAnalysis, chatMessages, clearChat };
 }
