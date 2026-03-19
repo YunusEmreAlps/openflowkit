@@ -1,6 +1,5 @@
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import type { DiagramPlugin } from '@/diagram-types/core';
-import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { MarkerType } from '@/lib/reactflowCompat';
 import { setNodeParent } from '@/lib/nodeParent';
 
@@ -253,8 +252,7 @@ function parseArchitecture(input: string): { nodes: FlowNode[]; edges: FlowEdge[
     };
 
     if (
-      ROLLOUT_FLAGS.architectureParentingV12
-      && typeof node.parentId === 'string'
+      typeof node.parentId === 'string'
       && node.parentId.length > 0
       && node.parentId !== node.id
       && nodeIds.has(node.parentId)

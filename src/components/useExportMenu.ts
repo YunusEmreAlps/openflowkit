@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 
 interface UseExportMenuParams {
     onExportPNG: (format: 'png' | 'jpeg') => void;
+    onExportSVG: () => void;
     onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
@@ -20,6 +21,7 @@ interface UseExportMenuResult {
 
 export function useExportMenu({
     onExportPNG,
+    onExportSVG,
     onExportAnimated,
     onExportJSON,
     onExportMermaid,
@@ -46,6 +48,7 @@ export function useExportMenu({
     const handlers: Record<string, () => void> = {
         png: () => onExportPNG('png'),
         jpeg: () => onExportPNG('jpeg'),
+        svg: onExportSVG,
         video: () => onExportAnimated('video'),
         gif: () => onExportAnimated('gif'),
         json: onExportJSON,

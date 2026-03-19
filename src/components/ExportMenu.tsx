@@ -12,6 +12,7 @@ const LazyExportMenuPanel = lazy(async () => {
 
 interface ExportMenuProps {
     onExportPNG: (format: 'png' | 'jpeg') => void;
+    onExportSVG: () => void;
     onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
@@ -22,6 +23,7 @@ interface ExportMenuProps {
 
 export const ExportMenu: React.FC<ExportMenuProps> = ({
     onExportPNG,
+    onExportSVG,
     onExportAnimated,
     onExportJSON,
     onExportMermaid,
@@ -32,6 +34,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
     const { t } = useTranslation();
     const { isOpen, menuRef, toggleMenu, handleSelect } = useExportMenu({
         onExportPNG,
+        onExportSVG,
         onExportAnimated,
         onExportJSON,
         onExportMermaid,

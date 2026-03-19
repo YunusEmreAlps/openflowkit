@@ -22,6 +22,7 @@ interface TopNavProps {
 
     // Actions
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onExportSVG: () => void;
     onExportAnimated: (format: 'video' | 'gif') => void;
     onExportJSON: () => void;
     onExportMermaid: () => void;
@@ -56,6 +57,7 @@ export function TopNav({
     onCloseTab,
     onRenameTab,
     onExportPNG,
+    onExportSVG,
     onExportAnimated,
     onExportJSON,
     onExportMermaid,
@@ -70,6 +72,7 @@ export function TopNav({
 }: TopNavProps): React.ReactElement {
     const isBeveled = IS_BEVELED;
     const handleExportPNG = onExportPNG;
+    const handleExportSVG = onExportSVG;
     const handleExportAnimated = onExportAnimated;
     const handleExportJSON = onExportJSON;
     const handleExportMermaid = onExportMermaid;
@@ -125,6 +128,7 @@ export function TopNav({
             <TopNavActions
                 onPlay={onPlay}
                 onExportPNG={handleExportPNG}
+                onExportSVG={handleExportSVG}
                 onExportAnimated={handleExportAnimated}
                 onExportJSON={handleExportJSON}
                 onExportMermaid={handleExportMermaid}

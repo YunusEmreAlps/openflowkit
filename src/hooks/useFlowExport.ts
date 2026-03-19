@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { getCompatibleNodesBounds, useReactFlow } from '@/lib/reactflowCompat';
-import { toPng, toJpeg } from 'html-to-image';
+import { toPng, toJpeg, toSvg } from 'html-to-image';
 import { useFlowStore } from '../store';
 import { useCanvasActions, useCanvasState } from '@/store/canvasHooks';
 import { useActiveTabId, useTabActions } from '@/store/tabHooks';
@@ -138,6 +138,37 @@ export const useFlowExport = (
         .catch((err) => {
           console.error('Export failed:', err);
           addToast('Failed to export. Please try again.', 'error');
+        })
+        .finally(() => {
+          reactFlowWrapper.current?.classList.remove('exporting');
+        });
+    }, 300);
+  }, [nodes, reactFlowWrapper, addToast]);
+
+  const handleSvgExport = useCallback(() => {
+    if (!reactFlowWrapper.current) return;
+    reactFlowWrapper.current.classList.add('exporting');
+
+    setTimeout(() => {
+      const { options } = createExportOptions(nodes, 'png');
+      const flowViewport = document.querySelector('.react-flow__viewport') as HTMLElement;
+
+      if (!flowViewport) {
+        reactFlowWrapper.current?.classList.remove('exporting');
+        return;
+      }
+
+      toSvg(flowViewport, { ...options, backgroundColor: null })
+        .then((dataUrl) => {
+          const link = document.createElement('a');
+          link.download = 'openflowkit-diagram.svg';
+          link.href = dataUrl;
+          link.click();
+          addToast('Diagram exported as SVG!', 'success');
+        })
+        .catch((err) => {
+          console.error('SVG export failed:', err);
+          addToast('Failed to export SVG. Please try again.', 'error');
         })
         .finally(() => {
           reactFlowWrapper.current?.classList.remove('exporting');
@@ -367,5 +398,5 @@ export const useFlowExport = (
     [recordHistory, setNodes, setEdges, fitView, addToast, activeTabId, updateTab]
   );
 
-  return { fileInputRef, handleExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport };
+  return { fileInputRef, handleExport, handleSvgExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport };
 };

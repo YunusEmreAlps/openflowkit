@@ -343,19 +343,21 @@ function CustomNode(props: LegacyNodeProps<NodeData>): React.ReactElement {
 
   if (isIconAssetNode) {
     return (
-      <IconAssetNodeBody
-        selected={Boolean(selected)}
-        setShiftHeld={setShiftHeld}
-        connectionHandleClass={connectionHandleClass}
-        explicitWidth={explicitWidth}
-        nodeHeightPx={nodeHeightPx}
-        hasLabel={hasLabel}
-        resolvedAssetIconUrl={resolvedAssetIconUrl}
-        activeIconKey={activeIconKey}
-        label={data.label}
-        isActiveSelected={isActiveSelected}
-        labelEdit={labelEdit}
-      />
+      <>
+        <IconAssetNodeBody
+          selected={Boolean(selected)}
+          setShiftHeld={setShiftHeld}
+          connectionHandleClass={connectionHandleClass}
+          explicitWidth={explicitWidth}
+          nodeHeightPx={nodeHeightPx}
+          hasLabel={hasLabel}
+          resolvedAssetIconUrl={resolvedAssetIconUrl}
+          activeIconKey={activeIconKey}
+          label={data.label}
+          isActiveSelected={isActiveSelected}
+          labelEdit={labelEdit}
+        />
+      </>
     );
   }
 

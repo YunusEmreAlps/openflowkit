@@ -228,7 +228,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
     } = usePlayback();
 
     // --- Export ---
-    const { fileInputRef, handleExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport } = useFlowExport(
+    const { fileInputRef, handleExport, handleSvgExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport } = useFlowExport(
         recordHistory,
         reactFlowWrapper,
         {
@@ -495,6 +495,7 @@ export function FlowEditor({ onGoHome }: FlowEditorProps) {
                     onCloseTab={handleCloseTab}
                     onRenameTab={handleRenameTab}
                     onExportPNG={handleExport}
+                    onExportSVG={handleSvgExport}
                     onExportAnimated={handleAnimatedExport}
                     onExportJSON={handleExportJSON}
                     onExportMermaid={handleExportMermaid}

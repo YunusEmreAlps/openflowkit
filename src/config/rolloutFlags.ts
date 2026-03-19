@@ -18,10 +18,7 @@ export type RolloutFlagKey =
     | 'terraformImportV1'
     | 'openApiImportV1'
     | 'liveBindingsV1'
-    | 'documentModelV2'
-    | 'reactFlowV12Migration'
-    | 'architectureParentingV12'
-    | 'reactFlowV12Cleanup';
+    | 'documentModelV2';
 
 interface RolloutFlagDefinition {
     key: RolloutFlagKey;
@@ -106,19 +103,19 @@ const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = 
     animationTimelineV1: {
         key: 'animationTimelineV1',
         envVar: 'VITE_ANIMATION_TIMELINE_V1',
-        defaultEnabled: false,
+        defaultEnabled: true,
         description: 'Typed playback timeline contracts and sequencing foundation',
     },
     playbackStudioV1: {
         key: 'playbackStudioV1',
         envVar: 'VITE_PLAYBACK_STUDIO_V1',
-        defaultEnabled: false,
+        defaultEnabled: true,
         description: 'Dedicated playback studio shell and authoring tools',
     },
     animatedExportV1: {
         key: 'animatedExportV1',
         envVar: 'VITE_ANIMATED_EXPORT_V1',
-        defaultEnabled: false,
+        defaultEnabled: true,
         description: 'Animated diagram export pipeline',
     },
     importAdaptersV1: {
@@ -150,24 +147,6 @@ const ROLLOUT_FLAG_DEFINITIONS: Record<RolloutFlagKey, RolloutFlagDefinition> = 
         envVar: 'VITE_DOCUMENT_MODEL_V2',
         defaultEnabled: false,
         description: 'Extended document metadata for scenes, exports, and bindings',
-    },
-    reactFlowV12Migration: {
-        key: 'reactFlowV12Migration',
-        envVar: 'VITE_REACTFLOW_V12_MIGRATION',
-        defaultEnabled: false,
-        description: 'React Flow v12 migration path',
-    },
-    architectureParentingV12: {
-        key: 'architectureParentingV12',
-        envVar: 'VITE_ARCHITECTURE_PARENTING_V12',
-        defaultEnabled: false,
-        description: 'React Flow v12 parent/extent rollout for architecture boundaries',
-    },
-    reactFlowV12Cleanup: {
-        key: 'reactFlowV12Cleanup',
-        envVar: 'VITE_REACTFLOW_V12_CLEANUP',
-        defaultEnabled: false,
-        description: 'Post-migration cleanup rollout for temporary compatibility shims',
     },
 };
 
@@ -208,9 +187,6 @@ export const ROLLOUT_FLAGS: Record<RolloutFlagKey, boolean> = {
     openApiImportV1: isRolloutFlagEnabled('openApiImportV1'),
     liveBindingsV1: isRolloutFlagEnabled('liveBindingsV1'),
     documentModelV2: isRolloutFlagEnabled('documentModelV2'),
-    reactFlowV12Migration: isRolloutFlagEnabled('reactFlowV12Migration'),
-    architectureParentingV12: isRolloutFlagEnabled('architectureParentingV12'),
-    reactFlowV12Cleanup: isRolloutFlagEnabled('reactFlowV12Cleanup'),
 };
 
 export function getRolloutFlagDefinitions(): RolloutFlagDefinition[] {

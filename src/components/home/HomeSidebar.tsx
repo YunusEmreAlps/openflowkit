@@ -50,7 +50,7 @@ export function HomeSidebar({
                 </SidebarItem>
                 <SidebarItem
                     icon={<Book className="w-4 h-4" />}
-                    to="/docs"
+                    to="https://docs.openflowkit.com"
                     testId="sidebar-docs"
                 >
                     {t('nav.documentation', 'Documentation')}

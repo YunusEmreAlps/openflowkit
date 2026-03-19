@@ -25,6 +25,7 @@ export function ExportMenuPanel({ onSelect }: ExportMenuPanelProps): React.React
     const exportOptions: ExportOption[] = [
         { key: 'png', label: t('export.png', 'Export PNG'), hint: t('export.hintTransparent4K', 'Transparent (4K)'), Icon: Image },
         { key: 'jpeg', label: t('export.jpeg', 'Export JPG'), hint: t('export.hintWhiteBg4K', 'White Background (4K)'), Icon: Image },
+        { key: 'svg', label: t('export.svg', 'Export SVG'), hint: t('export.hintSvgScalable', 'Vector, scales to any size'), Icon: Image },
         ...(ROLLOUT_FLAGS.animatedExportV1
             ? [
                 { key: 'video', label: t('export.video', 'Playback Video'), hint: t('export.hintPlaybackWebM', 'Playback timeline (WebM/MP4)'), Icon: Film },
