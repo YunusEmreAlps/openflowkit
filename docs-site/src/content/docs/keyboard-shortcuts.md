@@ -43,7 +43,9 @@ These are the current shortcut groups defined by the app.
 | Pan canvas | `Space + Drag` | `Space + Drag` |
 | Zoom | `Cmd + +/-` | `Ctrl + +/-` |
 | Fit view | `Shift + 1` | `Shift + 1` |
-| Nudge node | `Arrow keys` | `Arrow keys` |
+| Nudge node 1px | `Arrow keys` | `Arrow keys` |
+| Nudge node 10px | `Shift + Arrow` | `Shift + Arrow` |
+| Clear selection | `Escape` | `Escape` |
 
 ## Help and launcher
 

@@ -59,7 +59,11 @@ Drag nodes directly on the canvas.
 
 ## Creating connections
 
-Drag from a node handle to another node to create an edge. After that, use the edge inspector to refine:
+Drag from a node handle (the small dot that appears on hover) to another node to create an edge. As you drag toward a target node, a snap ring highlights the destination to confirm the connection will land correctly.
+
+Releasing on empty canvas opens a node-creation menu so you can create and connect a new node in one gesture.
+
+After creating an edge, use the edge inspector to refine:
 
 - label
 - route style
@@ -68,6 +72,10 @@ Drag from a node handle to another node to create an edge. After that, use the e
 - appearance and animation flags
 
 Architecture edges expose extra semantics such as protocol, port, and direction.
+
+### Edit an edge label
+
+Double-click any edge label to enter inline edit mode. Press `Enter` or click away to save. Press `Escape` to cancel.
 
 ## Working styles
 

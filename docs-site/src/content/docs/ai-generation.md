@@ -7,7 +7,13 @@ OpenFlowKit ships with AI-assisted diagram generation through the Studio rail. I
 
 ## Where AI lives in the product
 
-AI is available in the Studio panel under the **AI** tab and through the **Open FlowPilot** command in the Command Center.
+AI is available in the Studio panel under the **AI** tab and through the **Open FlowPilot** command in the Command Center. The panel has three tabs:
+
+| Tab | What it does |
+| --- | --- |
+| **FlowPilot** | Chat-based generation and iteration |
+| **From Code** | Paste source code → architecture diagram |
+| **Import** | Paste SQL / Terraform / K8s / OpenAPI → diagram |
 
 The current hook path:
 
@@ -95,6 +101,7 @@ AI is weaker at:
 
 ## Related reading
 
+- [Import from Structured Data](/import-from-data/) — SQL, Terraform, OpenAPI → diagram
 - [Prompting AI Agents](/prompting-agents/)
 - [OpenFlow DSL](/openflow-dsl/)
 - [Mermaid Integration](/mermaid-integration/)
