@@ -39,8 +39,9 @@ export function KeyboardShortcutsModal(): React.JSX.Element | null {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="keyboard-shortcuts-title"
-                className="bg-white shadow-2xl max-w-2xl w-full border border-slate-200/60 flex flex-col overflow-hidden animate-in zoom-in duration-200"
-                style={{ borderRadius: 'var(--brand-radius, 20px)' }}
+                aria-describedby="keyboard-shortcuts-description"
+                className="max-w-2xl w-full overflow-hidden border border-slate-200/60 bg-white shadow-[var(--shadow-overlay)] flex flex-col animate-in zoom-in duration-200"
+                style={{ borderRadius: 'var(--radius-xl)' }}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-100">
@@ -50,14 +51,14 @@ export function KeyboardShortcutsModal(): React.JSX.Element | null {
                             style={{
                                 background: 'var(--brand-primary-50, #eef2ff)',
                                 color: 'var(--brand-primary, #6366f1)',
-                                borderRadius: 'calc(var(--brand-radius, 24px) * 0.4)'
+                                borderRadius: 'var(--radius-md)'
                             }}
                         >
                             <Keyboard className="w-5 h-5" />
                         </div>
                         <div>
                             <h2 id="keyboard-shortcuts-title" className="text-lg font-bold leading-none">{t('keyboardShortcutsModal.title')}</h2>
-                            <p className="text-xs text-slate-500 mt-1">{t('keyboardShortcutsModal.subtitle')}</p>
+                            <p id="keyboard-shortcuts-description" className="text-xs text-slate-500 mt-1">{t('keyboardShortcutsModal.subtitle')}</p>
                         </div>
                     </div>
                     <button

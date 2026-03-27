@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect } from 'react';
 import type { FlowTab } from '@/lib/types';
 import { FlowTabs } from './FlowTabs';
 import { TopNavMenu } from './top-nav/TopNavMenu';
@@ -6,6 +6,8 @@ import { TopNavBrand } from './top-nav/TopNavBrand';
 import { TopNavActions } from './top-nav/TopNavActions';
 import { useTopNavState } from './top-nav/useTopNavState';
 import { APP_NAME, IS_BEVELED } from '@/lib/brand';
+
+const OPEN_AI_SETTINGS_EVENT = 'open-ai-settings';
 
 const LazySettingsModal = lazy(async () => {
     const module = await import('./SettingsModal/SettingsModal');
@@ -22,19 +24,29 @@ interface TopNavProps {
 
     // Actions
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onCopyImage: (format?: 'png' | 'jpeg') => void;
     onExportSVG: () => void;
-    onExportAnimated: (format: 'video' | 'gif') => void;
+    onCopySVG: () => void;
+    onExportPDF: () => void;
+    onExportCinematic: (format: 'cinematic-video' | 'cinematic-gif') => void;
     onExportJSON: () => void;
+    onCopyJSON: () => void;
     onExportMermaid: () => void;
+    onDownloadMermaid: () => void;
     onExportPlantUML: () => void;
+    onDownloadPlantUML: () => void;
     onExportOpenFlowDSL: () => void;
+    onDownloadOpenFlowDSL: () => void;
     onExportFigma: () => void;
+    onDownloadFigma: () => void;
+    onShare: () => void;
     onImportJSON: () => void;
     onHistory: () => void;
     onGoHome: () => void;
     onPlay: () => void;
     collaboration?: {
         roomId: string;
+        inviteUrl: string;
         viewerCount: number;
         status: 'realtime' | 'waiting' | 'fallback';
         cacheState: 'unavailable' | 'syncing' | 'ready' | 'hydrated';
@@ -48,7 +60,6 @@ interface TopNavProps {
     };
 }
 
-
 export function TopNav({
     tabs,
     activeTabId,
@@ -57,13 +68,22 @@ export function TopNav({
     onCloseTab,
     onRenameTab,
     onExportPNG,
+    onCopyImage,
     onExportSVG,
-    onExportAnimated,
+    onCopySVG,
+    onExportPDF,
+    onExportCinematic,
     onExportJSON,
+    onCopyJSON,
     onExportMermaid,
+    onDownloadMermaid,
     onExportPlantUML,
+    onDownloadPlantUML,
     onExportOpenFlowDSL,
+    onDownloadOpenFlowDSL,
     onExportFigma,
+    onDownloadFigma,
+    onShare,
     onImportJSON,
     onHistory,
     onGoHome,
@@ -71,14 +91,6 @@ export function TopNav({
     collaboration,
 }: TopNavProps): React.ReactElement {
     const isBeveled = IS_BEVELED;
-    const handleExportPNG = onExportPNG;
-    const handleExportSVG = onExportSVG;
-    const handleExportAnimated = onExportAnimated;
-    const handleExportJSON = onExportJSON;
-    const handleExportMermaid = onExportMermaid;
-    const handleExportPlantUML = onExportPlantUML;
-    const handleExportOpenFlowDSL = onExportOpenFlowDSL;
-    const handleExportFigma = onExportFigma;
     const {
         isMenuOpen,
         isSettingsOpen,
@@ -88,56 +100,76 @@ export function TopNav({
         openSettings,
         closeSettings,
     } = useTopNavState();
+    const openGeneralSettings = useCallback(() => {
+        openSettings('general');
+    }, [openSettings]);
+    const openAISettings = useCallback(() => {
+        openSettings('ai');
+    }, [openSettings]);
+
+    useEffect(() => {
+        window.addEventListener(OPEN_AI_SETTINGS_EVENT, openAISettings);
+        return () => window.removeEventListener(OPEN_AI_SETTINGS_EVENT, openAISettings);
+    }, [openAISettings]);
 
     return (
-        <div className="absolute top-0 left-0 right-0 z-50 h-16 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-sm px-6 flex items-center justify-between transition-all">
+        <div className="absolute top-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-b border-white/20 bg-white/70 px-3 shadow-sm backdrop-blur-md transition-all sm:px-4">
             {/* Left: Menu & Brand */}
-            <div className="flex items-center gap-4 min-w-[240px]">
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
                 <TopNavMenu
                     isOpen={isMenuOpen}
                     isBeveled={isBeveled}
                     onToggle={toggleMenu}
                     onClose={closeMenu}
                     onGoHome={onGoHome}
-                    onOpenSettings={() => openSettings('general')}
+                    onOpenSettings={openGeneralSettings}
                     onHistory={onHistory}
                     onImportJSON={onImportJSON}
                 />
                 <TopNavBrand
                     appName={APP_NAME}
                     logoUrl={null}
-                    logoStyle={'text'}
+                    logoStyle="text"
                     ui={{ showBeta: true }}
                 />
             </div>
 
             {/* Center: Tabs */}
-            <div className="flex-1 flex justify-center max-w-2xl">
-                <div className="bg-slate-100/50 p-1 rounded-[var(--radius-lg)] border border-slate-200/60 backdrop-blur-sm">
-                    <FlowTabs
-                        tabs={tabs}
-                        activeTabId={activeTabId}
-                        onSwitchTab={onSwitchTab}
-                        onAddTab={onAddTab}
-                        onCloseTab={onCloseTab}
-                        onRenameTab={onRenameTab}
-                    />
-                </div>
+            <div className="flex min-w-0 flex-[1.2] justify-center px-2 sm:px-3">
+                <FlowTabs
+                    tabs={tabs}
+                    activeTabId={activeTabId}
+                    onSwitchTab={onSwitchTab}
+                    onAddTab={onAddTab}
+                    onCloseTab={onCloseTab}
+                    onRenameTab={onRenameTab}
+                />
             </div>
 
-            <TopNavActions
-                onPlay={onPlay}
-                onExportPNG={handleExportPNG}
-                onExportSVG={handleExportSVG}
-                onExportAnimated={handleExportAnimated}
-                onExportJSON={handleExportJSON}
-                onExportMermaid={handleExportMermaid}
-                onExportPlantUML={handleExportPlantUML}
-                onExportOpenFlowDSL={handleExportOpenFlowDSL}
-                onExportFigma={handleExportFigma}
-                collaboration={collaboration}
-                isBeveled={isBeveled}
-            />
+            <div className="flex min-w-0 flex-1 justify-end">
+                <TopNavActions
+                    onPlay={onPlay}
+                    onExportPNG={onExportPNG}
+                    onCopyImage={onCopyImage}
+                    onExportSVG={onExportSVG}
+                    onCopySVG={onCopySVG}
+                    onExportPDF={onExportPDF}
+                    onExportCinematic={onExportCinematic}
+                    onExportJSON={onExportJSON}
+                    onCopyJSON={onCopyJSON}
+                    onExportMermaid={onExportMermaid}
+                    onDownloadMermaid={onDownloadMermaid}
+                    onExportPlantUML={onExportPlantUML}
+                    onDownloadPlantUML={onDownloadPlantUML}
+                    onExportOpenFlowDSL={onExportOpenFlowDSL}
+                    onDownloadOpenFlowDSL={onDownloadOpenFlowDSL}
+                    onExportFigma={onExportFigma}
+                    onDownloadFigma={onDownloadFigma}
+                    onShare={onShare}
+                    collaboration={collaboration}
+                    isBeveled={isBeveled}
+                />
+            </div>
 
             {isSettingsOpen ? (
                 <Suspense fallback={null}>

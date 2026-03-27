@@ -60,18 +60,19 @@ export function HomeFlowRenameDialog({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="home-flow-rename-title"
-                className="w-full max-w-md rounded-[var(--radius-xl)] border border-slate-200 bg-white shadow-2xl"
+                aria-describedby="home-flow-rename-description"
+                className="w-full max-w-md rounded-[var(--radius-lg)] border border-slate-200 bg-white shadow-[var(--shadow-overlay)]"
             >
                 <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--brand-primary-50)] text-[var(--brand-primary)]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-[var(--brand-primary-50)] text-[var(--brand-primary)]">
                             <Pencil className="h-4 w-4" />
                         </div>
                         <div>
                             <h2 id="home-flow-rename-title" className="text-base font-semibold text-slate-900">
                                 {t('home.renameFlow.title', 'Rename flow')}
                             </h2>
-                            <p className="text-sm text-slate-500">
+                            <p id="home-flow-rename-description" className="text-sm text-slate-500">
                                 {t('home.renameFlow.description', 'Update the name shown on your dashboard and tabs.')}
                             </p>
                         </div>
@@ -95,7 +96,7 @@ export function HomeFlowRenameDialog({
                         id="home-flow-rename-input"
                         value={draftName}
                         onChange={(event) => setDraftName(event.target.value)}
-                        className="w-full rounded-[var(--radius-lg)] border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[var(--brand-primary)]"
+                        className="w-full rounded-[var(--radius-md)] border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-[var(--brand-primary)]"
                         placeholder={t('home.renameFlow.placeholder', 'Enter a flow name')}
                         autoFocus
                     />
@@ -161,7 +162,8 @@ export function HomeFlowDeleteDialog({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="home-flow-delete-title"
-                className="w-full max-w-md rounded-[var(--radius-xl)] border border-slate-200 bg-white shadow-2xl"
+                aria-describedby="home-flow-delete-description"
+                className="w-full max-w-md rounded-[var(--radius-lg)] border border-slate-200 bg-white shadow-[var(--shadow-overlay)]"
             >
                 <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
                     <div className="flex items-center gap-3">
@@ -172,7 +174,7 @@ export function HomeFlowDeleteDialog({
                             <h2 id="home-flow-delete-title" className="text-base font-semibold text-slate-900">
                                 {t('home.deleteFlow.title', 'Delete flow')}
                             </h2>
-                            <p className="text-sm text-slate-500">
+                            <p id="home-flow-delete-description" className="text-sm text-slate-500">
                                 {t('home.deleteFlow.description', 'This removes the local autosaved flow from this device.')}
                             </p>
                         </div>

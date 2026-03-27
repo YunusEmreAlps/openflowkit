@@ -1,8 +1,8 @@
 import type { EdgeTypes, NodeTypes } from '@/lib/reactflowCompat';
-import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import AnnotationNode from '@/components/AnnotationNode';
 import CustomNode from '@/components/CustomNode';
 import { CustomBezierEdge, CustomSmoothStepEdge, CustomStepEdge, CustomStraightEdge } from '@/components/CustomEdge';
+import SequenceMessageEdge from '@/components/custom-edge/SequenceMessageEdge';
 import GroupNode from '@/components/GroupNode';
 import ImageNode from '@/components/ImageNode';
 import SectionNode from '@/components/SectionNode';
@@ -15,6 +15,7 @@ import EntityNode from '@/components/custom-nodes/EntityNode';
 import MindmapNode from '@/components/custom-nodes/MindmapNode';
 import JourneyNode from '@/components/custom-nodes/JourneyNode';
 import ArchitectureNode from '@/components/custom-nodes/ArchitectureNode';
+import SequenceParticipantNode from '@/components/custom-nodes/SequenceParticipantNode';
 
 export const flowCanvasNodeTypes: NodeTypes = {
     start: CustomNode,
@@ -35,18 +36,16 @@ export const flowCanvasNodeTypes: NodeTypes = {
     image: ImageNode,
     browser: BrowserNode,
     mobile: MobileNode,
+    sequence_participant: SequenceParticipantNode,
 };
 
 export const flowCanvasEdgeTypes: EdgeTypes = {
     default: CustomBezierEdge,
     smoothstep: CustomSmoothStepEdge,
     step: CustomStepEdge,
-    ...(ROLLOUT_FLAGS.connectorModelV1
-        ? {
-            bezier: CustomBezierEdge,
-            straight: CustomStraightEdge,
-        }
-        : {}),
+    bezier: CustomBezierEdge,
+    straight: CustomStraightEdge,
+    sequence_message: SequenceMessageEdge,
 };
 
 interface ConnectionLike {

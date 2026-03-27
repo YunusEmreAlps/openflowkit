@@ -1,7 +1,6 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { useFlowStore } from '../store';
 import { useTabActions, useTabsState } from '@/store/tabHooks';
-import { FlowSnapshot } from '@/lib/types';
 import { HomeDashboard, type HomeFlowCard } from './home/HomeDashboard';
 import { HomeFlowDeleteDialog, HomeFlowRenameDialog } from './home/HomeFlowDialogs';
 import { HomeSettingsView } from './home/HomeSettingsView';
@@ -15,8 +14,9 @@ const LazyWelcomeModal = lazy(async () => {
 
 interface HomePageProps {
     onLaunch: () => void;
+    onLaunchWithTemplates: () => void;
+    onLaunchWithAI: () => void;
     onImportJSON: () => void;
-    onRestoreSnapshot: (snapshot: FlowSnapshot) => void;
     onOpenFlow: (flowId: string) => void;
     activeTab?: 'home' | 'settings';
     onSwitchTab?: (tab: 'home' | 'settings') => void;
@@ -24,8 +24,9 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({
     onLaunch,
+    onLaunchWithTemplates,
+    onLaunchWithAI,
     onImportJSON,
-    onRestoreSnapshot: _onRestoreSnapshot,
     onOpenFlow,
     activeTab: propActiveTab,
     onSwitchTab
@@ -112,27 +113,23 @@ export const HomePage: React.FC<HomePageProps> = ({
     };
 
     return (
-        <div className="min-h-screen bg-[var(--brand-background)] flex text-[var(--brand-text)]">
+        <div className="min-h-screen bg-[var(--brand-background)] flex flex-col text-[var(--brand-text)] md:flex-row">
             <HomeSidebar
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
             />
 
             {/* Main Content */}
-            <main className="ml-64 flex-1 flex flex-col min-w-0 bg-[var(--brand-surface)]">
+            <main className="flex-1 flex min-w-0 flex-col bg-[var(--brand-surface)] md:ml-64">
 
                 {activeTab === 'home' && (
                     <HomeDashboard
                         flows={flows}
-                        onCreateNew={() => {
-                            onLaunch();
-                        }}
-                        onImportJSON={() => {
-                            onImportJSON();
-                        }}
-                        onOpenFlow={(flowId) => {
-                            onOpenFlow(flowId);
-                        }}
+                        onCreateNew={onLaunch}
+                        onOpenTemplates={onLaunchWithTemplates}
+                        onPromptWithAI={onLaunchWithAI}
+                        onImportJSON={onImportJSON}
+                        onOpenFlow={onOpenFlow}
                         onRenameFlow={handleRenameFlow}
                         onDuplicateFlow={(flowId) => {
                             const newFlowId = duplicateTab(flowId);
@@ -167,7 +164,12 @@ export const HomePage: React.FC<HomePageProps> = ({
             />
             {showWelcomeModal ? (
                 <Suspense fallback={null}>
-                    <LazyWelcomeModal />
+                    <LazyWelcomeModal
+                        onOpenTemplates={onLaunchWithTemplates}
+                        onPromptWithAI={onLaunchWithAI}
+                        onImport={onImportJSON}
+                        onBlankCanvas={onLaunch}
+                    />
                 </Suspense>
             ) : null}
         </div>

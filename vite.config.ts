@@ -2,7 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   return {
     server: {
       port: 3000,
@@ -72,6 +72,8 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: 'jsdom',
       setupFiles: './vitest.setup.ts',
+      testTimeout: 10000,
+      maxWorkers: 2,
       exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
     },
   };

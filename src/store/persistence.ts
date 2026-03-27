@@ -3,8 +3,9 @@ import { DEFAULT_DIAGRAM_TYPE } from '@/services/diagramDocument';
 import { clonePlaybackState, sanitizePlaybackState } from '@/services/playback/model';
 import type { FlowTab } from '@/lib/types';
 import { isDiagramType } from '@/lib/types';
+import { sanitizeAISettings } from './aiSettings';
+import { loadPersistedAISettings, persistAISettings } from './aiSettingsPersistence';
 import {
-    DEFAULT_AI_SETTINGS,
     DEFAULT_DESIGN_SYSTEM,
     INITIAL_GLOBAL_EDGE_OPTIONS,
     INITIAL_LAYERS,
@@ -14,13 +15,10 @@ import type { FlowState } from './types';
 
 export type PersistedFlowStateSlice = Pick<
     FlowState,
-    | 'tabs'
-    | 'activeTabId'
     | 'designSystems'
     | 'activeDesignSystemId'
     | 'viewSettings'
     | 'globalEdgeOptions'
-    | 'aiSettings'
     | 'layers'
     | 'activeLayerId'
 >;
@@ -147,6 +145,14 @@ export function migratePersistedFlowState(persistedState: unknown): unknown {
     const layers = persistedLayers.some((layer) => layer.id === 'default')
         ? persistedLayers
         : [...INITIAL_LAYERS, ...persistedLayers];
+    const persistedAiSettings =
+        state.aiSettings && typeof state.aiSettings === 'object'
+            ? (state.aiSettings as Partial<FlowState['aiSettings']>)
+            : undefined;
+    const migratedAISettings = sanitizeAISettings(persistedAiSettings, loadPersistedAISettings());
+    if (persistedAiSettings) {
+        persistAISettings(migratedAISettings);
+    }
 
     return {
         ...state,
@@ -164,18 +170,16 @@ export function migratePersistedFlowState(persistedState: unknown): unknown {
             ...INITIAL_VIEW_SETTINGS,
             ...persistedViewSettings,
         },
+        aiSettings: migratedAISettings,
     };
 }
 
 export function partializePersistedFlowState(state: FlowState): PersistedFlowStateSlice {
     return {
-        tabs: state.tabs.map(sanitizePersistedTab),
-        activeTabId: state.activeTabId,
         designSystems: state.designSystems,
         activeDesignSystemId: state.activeDesignSystemId,
         viewSettings: state.viewSettings,
         globalEdgeOptions: state.globalEdgeOptions,
-        aiSettings: state.aiSettings,
         layers: state.layers,
         activeLayerId: state.activeLayerId,
     };
@@ -208,7 +212,7 @@ export function createInitialFlowState(): Pick<
         activeDesignSystemId: 'default',
         viewSettings: INITIAL_VIEW_SETTINGS,
         globalEdgeOptions: INITIAL_GLOBAL_EDGE_OPTIONS,
-        aiSettings: DEFAULT_AI_SETTINGS,
+        aiSettings: loadPersistedAISettings(),
         layers: INITIAL_LAYERS,
         activeLayerId: 'default',
         selectedNodeId: null,

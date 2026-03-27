@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { FlowEdge, FlowNode, FlowSnapshot } from '@/lib/types';
-import { buildFlowEditorPanelsProps } from './panelProps';
+import {
+  buildFlowEditorPanelsProps,
+} from './panelProps';
 
 function createNode(id: string): FlowNode {
   return {
@@ -34,7 +36,7 @@ describe('buildFlowEditorPanelsProps', () => {
     const openStudioCode = vi.fn();
     const clearSelection = vi.fn();
 
-    const result = buildFlowEditorPanelsProps({
+    const commandBar = {
       isCommandBarOpen: true,
       closeCommandBar: vi.fn(),
       nodes,
@@ -46,13 +48,16 @@ describe('buildFlowEditorPanelsProps', () => {
       openStudioAI: vi.fn(),
       openStudioCode,
       openStudioPlayback: vi.fn(),
-      commandBarView: 'assets',
+      commandBarView: 'assets' as const,
       handleAddAnnotation: vi.fn(),
       handleAddSection: vi.fn(),
       handleAddTextNode: vi.fn(),
       handleAddJourneyNode: vi.fn(),
       handleAddMindmapNode: vi.fn(),
       handleAddArchitectureNode: vi.fn(),
+      handleAddSequenceParticipant: vi.fn(),
+      handleAddClassNode: vi.fn(),
+      handleAddEntityNode: vi.fn(),
       handleAddImage: vi.fn(),
       handleAddWireframe: vi.fn(),
       handleAddDomainLibraryItem: vi.fn(),
@@ -60,6 +65,8 @@ describe('buildFlowEditorPanelsProps', () => {
       toggleGrid: vi.fn(),
       snapToGrid: false,
       toggleSnap: vi.fn(),
+    };
+    const snapshotsPanel = {
       isHistoryOpen: true,
       closeHistory: vi.fn(),
       snapshots,
@@ -68,6 +75,10 @@ describe('buildFlowEditorPanelsProps', () => {
       saveSnapshot,
       handleRestoreSnapshot: vi.fn(),
       deleteSnapshot: vi.fn(),
+      nodes,
+      edges,
+    };
+    const properties = {
       selectedNode: nodes[0],
       selectedNodes: nodes,
       selectedEdge: edges[0],
@@ -83,16 +94,43 @@ describe('buildFlowEditorPanelsProps', () => {
       handleAddMindmapSibling: vi.fn(),
       handleAddArchitectureService: vi.fn(),
       handleCreateArchitectureBoundary: vi.fn(),
+      handleApplyArchitectureTemplate: vi.fn(),
+      handleGenerateEntityFields: vi.fn(),
+      handleSuggestArchitectureNode: vi.fn(),
+      handleConvertEntitySelectionToClassDiagram: vi.fn(),
+      handleOpenMermaidCodeEditor: vi.fn(),
       clearSelection,
+    };
+    const studio = {
       closeStudioPanel: vi.fn(),
       handleCommandBarApply: vi.fn(),
-      handleAIRequest: vi.fn(async () => undefined),
+      handleAIRequest: vi.fn(async () => true),
+      handleCodeAnalysis: vi.fn(async () => true),
+      handleSqlAnalysis: vi.fn(async () => true),
+      handleTerraformAnalysis: vi.fn(async () => true),
+      handleOpenApiAnalysis: vi.fn(async () => true),
+      setCanvasMode: vi.fn(),
       isGenerating: false,
+      streamingText: null,
+      retryCount: 0,
+      cancelGeneration: vi.fn(),
+      pendingDiff: null,
+      confirmPendingDiff: vi.fn(),
+      discardPendingDiff: vi.fn(),
+      aiReadiness: {
+        canGenerate: true,
+        blockingIssue: null,
+        advisory: null,
+      },
+      lastAIError: null,
+      onClearAIError: vi.fn(),
       chatMessages: [],
       clearChat: vi.fn(),
-      studioTab: 'ai',
+      selectedNode: nodes[0],
+      selectedNodeCount: nodes.length,
+      studioTab: 'ai' as const,
       setStudioTab: vi.fn(),
-      studioCodeMode: 'openflow',
+      studioCodeMode: 'openflow' as const,
       setStudioCodeMode: vi.fn(),
       playback: {
         currentStepIndex: -1,
@@ -107,6 +145,14 @@ describe('buildFlowEditorPanelsProps', () => {
         playbackSpeed: 2000,
         onPlaybackSpeedChange: vi.fn(),
       },
+    };
+
+    const result = buildFlowEditorPanelsProps({
+      commandBar,
+      snapshots: snapshotsPanel,
+      properties,
+      studio,
+      isHistoryOpen: true,
       editorMode: 'studio',
     });
 
@@ -115,7 +161,7 @@ describe('buildFlowEditorPanelsProps', () => {
     expect(result.properties.selectedNode?.id).toBe('n1');
     expect(result.studio.activeTab).toBe('ai');
 
-    result.commandBar.onOpenStudioFlowMind();
+    result.commandBar.onOpenStudioOpenFlow();
     expect(openStudioCode).toHaveBeenCalledWith('openflow');
 
     result.snapshots.onSaveSnapshot('Snapshot 1');

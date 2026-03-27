@@ -1,5 +1,6 @@
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import { getNodeParentId } from '@/lib/nodeParent';
+import { normalizeErFields, stringifyErField } from '@/lib/entityFields';
 import {
   DEFAULT_CLASS_RELATION,
   DEFAULT_ER_RELATION,
@@ -283,7 +284,7 @@ function toERDiagramMermaid(nodes: FlowNode[], edges: FlowEdge[]): string {
   const lines: string[] = ['erDiagram'];
   sortNodesByPosition(nodes).forEach((node) => {
     lines.push(`    ${node.id} {`);
-    const fields = Array.isArray(node.data.erFields) ? node.data.erFields.map((entry) => String(entry).trim()).filter(Boolean) : [];
+    const fields = normalizeErFields(node.data.erFields).map((entry) => stringifyErField(entry).trim()).filter(Boolean);
     fields.forEach((field) => lines.push(`      ${field}`));
     lines.push('    }');
   });
@@ -453,6 +454,48 @@ function resolveFlowchartConnector(edge: FlowEdge): string {
   return body;
 }
 
+function resolveSequenceArrow(kind: string | undefined): string {
+  if (kind === 'async') return '-)';
+  if (kind === 'return') return '-->>';
+  if (kind === 'destroy') return '-x';
+  return '->>';
+}
+
+function toSequenceMermaid(nodes: FlowNode[], edges: FlowEdge[]): string {
+  const lines: string[] = ['sequenceDiagram'];
+  const participantIdByNodeId = new Map<string, string>();
+  sortNodesByPosition(nodes).forEach((node) => {
+    const kind = node.data.seqParticipantKind || 'participant';
+    const label = String(node.data.label || node.id).trim() || node.id;
+    const explicitAlias = typeof node.data.seqParticipantAlias === 'string' ? node.data.seqParticipantAlias.trim() : '';
+    const participantId = sanitizeId(node.id);
+    participantIdByNodeId.set(node.id, participantId);
+
+    if (explicitAlias) {
+      lines.push(`    ${kind} ${participantId} as ${sanitizeLabel(label)}`);
+      return;
+    }
+
+    if (participantId !== label) {
+      lines.push(`    ${kind} ${participantId} as ${sanitizeLabel(label)}`);
+      return;
+    }
+
+    lines.push(`    ${kind} ${participantId}`);
+  });
+
+  edges.forEach((edge) => {
+    const arrow = resolveSequenceArrow(edge.data?.seqMessageKind);
+    const label = typeof edge.label === 'string' ? edge.label.trim() : '';
+    const suffix = label ? `: ${label}` : '';
+    const source = participantIdByNodeId.get(edge.source) ?? sanitizeId(edge.source);
+    const target = participantIdByNodeId.get(edge.target) ?? sanitizeId(edge.target);
+    lines.push(`    ${source}${arrow}${target}${suffix}`);
+  });
+
+  return `${lines.join('\n')}\n`;
+}
+
 export function toMermaid(nodes: FlowNode[], edges: FlowEdge[]): string {
   const architectureNodeCount = nodes.filter((node) => node.type === 'architecture').length;
   if (nodes.length > 0 && architectureNodeCount === nodes.length) {
@@ -477,6 +520,11 @@ export function toMermaid(nodes: FlowNode[], edges: FlowEdge[]): string {
   const erNodeCount = nodes.filter((node) => node.type === 'er_entity').length;
   if (nodes.length > 0 && erNodeCount === nodes.length) {
     return toERDiagramMermaid(nodes, edges);
+  }
+
+  const seqNodeCount = nodes.filter((node) => node.type === 'sequence_participant').length;
+  if (nodes.length > 0 && seqNodeCount === nodes.length) {
+    return toSequenceMermaid(nodes, edges);
   }
 
   if (looksLikeStateDiagram(nodes)) {

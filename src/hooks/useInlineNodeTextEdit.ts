@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useFlowStore } from '@/store';
 import type { NodeData } from '@/lib/types';
-import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { createConnectedSibling } from './node-operations/createConnectedSibling';
 import { useNodeLabelEditRequest } from './nodeLabelEditRequest';
 
@@ -30,7 +29,7 @@ export function useInlineNodeTextEdit(
   cancel: () => void;
   handleKeyDown: (event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 } {
-  const { setNodes } = useFlowStore();
+  const { setNodes, recordHistoryV2 } = useFlowStore();
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraftState] = useState(initialValue ?? '');
   const multiline = options.multiline ?? false;
@@ -52,6 +51,7 @@ export function useInlineNodeTextEdit(
 
   const commit = useCallback(() => {
     const nextValue = draft.trim();
+    recordHistoryV2();
     setNodes((nodes) =>
       nodes.map((node) =>
         node.id === nodeId
@@ -66,7 +66,7 @@ export function useInlineNodeTextEdit(
       )
     );
     setIsEditing(false);
-  }, [draft, field, nodeId, setNodes]);
+  }, [draft, field, nodeId, setNodes, recordHistoryV2]);
 
   const cancel = useCallback(() => {
     setDraftState(initialValue ?? '');
@@ -94,9 +94,7 @@ export function useInlineNodeTextEdit(
       if (event.key === 'Tab' && !event.shiftKey && allowTabCreateSibling) {
         event.preventDefault();
         commit();
-        if (ROLLOUT_FLAGS.canvasInteractionsV1) {
-          createConnectedSibling(nodeId);
-        }
+        createConnectedSibling(nodeId);
       }
     },
     [allowTabCreateSibling, cancel, commit, multiline, nodeId]

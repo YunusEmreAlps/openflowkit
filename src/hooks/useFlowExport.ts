@@ -1,105 +1,46 @@
 import { useCallback, useRef } from 'react';
-import { getCompatibleNodesBounds, useReactFlow } from '@/lib/reactflowCompat';
+import { createLogger } from '@/lib/logger';
+import { useReactFlow } from '@/lib/reactflowCompat';
 import { toPng, toJpeg, toSvg } from 'html-to-image';
+import { useCinematicExportActions } from '@/context/CinematicExportContext';
 import { useFlowStore } from '../store';
 import { useCanvasActions, useCanvasState } from '@/store/canvasHooks';
 import { useActiveTabId, useTabActions } from '@/store/tabHooks';
 import { useViewSettings } from '@/store/viewHooks';
-import { buildAnimatedExportPlan, getAnimatedExportFileExtension, selectSupportedVideoMimeType, type AnimatedExportKind } from '@/services/animatedExport';
-import { orderGraphForSerialization } from '@/services/canonicalSerialization';
-import { createDiagramDocument, parseDiagramDocumentImport } from '@/services/diagramDocument';
-import { composeDiagramForDisplay } from '@/services/composeDiagramForDisplay';
-import { encodeGif } from '@/services/gifEncoder';
-import { buildPlaybackSequence, buildPlaybackSequenceFromState } from '@/services/playback/contracts';
-import {
-  buildImportFidelityReport,
-  mapErrorToIssue,
-  mapWarningToIssue,
-  persistLatestImportReport,
-  summarizeImportReport,
-} from '@/services/importFidelity';
-
+import { getAnimatedExportFileExtension, selectSupportedVideoMimeType } from '@/services/animatedExport';
+import { buildCinematicBuildPlan, type CinematicExportKind } from '@/services/export/cinematicBuildPlan';
+import { buildCinematicTimeline, getCinematicExportPreset, resolveCinematicRenderState } from '@/services/export/cinematicRenderState';
 import { useToast } from '../components/ui/ToastContext';
+import { resolveFlowExportViewport } from './flowExportViewport';
+import { notifyOperationOutcome } from '@/services/operationFeedback';
+import { createPdfFromJpeg } from '@/services/export/pdfDocument';
+import { buildExportFileName } from '@/lib/exportFileName';
+import {
+  copyDataUrlToClipboard,
+  createDownload,
+  createExportOptions,
+  decodeCapturedFrames,
+  encodeGifFromFrames,
+  encodeVideoFromFrames,
+  waitForExportRender,
+  waitForExportSurface,
+} from './flow-export/exportCapture';
+import {
+  buildDiagramDocumentJson,
+  importDiagramDocumentJson,
+} from './flow-export/diagramDocumentTransfer';
+
+const logger = createLogger({ scope: 'useFlowExport' });
 
 interface AnimatedPlaybackControls {
-  jumpToStep: (stepIndex: number) => void;
   stopPlayback: () => void;
-  playbackSpeed: number;
-}
-
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
-
-function createDownload(blob: Blob, fileName: string): void {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = fileName;
-  link.href = url;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function createExportOptions(
-  nodes: ReturnType<typeof useCanvasState>['nodes'],
-  format: 'png' | 'jpeg',
-  config?: { maxDimension?: number; pixelRatio?: number }
-) {
-  const bounds = getCompatibleNodesBounds(nodes);
-  const padding = 80;
-  const rawWidth = (bounds.width || 800) + padding * 2;
-  const rawHeight = (bounds.height || 600) + padding * 2;
-  const longestSide = Math.max(rawWidth, rawHeight);
-  const maxDimension = config?.maxDimension ?? longestSide;
-  const scale = longestSide > maxDimension ? maxDimension / longestSide : 1;
-  const width = Math.max(1, Math.round(rawWidth * scale));
-  const height = Math.max(1, Math.round(rawHeight * scale));
-
-  return {
-    width,
-    height,
-    options: {
-      backgroundColor: format === 'png' ? null : '#ffffff',
-      width,
-      height,
-      style: {
-        transform: `translate(${-bounds.x + padding}px, ${-bounds.y + padding}px) scale(${scale})`,
-        width: `${rawWidth}px`,
-        height: `${rawHeight}px`,
-      },
-      pixelRatio: config?.pixelRatio ?? 3,
-      filter: (node: HTMLElement) => {
-        if (node.classList) {
-          if (
-            node.classList.contains('react-flow__controls') ||
-            node.classList.contains('react-flow__minimap') ||
-            node.classList.contains('react-flow__attribution') ||
-            node.classList.contains('react-flow__background')
-          ) {
-            return false;
-          }
-        }
-        return true;
-      },
-    },
-  };
-}
-
-async function loadImage(dataUrl: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error('Failed to decode exported frame.'));
-    image.src = dataUrl;
-  });
 }
 
 export const useFlowExport = (
   recordHistory: () => void,
   reactFlowWrapper: React.RefObject<HTMLDivElement>,
-  animatedPlayback: AnimatedPlaybackControls
+  animatedPlayback: AnimatedPlaybackControls,
+  cinematicExportSurfaceRef?: React.RefObject<HTMLDivElement | null>,
 ) => {
   const tabs = useFlowStore((state) => state.tabs);
   const { nodes, edges } = useCanvasState();
@@ -108,36 +49,67 @@ export const useFlowExport = (
   const activeTabId = useActiveTabId();
   const { updateTab } = useTabActions();
   const { fitView } = useReactFlow();
+  const { setRenderState, setSurfaceConfig, resetRenderState } = useCinematicExportActions();
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  const exportBaseName = activeTab?.name;
 
   const handleExport = useCallback((format: 'png' | 'jpeg' = 'png') => {
-    if (!reactFlowWrapper.current) return;
+    const { viewport: flowViewport, message } = resolveFlowExportViewport(reactFlowWrapper.current);
+    if (!flowViewport) {
+      addToast(message ?? 'The canvas viewport could not be found.', 'error');
+      return;
+    }
+
     reactFlowWrapper.current.classList.add('exporting');
+    addToast(`Preparing ${format.toUpperCase()} download…`, 'info');
 
     setTimeout(() => {
       const { options } = createExportOptions(nodes, format);
-      const flowViewport = document.querySelector('.react-flow__viewport') as HTMLElement;
-
-      if (!flowViewport) {
-        reactFlowWrapper.current?.classList.remove('exporting');
-        return;
-      }
 
       const exportPromise = format === 'png' ? toPng(flowViewport, options) : toJpeg(flowViewport, options);
 
       exportPromise
         .then((dataUrl) => {
           const link = document.createElement('a');
-          link.download = `openflowkit-diagram.${format === 'jpeg' ? 'jpg' : 'png'}`;
+          link.download = buildExportFileName(exportBaseName, format === 'jpeg' ? 'jpg' : 'png');
           link.href = dataUrl;
           link.click();
           addToast(`Diagram exported as ${format.toUpperCase()}!`, 'success');
         })
         .catch((err) => {
-          console.error('Export failed:', err);
+          logger.error('Export failed.', { error: err, format });
           addToast('Failed to export. Please try again.', 'error');
+        })
+        .finally(() => {
+          reactFlowWrapper.current?.classList.remove('exporting');
+        });
+    }, 300);
+  }, [nodes, reactFlowWrapper, addToast, exportBaseName]);
+
+  const handleCopyImage = useCallback((format: 'png' | 'jpeg' = 'png') => {
+    const { viewport: flowViewport, message } = resolveFlowExportViewport(reactFlowWrapper.current);
+    if (!flowViewport) {
+      addToast(message ?? 'The canvas viewport could not be found.', 'error');
+      return;
+    }
+
+    reactFlowWrapper.current.classList.add('exporting');
+    addToast(`Preparing ${format.toUpperCase()} copy…`, 'info');
+
+    setTimeout(() => {
+      const { options } = createExportOptions(nodes, format);
+      const exportPromise = format === 'png' ? toPng(flowViewport, options) : toJpeg(flowViewport, options);
+
+      exportPromise
+        .then(async (dataUrl) => {
+          await copyDataUrlToClipboard(dataUrl);
+          addToast(`Diagram copied as ${format.toUpperCase()}!`, 'success');
+        })
+        .catch((err) => {
+          logger.error('Clipboard image export failed.', { error: err, format });
+          addToast('Failed to copy image. Please try again.', 'error');
         })
         .finally(() => {
           reactFlowWrapper.current?.classList.remove('exporting');
@@ -146,29 +118,57 @@ export const useFlowExport = (
   }, [nodes, reactFlowWrapper, addToast]);
 
   const handleSvgExport = useCallback(() => {
-    if (!reactFlowWrapper.current) return;
+    const { viewport: flowViewport, message } = resolveFlowExportViewport(reactFlowWrapper.current);
+    if (!flowViewport) {
+      addToast(message ?? 'The canvas viewport could not be found.', 'error');
+      return;
+    }
+
     reactFlowWrapper.current.classList.add('exporting');
+    addToast('Preparing SVG download…', 'info');
 
     setTimeout(() => {
       const { options } = createExportOptions(nodes, 'png');
-      const flowViewport = document.querySelector('.react-flow__viewport') as HTMLElement;
-
-      if (!flowViewport) {
-        reactFlowWrapper.current?.classList.remove('exporting');
-        return;
-      }
 
       toSvg(flowViewport, { ...options, backgroundColor: null })
         .then((dataUrl) => {
           const link = document.createElement('a');
-          link.download = 'openflowkit-diagram.svg';
+          link.download = buildExportFileName(exportBaseName, 'svg');
           link.href = dataUrl;
           link.click();
           addToast('Diagram exported as SVG!', 'success');
         })
         .catch((err) => {
-          console.error('SVG export failed:', err);
+          logger.error('SVG export failed.', { error: err });
           addToast('Failed to export SVG. Please try again.', 'error');
+        })
+        .finally(() => {
+          reactFlowWrapper.current?.classList.remove('exporting');
+        });
+    }, 300);
+  }, [nodes, reactFlowWrapper, addToast, exportBaseName]);
+
+  const handleCopySvg = useCallback(() => {
+    const { viewport: flowViewport, message } = resolveFlowExportViewport(reactFlowWrapper.current);
+    if (!flowViewport) {
+      addToast(message ?? 'The canvas viewport could not be found.', 'error');
+      return;
+    }
+
+    reactFlowWrapper.current.classList.add('exporting');
+    addToast('Preparing SVG copy…', 'info');
+
+    setTimeout(() => {
+      const { options } = createExportOptions(nodes, 'png');
+
+      toSvg(flowViewport, { ...options, backgroundColor: null })
+        .then(async (dataUrl) => {
+          await copyDataUrlToClipboard(dataUrl);
+          addToast('Diagram copied as SVG!', 'success');
+        })
+        .catch((err) => {
+          logger.error('SVG clipboard export failed.', { error: err });
+          addToast('Failed to copy SVG. Please try again.', 'error');
         })
         .finally(() => {
           reactFlowWrapper.current?.classList.remove('exporting');
@@ -176,167 +176,193 @@ export const useFlowExport = (
     }, 300);
   }, [nodes, reactFlowWrapper, addToast]);
 
-  const handleAnimatedExport = useCallback(async (kind: AnimatedExportKind) => {
-    if (!reactFlowWrapper.current) {
+  const handlePdfExport = useCallback(() => {
+    const { viewport: flowViewport, message } = resolveFlowExportViewport(reactFlowWrapper.current);
+    if (!flowViewport) {
+      addToast(message ?? 'The canvas viewport could not be found.', 'error');
       return;
     }
 
-    const flowViewport = document.querySelector('.react-flow__viewport') as HTMLElement | null;
-    if (!flowViewport) {
-      addToast('Animated export is unavailable because the canvas viewport could not be found.', 'error');
+    reactFlowWrapper.current.classList.add('exporting');
+    addToast('Preparing PDF download…', 'info');
+
+    setTimeout(() => {
+      const { width, height, options } = createExportOptions(nodes, 'jpeg');
+
+      toJpeg(flowViewport, options)
+        .then((jpegDataUrl) => {
+          const pdfBlob = createPdfFromJpeg({
+            jpegDataUrl,
+            width,
+            height,
+            title: 'OpenFlowKit Diagram',
+          });
+          createDownload(pdfBlob, buildExportFileName(exportBaseName, 'pdf'));
+          addToast('Diagram exported as PDF!', 'success');
+        })
+        .catch((err) => {
+          logger.error('PDF export failed.', { error: err });
+          addToast('Failed to export PDF. Please try again.', 'error');
+        })
+        .finally(() => {
+          reactFlowWrapper.current?.classList.remove('exporting');
+        });
+    }, 300);
+  }, [nodes, reactFlowWrapper, addToast, exportBaseName]);
+
+  const handleCinematicExport = useCallback(async (kind: CinematicExportKind) => {
+    if (!reactFlowWrapper.current) {
+      addToast('Canvas viewport not found.', 'error');
       return;
     }
 
     if (nodes.length === 0) {
-      addToast('Add nodes before exporting a playback animation.', 'error');
+      addToast('Add nodes before exporting a cinematic build animation.', 'error');
       return;
     }
 
-    const sequence = activeTab?.playback
-      ? buildPlaybackSequenceFromState(nodes, activeTab.playback, animatedPlayback.playbackSpeed)
-      : buildPlaybackSequence(nodes, animatedPlayback.playbackSpeed);
-
-    if (sequence.steps.length === 0) {
-      addToast('Playback export needs at least one playback step.', 'error');
+    const plan = buildCinematicBuildPlan(nodes, edges);
+    if (plan.segments.length === 0) {
+      addToast('Could not build a cinematic export sequence.', 'error');
       return;
     }
 
-    const { width, height } = createExportOptions(nodes, 'png');
-    const plan = buildAnimatedExportPlan({
-      kind,
-      width,
-      height,
-      sequence,
-    });
-
-    if (kind === 'gif' && plan.estimatedBytes > 12_000_000) {
-      addToast('GIF export may be large. Prefer video for longer playback.', 'warning');
+    const preset = getCinematicExportPreset(kind);
+    const timeline = buildCinematicTimeline(plan, preset);
+    const totalFrames = Math.max(1, Math.ceil((timeline.totalDurationMs / 1000) * timeline.preset.fps));
+    if (kind === 'cinematic-gif' && totalFrames >= timeline.preset.maxFrames) {
+      addToast('Cinematic GIF was compressed to stay performant. Prefer video for longer flows.', 'warning');
     }
 
     reactFlowWrapper.current.classList.add('exporting');
-    addToast(kind === 'gif' ? 'Preparing playback GIF…' : 'Preparing playback video…', 'info');
+    addToast(kind === 'cinematic-gif' ? 'Preparing cinematic build GIF…' : 'Preparing cinematic build video…', 'info');
 
     try {
       const frameOptions = createExportOptions(nodes, 'png', {
-        maxDimension: Math.max(plan.frameWidth, plan.frameHeight),
-        pixelRatio: plan.preset.pixelRatio,
+        maxDimension: timeline.preset.maxDimension,
+        pixelRatio: timeline.preset.pixelRatio,
       }).options;
-
+      const frameDurationMs = Math.max(1, Math.round(1000 / timeline.preset.fps));
       const capturedFrames: Array<{ dataUrl: string; delayMs: number }> = [];
+
       animatedPlayback.stopPlayback();
 
-      for (let index = 0; index < sequence.steps.length; index += 1) {
-        animatedPlayback.jumpToStep(index);
-        await wait(140);
-        const dataUrl = await toPng(flowViewport, frameOptions);
-        capturedFrames.push({
-          dataUrl,
-          delayMs: sequence.steps[index].durationMs,
-        });
+      setSurfaceConfig({
+        width: frameOptions.width ?? 0,
+        height: frameOptions.height ?? 0,
+      });
+      const exportSurfaceTarget = await waitForExportSurface(cinematicExportSurfaceRef);
+
+      if (!exportSurfaceTarget) {
+        throw new Error('Cinematic export surface is unavailable.');
       }
 
-      animatedPlayback.stopPlayback();
+      for (let timeMs = 0; timeMs < timeline.totalDurationMs; timeMs += frameDurationMs) {
+        setRenderState(resolveCinematicRenderState(timeline, edges, timeMs));
+        await waitForExportRender(12);
+        const dataUrl = await toPng(exportSurfaceTarget, {
+          backgroundColor: null,
+          width: frameOptions.width,
+          height: frameOptions.height,
+          pixelRatio: frameOptions.pixelRatio,
+          skipFonts: true,
+          cacheBust: true,
+        });
+        capturedFrames.push({ dataUrl, delayMs: frameDurationMs });
+      }
 
-      if (kind === 'gif') {
-        const canvas = document.createElement('canvas');
-        canvas.width = plan.frameWidth;
-        canvas.height = plan.frameHeight;
-        const context = canvas.getContext('2d');
-        if (!context) {
-          throw new Error('Canvas 2D context is unavailable.');
-        }
+      setRenderState(resolveCinematicRenderState(timeline, edges, timeline.totalDurationMs));
+      await waitForExportRender(12);
+      capturedFrames.push({
+        dataUrl: await toPng(exportSurfaceTarget, {
+          backgroundColor: null,
+          width: frameOptions.width,
+          height: frameOptions.height,
+          pixelRatio: frameOptions.pixelRatio,
+          skipFonts: true,
+          cacheBust: true,
+        }),
+        delayMs: Math.max(frameDurationMs, timeline.preset.finalHoldMs),
+      });
 
-        const gifFrames = [];
-        for (const frame of capturedFrames) {
-          const image = await loadImage(frame.dataUrl);
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          gifFrames.push({
-            imageData: context.getImageData(0, 0, canvas.width, canvas.height),
-            delayMs: frame.delayMs,
-          });
-        }
-
-        const blob = encodeGif(gifFrames);
-        createDownload(blob, 'openflowkit-playback.gif');
-        addToast('Playback GIF exported.', 'success');
+      const { width, height } = createExportOptions(nodes, 'png', {
+        maxDimension: timeline.preset.maxDimension,
+        pixelRatio: timeline.preset.pixelRatio,
+      });
+      if (kind === 'cinematic-gif') {
+        const decodedFrames = await decodeCapturedFrames(capturedFrames);
+        const blob = await encodeGifFromFrames({
+          frames: decodedFrames,
+          width,
+          height,
+        });
+        createDownload(blob, buildExportFileName(exportBaseName ?? 'openflowkit-cinematic-build', 'gif'));
+        addToast('Cinematic build GIF exported.', 'success');
         return;
       }
 
       const mimeType = selectSupportedVideoMimeType(window.MediaRecorder);
       if (!mimeType) {
-        throw new Error('This browser does not support local video recording for playback export.');
+        throw new Error('This browser does not support local video recording for cinematic export.');
       }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = plan.frameWidth;
-      canvas.height = plan.frameHeight;
-      const context = canvas.getContext('2d');
-      if (!context) {
-        throw new Error('Canvas 2D context is unavailable.');
-      }
-
-      const stream = canvas.captureStream(plan.preset.fps);
-      const recorder = new MediaRecorder(stream, { mimeType });
-      const chunks: BlobPart[] = [];
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-        }
-      };
-
-      const stopped = new Promise<Blob>((resolve) => {
-        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+      const decodedFrames = await decodeCapturedFrames(capturedFrames);
+      const blob = await encodeVideoFromFrames({
+        frames: decodedFrames,
+        width,
+        height,
+        fps: timeline.preset.fps,
+        mimeType,
       });
-
-      recorder.start();
-      const frameDurationMs = Math.max(1, Math.round(1000 / plan.preset.fps));
-
-      for (const frame of capturedFrames) {
-        const image = await loadImage(frame.dataUrl);
-        const repeatCount = Math.max(1, Math.round(frame.delayMs / frameDurationMs));
-        for (let repeatIndex = 0; repeatIndex < repeatCount; repeatIndex += 1) {
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          await wait(frameDurationMs);
-        }
-      }
-
-      recorder.stop();
-      const blob = await stopped;
-      const extension = getAnimatedExportFileExtension(mimeType, 'video');
-      createDownload(blob, `openflowkit-playback.${extension}`);
-      addToast(`Playback ${extension.toUpperCase()} exported.`, 'success');
+      const extension = getAnimatedExportFileExtension(mimeType);
+      createDownload(blob, buildExportFileName(exportBaseName ?? 'openflowkit-cinematic-build', extension));
+      addToast(`Cinematic build ${extension.toUpperCase()} exported.`, 'success');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Animated export failed.';
-      console.error('Animated export failed:', error);
-      addToast(message, 'error');
+      const exportMessage = error instanceof Error ? error.message : 'Cinematic export failed.';
+      logger.error('Cinematic export failed.', { error, kind });
+      addToast(exportMessage, 'error');
     } finally {
-      animatedPlayback.stopPlayback();
+      resetRenderState();
       reactFlowWrapper.current?.classList.remove('exporting');
     }
-  }, [activeTab, addToast, animatedPlayback, nodes, reactFlowWrapper]);
+  }, [addToast, animatedPlayback, cinematicExportSurfaceRef, edges, exportBaseName, nodes, reactFlowWrapper, resetRenderState, setRenderState, setSurfaceConfig]);
 
   // --- JSON Export ---
   const handleExportJSON = useCallback(() => {
-    const { nodes: orderedNodes, edges: orderedEdges } = orderGraphForSerialization(
+    addToast('Preparing JSON download…', 'info');
+    const documentJson = buildDiagramDocumentJson({
       nodes,
       edges,
-      viewSettings.exportSerializationMode
-    );
-    // Use the outer `activeTab` derived from `tabs` — no inner redefinition needed.
-    const doc = createDiagramDocument(orderedNodes, orderedEdges, activeTab?.diagramType, {
-      playback: activeTab?.playback,
-      extendedDocumentModel: Boolean(activeTab?.playback),
+      exportSerializationMode: viewSettings.exportSerializationMode,
+      activeTab,
     });
-    const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json' });
+    const blob = new Blob([documentJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.download = 'openflowkit-diagram.json';
+    link.download = buildExportFileName(exportBaseName, 'json');
     link.href = url;
     link.click();
     URL.revokeObjectURL(url);
-  }, [nodes, edges, viewSettings.exportSerializationMode, activeTab]);
+    addToast('Diagram JSON downloaded!', 'success');
+  }, [nodes, edges, viewSettings.exportSerializationMode, activeTab, addToast, exportBaseName]);
+
+  const handleCopyJSON = useCallback(async () => {
+    addToast('Preparing JSON copy…', 'info');
+    const documentJson = buildDiagramDocumentJson({
+      nodes,
+      edges,
+      exportSerializationMode: viewSettings.exportSerializationMode,
+      activeTab,
+    });
+
+    try {
+      await navigator.clipboard.writeText(documentJson);
+      addToast('Diagram JSON copied to clipboard!', 'success');
+    } catch (error) {
+      logger.error('JSON clipboard export failed.', { error });
+      addToast('Failed to copy JSON. Please try again.', 'error');
+    }
+  }, [nodes, edges, viewSettings.exportSerializationMode, activeTab, addToast]);
 
   // --- JSON Import ---
   const handleImportJSON = useCallback(() => {
@@ -351,45 +377,23 @@ export const useFlowExport = (
       reader.onload = (ev) => {
         const importStart = performance.now();
         void (async () => {
-          try {
-            const raw = JSON.parse(ev.target?.result as string);
-            const parsed = parseDiagramDocumentImport(raw);
-            const { nodes: composedNodes, edges: composedEdges } = await composeDiagramForDisplay(
-              parsed.nodes,
-              parsed.edges,
-              {
-                diagramType: parsed.diagramType,
-              }
-            );
+          const result = await importDiagramDocumentJson({
+            json: ev.target?.result as string,
+            importStart,
+          });
+
+          if (result.ok) {
             recordHistory();
-            setNodes(composedNodes);
-            setEdges(composedEdges);
-            updateTab(activeTabId, { diagramType: parsed.diagramType, playback: parsed.playback });
-            parsed.warnings.forEach((message) => addToast(message, 'warning'));
-            const report = buildImportFidelityReport({
-              source: 'json',
-              nodeCount: composedNodes.length,
-              edgeCount: composedEdges.length,
-              elapsedMs: Math.round(performance.now() - importStart),
-              issues: parsed.warnings.map((warning) => mapWarningToIssue(warning)),
-            });
-            persistLatestImportReport(report);
-            addToast(summarizeImportReport(report), report.summary.warningCount > 0 ? 'warning' : 'success');
-            addToast('Diagram loaded successfully!', 'success');
+            setNodes(result.nodes);
+            setEdges(result.edges);
+            updateTab(activeTabId, { diagramType: result.diagramType, playback: result.playback });
+            result.warnings.forEach((message) => addToast(message, 'warning'));
+            notifyOperationOutcome(addToast, result.outcome);
             setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 100);
-          } catch (error) {
-            const message = error instanceof Error ? error.message : 'Failed to parse JSON file. Please check the format.';
-            const report = buildImportFidelityReport({
-              source: 'json',
-              nodeCount: 0,
-              edgeCount: 0,
-              elapsedMs: Math.round(performance.now() - importStart),
-              issues: [mapErrorToIssue(message)],
-            });
-            persistLatestImportReport(report);
-            addToast(summarizeImportReport(report), 'error');
-            addToast(message, 'error');
+            return;
           }
+
+          notifyOperationOutcome(addToast, result.outcome);
         })();
       };
       reader.readAsText(file);
@@ -398,5 +402,17 @@ export const useFlowExport = (
     [recordHistory, setNodes, setEdges, fitView, addToast, activeTabId, updateTab]
   );
 
-  return { fileInputRef, handleExport, handleSvgExport, handleAnimatedExport, handleExportJSON, handleImportJSON, onFileImport };
+  return {
+    fileInputRef,
+    handleExport,
+    handleCopyImage,
+    handleSvgExport,
+    handleCopySvg,
+    handlePdfExport,
+    handleCinematicExport,
+    handleExportJSON,
+    handleCopyJSON,
+    handleImportJSON,
+    onFileImport,
+  };
 };

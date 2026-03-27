@@ -17,6 +17,11 @@ interface DiagramNodePropertiesRouterProps {
   onAddMindmapSibling?: (nodeId: string) => void;
   onAddArchitectureService?: (sourceId: string) => void;
   onCreateArchitectureBoundary?: (sourceId: string) => void;
+  onApplyArchitectureTemplate?: (sourceId: string, templateId: import('@/lib/architectureTemplates').ArchitectureTemplateId) => void;
+  onGenerateEntityFields?: (nodeId: string) => Promise<void> | void;
+  onSuggestArchitectureNode?: (nodeId: string) => Promise<void> | void;
+  onConvertEntitySelectionToClassDiagram?: () => void;
+  onOpenMermaidCodeEditor?: () => void;
 }
 
 const NODE_TYPE_PANEL_MAP: Partial<Record<NodeType, DiagramType>> = {
@@ -25,6 +30,7 @@ const NODE_TYPE_PANEL_MAP: Partial<Record<NodeType, DiagramType>> = {
   [NodeType.ER_ENTITY]: 'erDiagram',
   [NodeType.JOURNEY]: 'journey',
   [NodeType.MINDMAP]: 'mindmap',
+  [NodeType.SEQUENCE_PARTICIPANT]: 'sequence',
 };
 
 export function resolveNodePropertiesPanelDiagramType(
@@ -43,6 +49,11 @@ export function DiagramNodePropertiesRouter({
   onAddMindmapSibling,
   onAddArchitectureService,
   onCreateArchitectureBoundary,
+  onApplyArchitectureTemplate,
+  onGenerateEntityFields,
+  onSuggestArchitectureNode,
+  onConvertEntitySelectionToClassDiagram,
+  onOpenMermaidCodeEditor,
 }: DiagramNodePropertiesRouterProps): ReactElement {
   const { tabs, activeTabId } = useFlowStore();
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
@@ -70,5 +81,10 @@ export function DiagramNodePropertiesRouter({
     onAddMindmapSibling,
     onAddArchitectureService,
     onCreateArchitectureBoundary,
+    onApplyArchitectureTemplate,
+    onGenerateEntityFields,
+    onSuggestArchitectureNode,
+    onConvertEntitySelectionToClassDiagram,
+    onOpenMermaidCodeEditor,
   });
 }

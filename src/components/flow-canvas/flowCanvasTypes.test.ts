@@ -21,6 +21,7 @@ describe('flowCanvasNodeTypes', () => {
         "mobile",
         "process",
         "section",
+        "sequence_participant",
         "start",
         "swimlane",
         "text",
@@ -46,9 +47,12 @@ describe('flowCanvasEdgeTypes', () => {
     const edgeTypeKeys = Object.keys(flowCanvasEdgeTypes).sort();
     expect(edgeTypeKeys).toMatchInlineSnapshot(`
       [
+        "bezier",
         "default",
+        "sequence_message",
         "smoothstep",
         "step",
+        "straight",
       ]
     `);
   });

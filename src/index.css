@@ -1,6 +1,94 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter/inter-400-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('/fonts/google-sans/google-sans-flex-400-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('/fonts/google-sans/google-sans-400-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('/fonts/google-sans/google-sans-500-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('/fonts/google-sans/google-sans-600-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('/fonts/google-sans/google-sans-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Text';
+  src: url('/fonts/google-sans/google-sans-text-400-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Text';
+  src: url('/fonts/google-sans/google-sans-text-500-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Text';
+  src: url('/fonts/google-sans/google-sans-text-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Code';
+  src: url('/fonts/google-sans/google-sans-code-400-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Google Sans Code';
+  src: url('/fonts/google-sans/google-sans-code-500-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
 
 html {
   scroll-behavior: smooth;
@@ -10,10 +98,10 @@ html {
   --animate-gradient-x: gradient-x 15s ease infinite;
 
   /* Typography */
-  --font-display: "Space Grotesk", sans-serif;
-  --font-serif: "Instrument Serif", serif;
-  --font-sans: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Inter", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "Google Sans Code", ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-600: var(--brand-primary-600);
@@ -80,6 +168,28 @@ html {
     50% {
       opacity: 0.6;
       transform: scale(1.05);
+    }
+  }
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes nodeAnimateIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.85) translateY(8px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
   }
 
@@ -197,18 +307,29 @@ html {
 
   /* Dimensions */
   --brand-radius: 8px;
-  --radius-sm: max(2px, calc(var(--brand-radius) - 3px));
+  --radius-xs: 4px;
+  --radius-sm: 6px;
   --radius-md: var(--brand-radius);
-  --radius-lg: calc(var(--brand-radius) + 4px);
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
   --brand-border-width: 1px;
 
   /* Typography */
-  --brand-font-family: 'Inter', sans-serif;
+  --brand-font-family: var(--font-sans);
 
   /* UI Effects */
   --brand-glass-blur: 12px;
   --brand-glass-opacity: 0.7;
   --brand-glass-bg: rgba(255, 255, 255, 0.7);
+
+  /* App Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.03), 0 1px 1px rgba(15, 23, 42, 0.02);
+  --shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.07), 0 3px 8px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.09), 0 6px 16px rgba(15, 23, 42, 0.05);
+  --shadow-overlay: 0 22px 48px rgba(15, 23, 42, 0.11), 0 8px 20px rgba(15, 23, 42, 0.05);
 }
 
 body {
@@ -220,15 +341,35 @@ body {
 .flow-handle-hitarea.react-flow__handle::after {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -10px;
   border-radius: 9999px;
   pointer-events: none;
+}
+
+/* Handle base size — larger dots are easier to grab */
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border: 2px solid white !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  transition: transform 0.1s, opacity 0.15s !important;
+}
+
+/* Pop the handle on hover so it's obviously clickable */
+.react-flow__handle:hover {
+  transform: translate(-50%, -50%) scale(1.35) !important;
 }
 
 /* Hide connection handles during active node drag to reduce visual noise. */
 .react-flow__node.dragging .react-flow__handle {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+
+/* When connecting, make all other nodes' handles glow to invite connection */
+.is-connecting .react-flow__node:not(.selected) .react-flow__handle {
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1.2) !important;
 }
 
 /* ===== Node Resizer Bounding Box (Miro/Figma style) ===== */
@@ -338,7 +479,7 @@ body {
 }
 
 .font-inter {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* Global Noise Texture */
@@ -359,19 +500,19 @@ body {
 }
 
 .font-roboto {
-  font-family: 'Roboto', sans-serif;
+  font-family: var(--font-sans);
 }
 
 .font-playfair {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-serif);
 }
 
 .font-fira {
-  font-family: 'Fira Code', monospace;
+  font-family: var(--font-mono);
 }
 
 .font-outfit {
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-sans);
 }
 
 
@@ -474,6 +615,13 @@ body {
 .flow-edge-waypoint:active,
 .flow-edge-waypoint:active * {
   cursor: grabbing !important;
+}
+
+/* ===== Selection marquee — Figma style ===== */
+.react-flow__selection {
+  background: rgba(233, 84, 32, 0.06);
+  border: 1px solid var(--brand-primary, #e95420);
+  border-radius: 2px;
 }
 
 /* React Flow defaults to pointer in selection mode; keep arrow cursor for select mode panes. */
@@ -682,5 +830,12 @@ body {
 
   .btn-beveled:active {
     box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-beveled-primary:disabled,
+  .btn-beveled-secondary:disabled,
+  .btn-beveled:disabled {
+    box-shadow: none;
+    transform: none;
   }
 }

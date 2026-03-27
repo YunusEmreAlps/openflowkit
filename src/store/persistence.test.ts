@@ -1,10 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { FlowEdge, FlowNode, FlowTab } from '@/lib/types';
 import {
     createInitialFlowState,
     migratePersistedFlowState,
     partializePersistedFlowState,
+    sanitizePersistedTab,
 } from './persistence';
+import * as aiSettingsPersistence from './aiSettingsPersistence';
 
 function createNode(id: string, label: string): FlowNode {
     return {
@@ -32,15 +34,27 @@ function createTab(id: string, name: string, nodes: FlowNode[], edges: FlowEdge[
 
 describe('store persistence helpers', () => {
     it('creates the expected initial persisted runtime slice', () => {
+        const loadPersistedAISettingsSpy = vi.spyOn(aiSettingsPersistence, 'loadPersistedAISettings').mockReturnValue({
+            provider: 'openai',
+            storageMode: 'local',
+            apiKey: 'persisted-key',
+            model: 'gpt-test',
+            customBaseUrl: undefined,
+            customHeaders: [],
+        });
         const state = createInitialFlowState();
 
         expect(state.activeTabId).toBe('tab-1');
         expect(state.tabs).toHaveLength(1);
         expect(state.layers[0]?.id).toBe('default');
         expect(state.designSystems[0]?.id).toBe('default');
+        expect(state.aiSettings.provider).toBe('openai');
+        expect(state.aiSettings.apiKey).toBe('persisted-key');
+
+        loadPersistedAISettingsSpy.mockRestore();
     });
 
-    it('partializes store state while stripping transient canvas fields from tabs', () => {
+    it('sanitizes tab content while stripping transient canvas fields', () => {
         const tab = createTab(
             'tab-2',
             'Tab 2',
@@ -55,21 +69,12 @@ describe('store persistence helpers', () => {
             ],
             [{ ...createEdge('e2', 'n2', 'n2'), selected: true }]
         );
-        const state = {
-            ...createInitialFlowState(),
-            tabs: [createInitialFlowState().tabs[0], tab],
-            activeTabId: 'tab-2',
-            nodes: tab.nodes,
-            edges: tab.edges,
-        };
-
-        const persistedSlice = partializePersistedFlowState(state as never);
-        const persistedTab = persistedSlice.tabs.find((entry) => entry.id === 'tab-2');
-        const persistedNode = persistedTab?.nodes[0] as FlowNode & {
+        const persistedTab = sanitizePersistedTab(tab);
+        const persistedNode = persistedTab.nodes[0] as FlowNode & {
             measured?: unknown;
             positionAbsolute?: unknown;
         };
-        const persistedEdge = persistedTab?.edges[0];
+        const persistedEdge = persistedTab.edges[0];
 
         expect(persistedNode.selected).toBeUndefined();
         expect(persistedNode.dragging).toBeUndefined();
@@ -88,18 +93,12 @@ describe('store persistence helpers', () => {
             defaultStepDurationMs: 1500,
         };
 
-        const persistedSlice = partializePersistedFlowState({
-            ...createInitialFlowState(),
-            tabs: [tab],
-            activeTabId: 'tab-2',
-            nodes: tab.nodes,
-            edges: tab.edges,
-        } as never);
+        const persistedTab = sanitizePersistedTab(tab);
 
-        expect(persistedSlice.tabs[0].playback?.timeline[0]?.nodeId).toBe('n2');
+        expect(persistedTab.playback?.timeline[0]?.nodeId).toBe('n2');
 
         const migrated = migratePersistedFlowState({
-            tabs: [persistedSlice.tabs[0]],
+            tabs: [persistedTab],
             activeTabId: 'tab-2',
         }) as {
             tabs: FlowTab[];
@@ -147,5 +146,75 @@ describe('store persistence helpers', () => {
         expect(migrated.activeLayerId).toBe('default');
         expect(migrated.viewSettings.showGrid).toBe(false);
         expect(migrated.viewSettings.snapToGrid).toBe(true);
+    });
+
+    it('sanitizes persisted ai settings during migration', () => {
+        const loadPersistedAISettingsSpy = vi.spyOn(aiSettingsPersistence, 'loadPersistedAISettings').mockReturnValue({
+            provider: 'gemini',
+            storageMode: 'local',
+            apiKey: undefined,
+            model: undefined,
+            customBaseUrl: undefined,
+            customHeaders: [],
+        });
+        const persistAISettingsSpy = vi.spyOn(aiSettingsPersistence, 'persistAISettings').mockImplementation(() => undefined);
+        const migrated = migratePersistedFlowState({
+            tabs: [
+                {
+                    id: 'tab-a',
+                    name: 'A',
+                    nodes: [createNode('na', 'A')],
+                    edges: [],
+                    history: { past: [], future: [] },
+                },
+            ],
+            activeTabId: 'tab-a',
+            aiSettings: {
+                provider: 'invalid-provider',
+                apiKey: '  secret  ',
+                customHeaders: [
+                    { key: ' Authorization ', value: 'Bearer token', enabled: true },
+                    { key: '', value: 'skip-me' },
+                ],
+            },
+        }) as {
+            aiSettings: {
+                provider: string;
+                apiKey?: string;
+                customHeaders?: Array<{ key: string; value: string; enabled?: boolean }>;
+            };
+        };
+
+        expect(migrated.aiSettings.provider).toBe('gemini');
+        expect(migrated.aiSettings.apiKey).toBe('secret');
+        expect(migrated.aiSettings.customHeaders).toEqual([
+            { key: 'Authorization', value: 'Bearer token', enabled: true },
+        ]);
+        expect(persistAISettingsSpy).toHaveBeenCalledWith({
+            provider: 'gemini',
+            storageMode: 'local',
+            apiKey: 'secret',
+            model: undefined,
+            customBaseUrl: undefined,
+            customHeaders: [
+                { key: 'Authorization', value: 'Bearer token', enabled: true },
+            ],
+        });
+
+        loadPersistedAISettingsSpy.mockRestore();
+        persistAISettingsSpy.mockRestore();
+    });
+
+    it('does not include aiSettings in the main persisted flow slice', () => {
+        const persistedSlice = partializePersistedFlowState(createInitialFlowState() as never);
+
+        expect('aiSettings' in persistedSlice).toBe(false);
+    });
+
+    it('does not include durable document state in the main persisted flow slice', () => {
+        const persistedSlice = partializePersistedFlowState(createInitialFlowState() as never);
+
+        expect('tabs' in persistedSlice).toBe(false);
+        expect('activeTabId' in persistedSlice).toBe(false);
     });
 });

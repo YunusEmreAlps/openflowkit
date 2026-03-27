@@ -28,7 +28,7 @@ function getMovePoint(path: string): string {
   return `${match[1]},${match[2]}`;
 }
 
-function getMoveY(path: string): number {
+function _getMoveY(path: string): number {
   const [, y] = getMovePoint(path).split(',');
   return Number(y);
 }
@@ -76,6 +76,46 @@ describe('buildEdgePath', () => {
     } finally {
       setEdgeInteractionLowDetailMode(false);
     }
+  });
+
+  it('skips sibling fanout offsets for very large edge sets even outside interaction mode', () => {
+    const allEdges = Array.from({ length: 600 }, (_, index) => ({
+      id: `edge-${index + 1}`,
+      source: 'a',
+      target: `target-${index + 1}`,
+      sourceHandle: 'right',
+      targetHandle: 'left',
+    }));
+    const allNodes = [
+      NODE_A,
+      ...Array.from({ length: 600 }, (_, index) => ({
+        id: `target-${index + 1}`,
+        position: { x: 260, y: 40 + index * 8 },
+        width: 0,
+        height: 0,
+      })),
+    ];
+
+    const result = buildEdgePath(
+      {
+        id: 'edge-1',
+        source: 'a',
+        target: 'target-1',
+        sourceX: 100,
+        sourceY: 100,
+        targetX: 260,
+        targetY: 40,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        sourceHandleId: 'right',
+        targetHandleId: 'left',
+      },
+      allEdges,
+      allNodes,
+      'smoothstep'
+    );
+
+    expect(getMovePoint(result.edgePath)).toBe('100,100');
   });
 
   it('routes edge through explicit waypoint when provided', () => {
@@ -164,7 +204,7 @@ describe('buildEdgePath', () => {
     expect(result.labelY).toBe(50);
   });
 
-  it('fans out edges that share the same node side by default', () => {
+  it('separates 3-edge bundles that share the same node side by default', () => {
     const allEdges = [
       { id: 'edge-1', source: 'a', target: 'b', sourceHandle: 'right', targetHandle: 'left' },
       { id: 'edge-2', source: 'a', target: 'c', sourceHandle: 'right', targetHandle: 'left' },
@@ -228,9 +268,8 @@ describe('buildEdgePath', () => {
       'smoothstep'
     );
 
-    expect(getMovePoint(first.edgePath)).not.toBe('100,100');
-    expect(getMovePoint(second.edgePath)).toBe('100,100');
-    expect(getMovePoint(third.edgePath)).not.toBe('100,100');
+    expect(first.labelY).toBeLessThan(second.labelY);
+    expect(third.labelY).toBeGreaterThan(second.labelY);
   });
 
   it('nudges bundle labels further for denser side bundles', () => {
@@ -339,7 +378,7 @@ describe('buildEdgePath', () => {
     expect(getMovePoint(center.edgePath)).toBe('100,100');
   });
 
-  it('does not use a shared source trunk for 3-edge bundles by default', () => {
+  it('uses a shared source trunk for 3-edge bundles by default', () => {
     const threeEdges = [
       { id: 'edge-1', source: 'a', target: 'b', sourceHandle: 'right', targetHandle: 'left' },
       { id: 'edge-2', source: 'a', target: 'c', sourceHandle: 'right', targetHandle: 'left' },
@@ -384,7 +423,7 @@ describe('buildEdgePath', () => {
       'smoothstep'
     );
 
-    expect(getMovePoint(outer.edgePath)).not.toBe('100,100');
+    expect(getMovePoint(outer.edgePath)).toBe('100,100');
     expect(getMovePoint(center.edgePath)).toBe('100,100');
   });
 
@@ -643,7 +682,7 @@ describe('buildEdgePath', () => {
     expect(result.edgePath).not.toContain('L 4 0');
   });
 
-  it('adds an orthogonal bridge from the current handle center into the ELK route', () => {
+  it('uses the rounded ELK connector path by default', () => {
     const result = buildEdgePath(
       {
         id: 'edge-elk-bridge',
@@ -668,11 +707,11 @@ describe('buildEdgePath', () => {
       }
     );
 
-    expect(result.edgePath).toContain('Q 12 0');
-    expect(result.edgePath).toContain('Q 12 30 20 30');
+    expect(result.edgePath).toContain('L 24 18 Q 40 30 60 30');
+    expect(result.edgePath).not.toContain('Q 12 0');
   });
 
-  it('still applies legacy renderer-side fanout to ELK endpoints by default', () => {
+  it('keeps ELK paths anchored at the real handle center by default', () => {
     const elkSiblingEdges = [
       { id: 'elk-1', source: 'a', target: 'b', sourceHandle: 'right', targetHandle: 'left' },
       { id: 'elk-2', source: 'a', target: 'c', sourceHandle: 'right', targetHandle: 'left' },
@@ -705,8 +744,8 @@ describe('buildEdgePath', () => {
       }
     );
 
-    expect(getMovePoint(first.edgePath)).not.toBe('100,100');
+    expect(getMovePoint(first.edgePath)).toBe('100,100');
     expect(first.labelX).toBe(160);
-    expect(first.labelY).toBeLessThan(70);
+    expect(first.labelY).toBe(70);
   });
 });

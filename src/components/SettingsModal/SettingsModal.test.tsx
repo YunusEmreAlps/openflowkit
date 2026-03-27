@@ -12,6 +12,10 @@ vi.mock('./GeneralSettings', () => ({
   GeneralSettings: () => <div>General content</div>,
 }));
 
+vi.mock('./AISettings', () => ({
+  AISettings: () => <div>AI settings content</div>,
+}));
+
 vi.mock('./ShortcutsSettings', () => ({
   ShortcutsSettings: () => <div>Shortcuts content</div>,
 }));
@@ -28,7 +32,7 @@ describe('SettingsModal', () => {
   it('renders with dialog semantics and initial focus on the close button', () => {
     render(<SettingsModal isOpen onClose={vi.fn()} />);
 
-    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getByRole('dialog').getAttribute('aria-describedby')).toBe('settings-modal-description');
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close settings' }));
   });
 
@@ -39,5 +43,12 @@ describe('SettingsModal', () => {
     fireEvent.keyDown(window, { key: 'Escape' });
 
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the AI settings tab when opened with the ai tab selected', () => {
+    render(<SettingsModal isOpen onClose={vi.fn()} initialTab="ai" />);
+
+    expect(screen.getByText('AI settings content')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'AI' })).toBeInTheDocument();
   });
 });

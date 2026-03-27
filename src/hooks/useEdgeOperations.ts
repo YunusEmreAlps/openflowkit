@@ -8,7 +8,6 @@ import type { DomainLibraryItem } from '@/services/domainLibrary';
 import { createDomainLibraryNode } from '@/services/domainLibrary';
 import { createId } from '@/lib/id';
 import { assignSmartHandlesWithOptions, getSmartRoutingOptionsFromViewSettings } from '../services/smartEdgeRouting';
-import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { getPointerClientPosition, isPaneTarget, normalizeConnectionFromDragStart } from './edgeConnectInteractions';
 import { normalizeNodeHandleId } from '@/lib/nodeHandles';
 import { buildReconnectedEdge, shouldRespectExplicitReconnectHandles } from '@/lib/reconnectEdge';
@@ -16,13 +15,20 @@ import { queueNodeLabelEditRequest } from './nodeLabelEditRequest';
 import { isMindmapConnectorSource } from '@/lib/connectCreationPolicy';
 import { resolveMindmapBranchStyleForNode, syncMindmapEdges } from '@/lib/mindmapLayout';
 import {
+    buildSequenceMessageEdge,
+    isSequenceConnection,
+} from '@/services/sequence/sequenceMessage';
+import {
     buildConnectedEdge,
     buildConnectedMindmapTopic,
     buildConnectedNode,
+    type ConnectedEdgePreset,
     getOppositeTargetHandle,
     isDuplicateConnection,
     resolveConnectEndAction,
 } from './edge-operations/utils';
+import { getDefaultConnectedNodeSpec } from '@/lib/connectCreationPolicy';
+import type { QuickCreateDirection } from './nodeQuickCreateRequest';
 
 export const useEdgeOperations = (
     recordHistory: () => void,
@@ -104,8 +110,22 @@ export const useEdgeOperations = (
                 );
                 return eds.concat(mindmapEdge);
             }
+
+            if (isSequenceConnection(sourceNode, targetNode, resolvedConnection)) {
+                return eds.concat(buildSequenceMessageEdge(
+                    resolvedConnection,
+                    sourceNode,
+                    targetNode,
+                    eds,
+                    t('connectionPanel.messagePlaceholder', 'Message')
+                ));
+            }
+
             const inserted = addEdge({
                 ...resolvedConnection,
+                data: {
+                    connectionType: resolvedConnection.sourceHandle || resolvedConnection.targetHandle ? 'fixed' : 'dynamic',
+                },
                 ...DEFAULT_EDGE_OPTIONS,
             }, eds);
 
@@ -122,7 +142,7 @@ export const useEdgeOperations = (
                 getSmartRoutingOptionsFromViewSettings(viewSettings)
             );
         });
-    }, [edges, nodes, setEdges, recordHistory]);
+    }, [edges, nodes, recordHistory, setEdges, t]);
 
     const onConnectStart = useCallback((_, { nodeId, handleId }: { nodeId: string | null; handleId: string | null }) => {
         connectingNodeId.current = nodeId;
@@ -130,7 +150,14 @@ export const useEdgeOperations = (
         isConnectionValid.current = false;
     }, []);
 
-    const handleAddAndConnect = useCallback((type: string, position: { x: number; y: number }, sourceId: string, sourceHandle: string | null, shape?: NodeData['shape']) => {
+    const handleAddAndConnect = useCallback((
+        type: string,
+        position: { x: number; y: number },
+        sourceId: string,
+        sourceHandle: string | null,
+        shape?: NodeData['shape'],
+        edgePreset?: ConnectedEdgePreset
+    ) => {
         recordHistory();
         const state = useFlowStore.getState();
         const sourceNode = state.nodes.find((node) => node.id === sourceId);
@@ -161,10 +188,11 @@ export const useEdgeOperations = (
             return;
         }
 
-        const { newNode, isGenericShape } = buildConnectedNode({
+        const { newNode } = buildConnectedNode({
             type,
             position,
             shape,
+            sourceNode,
             labels: {
                 noteLabel: t('nodes.note'),
                 noteSubLabel: t('nodes.addCommentsHere'),
@@ -180,7 +208,7 @@ export const useEdgeOperations = (
                 ? getOppositeTargetHandle(newNode, resolvedSourceHandle)
                 : null;
 
-            const insertedEdges = eds.concat(buildConnectedEdge(sourceId, id, resolvedSourceHandle, resolvedTargetHandle));
+            const insertedEdges = eds.concat(buildConnectedEdge(sourceId, id, resolvedSourceHandle, resolvedTargetHandle, edgePreset));
             if (!viewSettings.smartRoutingEnabled) {
                 return insertedEdges;
             }
@@ -191,10 +219,36 @@ export const useEdgeOperations = (
             );
         });
         setSelectedNodeId(id);
-        if (isGenericShape) {
-            queueNodeLabelEditRequest(id, { replaceExisting: true });
-        }
+        queueNodeLabelEditRequest(id, { replaceExisting: true });
     }, [recordHistory, setEdges, setNodes, setSelectedNodeId, t]);
+
+    const createConnectedNodeInDirection = useCallback((sourceId: string, direction: QuickCreateDirection) => {
+        const state = useFlowStore.getState();
+        const sourceNode = state.nodes.find((node) => node.id === sourceId);
+        if (!sourceNode) {
+            return;
+        }
+
+        const directionMap: Record<QuickCreateDirection, { dx: number; dy: number; handle: string }> = {
+            up: { dx: 0, dy: -180, handle: 'top' },
+            right: { dx: 260, dy: 0, handle: 'right' },
+            down: { dx: 0, dy: 180, handle: 'bottom' },
+            left: { dx: -260, dy: 0, handle: 'left' },
+        };
+        const directionConfig = directionMap[direction];
+        const defaultConnectedNode = getDefaultConnectedNodeSpec(sourceNode.type);
+
+        handleAddAndConnect(
+            defaultConnectedNode.type,
+            {
+                x: sourceNode.position.x + directionConfig.dx,
+                y: sourceNode.position.y + directionConfig.dy,
+            },
+            sourceId,
+            directionConfig.handle,
+            defaultConnectedNode.shape
+        );
+    }, [handleAddAndConnect]);
 
     const handleAddDomainLibraryItemAndConnect = useCallback((item: DomainLibraryItem, position: { x: number; y: number }, sourceId: string, sourceHandle: string | null) => {
         recordHistory();
@@ -240,7 +294,7 @@ export const useEdgeOperations = (
                 position,
                 clientPosition,
                 targetIsPane: isPaneTarget(target),
-                canvasInteractionsV1Enabled: ROLLOUT_FLAGS.canvasInteractionsV1,
+                canvasInteractionsV1Enabled: true,
             });
 
             if (resolution.type === 'connect') {
@@ -279,6 +333,7 @@ export const useEdgeOperations = (
         onConnectEnd,
         onReconnect,
         handleAddAndConnect,
+        createConnectedNodeInDirection,
         handleAddDomainLibraryItemAndConnect,
     };
 };

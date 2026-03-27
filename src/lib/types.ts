@@ -1,6 +1,17 @@
 import { type LegacyEdge, type LegacyNode } from '@/lib/reactflowCompat';
 import type { ClassRelationToken, ERRelationToken } from '@/lib/relationSemantics';
 
+export interface ErField {
+  name: string;
+  dataType: string;
+  isPrimaryKey: boolean;
+  isForeignKey: boolean;
+  isNotNull?: boolean;
+  isUnique?: boolean;
+  referencesTable?: string;
+  referencesField?: string;
+}
+
 export const DIAGRAM_TYPES = [
   'flowchart',
   'stateDiagram',
@@ -10,6 +21,7 @@ export const DIAGRAM_TYPES = [
   'mindmap',
   'journey',
   'architecture',
+  'sequence',
 ] as const;
 
 export type DiagramType = (typeof DIAGRAM_TYPES)[number];
@@ -34,6 +46,8 @@ export enum NodeType {
   GROUP = 'group',
   SWIMLANE = 'swimlane',
   IMAGE = 'image',
+  SEQUENCE_PARTICIPANT = 'sequence_participant',
+  SEQUENCE_MESSAGE = 'sequence_message',
 }
 
 export interface NodeData {
@@ -63,7 +77,7 @@ export interface NodeData {
   classStereotype?: string;
   classAttributes?: string[];
   classMethods?: string[];
-  erFields?: string[];
+  erFields?: Array<string | ErField>;
   journeySection?: string;
   journeyActor?: string;
   journeyTask?: string;
@@ -72,7 +86,9 @@ export interface NodeData {
   mindmapParentId?: string;
   mindmapSide?: 'left' | 'right';
   mindmapBranchStyle?: 'curved' | 'straight';
+  mindmapCollapsed?: boolean;
   archProvider?: string;
+  archProviderLabel?: string;
   archResourceType?: string;
   archEnvironment?: string;
   archBoundaryId?: string;
@@ -83,6 +99,12 @@ export interface NodeData {
   assetPresentation?: 'icon';
   assetProvider?: string;
   assetCategory?: string;
+  seqParticipantKind?: 'participant' | 'actor';
+  seqParticipantAlias?: string;
+  seqMessageKind?: 'sync' | 'async' | 'return' | 'self' | 'create' | 'destroy';
+  seqMessageFrom?: string;
+  seqMessageTo?: string;
+  seqMessageOrder?: number;
 }
 
 export interface AIRequestParams {
@@ -116,6 +138,8 @@ export interface EdgeData {
     y: number;
   }[];
   mindmapBranchKind?: 'root' | 'branch';
+  seqMessageKind?: 'sync' | 'async' | 'return' | 'self' | 'create' | 'destroy';
+  connectionType?: 'fixed' | 'dynamic';
   waypoint?: {
     x: number;
     y: number;

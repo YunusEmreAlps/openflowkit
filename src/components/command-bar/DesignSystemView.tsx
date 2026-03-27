@@ -1,18 +1,21 @@
-import React, { useMemo, useState } from 'react';
-import { Palette, Check, Plus, ArrowLeft, MoreHorizontal, Copy, Trash2, Edit2, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Palette, Check, Plus, ArrowLeft, Copy, Trash2, Edit2, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { createLogger } from '@/lib/logger';
 import { Button } from '../ui/Button';
 import { DesignSystemEditor } from './DesignSystemEditor';
 import { createId } from '@/lib/id';
 import { IS_BEVELED } from '@/lib/brand';
 import { useDesignSystemActions, useDesignSystemsCatalog } from '@/store/designSystemHooks';
 
+const logger = createLogger({ scope: 'DesignSystemView' });
+
 interface DesignSystemViewProps {
     onClose: () => void;
     handleBack: () => void;
 }
 
-export const DesignSystemView: React.FC<DesignSystemViewProps> = ({ onClose, handleBack }) => {
+export const DesignSystemView: React.FC<DesignSystemViewProps> = ({ onClose: _onClose, handleBack }) => {
     const { t } = useTranslation();
     const { designSystems, activeDesignSystemId } = useDesignSystemsCatalog();
     const { setActiveDesignSystem, addDesignSystem, duplicateDesignSystem, deleteDesignSystem } = useDesignSystemActions();
@@ -47,7 +50,7 @@ export const DesignSystemView: React.FC<DesignSystemViewProps> = ({ onClose, han
     return (
         <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-200">
             <div className="flex items-center gap-2 p-4 border-b border-slate-100 bg-slate-50/50">
-                <Button variant="ghost" size="icon" onClick={handleBack} className="h-8 w-8 rounded-full">
+                <Button variant="ghost" size="icon" onClick={handleBack} className="h-8 w-8 rounded-[var(--radius-sm)]">
                     <ArrowLeft className="w-4 h-4 text-slate-500" />
                 </Button>
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
@@ -149,8 +152,8 @@ export const DesignSystemView: React.FC<DesignSystemViewProps> = ({ onClose, han
                                                 if (ds.id && ds.colors && ds.components) {
                                                     addDesignSystem({ ...ds, id: createId('imported'), name: `${ds.name} (Imported)`, isDefault: false });
                                                 }
-                                            } catch (err) {
-                                                console.error('Invalid Design System JSON');
+                                            } catch {
+                                                logger.error('Invalid design system JSON.');
                                             }
                                         };
                                         reader.readAsText(file);

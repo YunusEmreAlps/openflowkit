@@ -1,24 +1,35 @@
 import { useCallback, useState } from 'react';
 import type { TFunction } from 'i18next';
+import { createLogger } from '@/lib/logger';
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import type { FlowTemplate } from '@/services/templates';
 import type { LayoutAlgorithm } from '@/services/elkLayout';
 import type { ExportSerializationMode } from '@/services/canonicalSerialization';
 import {
+    downloadFigmaToFile,
+    downloadMermaidToFile,
+    downloadOpenFlowDSLToFile,
+    downloadPlantUMLToFile,
     exportFigmaToClipboard,
     exportMermaidToClipboard,
     exportOpenFlowDSLToClipboard,
     exportPlantUMLToClipboard,
 } from './flow-editor-actions/exportHandlers';
+import { toOpenFlowDSL } from '@/services/openFlowDSLExporter';
+import { encodeDslForViewer } from '@/components/DiagramViewer';
 import {
     buildTemplateInsertionResult,
     getAutoLayoutResult,
     scheduleFitView,
 } from './flow-editor-actions/layoutHandlers';
+import { recordOnboardingEvent } from '@/services/onboarding/events';
+
+const logger = createLogger({ scope: 'useFlowEditorActions' });
 
 interface UseFlowEditorActionsParams {
     nodes: FlowNode[];
     edges: FlowEdge[];
+    activeTabName?: string;
     recordHistory: () => void;
     setNodes: (nodes: FlowNode[] | ((nodes: FlowNode[]) => FlowNode[])) => void;
     setEdges: (edges: FlowEdge[] | ((edges: FlowEdge[]) => FlowEdge[])) => void;
@@ -38,14 +49,22 @@ interface UseFlowEditorActionsResult {
     ) => Promise<void>;
     handleInsertTemplate: (template: FlowTemplate) => void;
     handleExportMermaid: () => Promise<void>;
+    handleDownloadMermaid: () => void;
     handleExportPlantUML: () => Promise<void>;
+    handleDownloadPlantUML: () => void;
     handleExportOpenFlowDSL: () => Promise<void>;
+    handleDownloadOpenFlowDSL: () => void;
     handleExportFigma: () => Promise<void>;
+    handleDownloadFigma: () => Promise<void>;
+    handleShare: () => void;
+    shareViewerUrl: string | null;
+    clearShareViewerUrl: () => void;
 }
 
 export function useFlowEditorActions({
     nodes,
     edges,
+    activeTabName,
     recordHistory,
     setNodes,
     setEdges,
@@ -79,7 +98,7 @@ export function useFlowEditorActions({
             setEdges(layoutedEdges);
             scheduleFitView(fitView, 800, 50);
         } catch (error) {
-            console.error('ELK layout failed:', error);
+            logger.error('ELK layout failed.', { error });
         } finally {
             setIsLayouting(false);
         }
@@ -87,6 +106,10 @@ export function useFlowEditorActions({
 
     const handleInsertTemplate = useCallback((template: FlowTemplate): void => {
         recordHistory();
+        recordOnboardingEvent('template_inserted', {
+            templateId: template.id,
+            category: template.category,
+        });
         const { nextNodes, newEdges } = buildTemplateInsertionResult({
             template,
             existingNodes: nodes,
@@ -98,12 +121,20 @@ export function useFlowEditorActions({
     }, [nodes, recordHistory, setNodes, setEdges, fitView]);
 
     const handleExportMermaid = useCallback(async (): Promise<void> => {
-        await exportMermaidToClipboard({ nodes, edges, t });
-    }, [nodes, edges, t]);
+        await exportMermaidToClipboard({ nodes, edges, t, addToast });
+    }, [nodes, edges, t, addToast]);
+
+    const handleDownloadMermaid = useCallback((): void => {
+        downloadMermaidToFile({ nodes, edges, addToast, baseFileName: activeTabName });
+    }, [nodes, edges, addToast, activeTabName]);
 
     const handleExportPlantUML = useCallback(async (): Promise<void> => {
-        await exportPlantUMLToClipboard({ nodes, edges, t });
-    }, [nodes, edges, t]);
+        await exportPlantUMLToClipboard({ nodes, edges, t, addToast });
+    }, [nodes, edges, t, addToast]);
+
+    const handleDownloadPlantUML = useCallback((): void => {
+        downloadPlantUMLToFile({ nodes, edges, addToast, baseFileName: activeTabName });
+    }, [nodes, edges, addToast, activeTabName]);
 
     const handleExportOpenFlowDSL = useCallback(async (): Promise<void> => {
         await exportOpenFlowDSLToClipboard({
@@ -115,17 +146,51 @@ export function useFlowEditorActions({
         });
     }, [nodes, edges, addToast, t, exportSerializationMode]);
 
+    const handleDownloadOpenFlowDSL = useCallback((): void => {
+        downloadOpenFlowDSLToFile({
+            nodes,
+            edges,
+            exportSerializationMode,
+            addToast,
+            baseFileName: activeTabName,
+        });
+    }, [nodes, edges, exportSerializationMode, addToast, activeTabName]);
+
     const handleExportFigma = useCallback(async (): Promise<void> => {
         await exportFigmaToClipboard({ nodes, edges, addToast, t });
     }, [nodes, edges, addToast, t]);
+
+    const handleDownloadFigma = useCallback(async (): Promise<void> => {
+        await downloadFigmaToFile({ nodes, edges, addToast, t, baseFileName: activeTabName });
+    }, [nodes, edges, addToast, t, activeTabName]);
+
+    const [shareViewerUrl, setShareViewerUrl] = useState<string | null>(null);
+
+    const handleShare = useCallback((): void => {
+        if (nodes.length === 0) return;
+        const dsl = toOpenFlowDSL(nodes, edges, { mode: exportSerializationMode });
+        const encoded = encodeDslForViewer(dsl);
+        const url = `${window.location.origin}/#/view?flow=${encoded}`;
+        setShareViewerUrl(url);
+        recordOnboardingEvent('first_share_opened', { surface: 'editor' });
+    }, [nodes, edges, exportSerializationMode]);
+
+    const clearShareViewerUrl = useCallback((): void => setShareViewerUrl(null), []);
 
     return {
         isLayouting,
         onLayout,
         handleInsertTemplate,
         handleExportMermaid,
+        handleDownloadMermaid,
         handleExportPlantUML,
+        handleDownloadPlantUML,
         handleExportOpenFlowDSL,
+        handleDownloadOpenFlowDSL,
         handleExportFigma,
+        handleDownloadFigma,
+        handleShare,
+        shareViewerUrl,
+        clearShareViewerUrl,
     };
 }

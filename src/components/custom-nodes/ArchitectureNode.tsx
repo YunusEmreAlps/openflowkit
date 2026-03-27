@@ -6,33 +6,51 @@ import { InlineTextEditSurface } from '@/components/InlineTextEditSurface';
 import { NodeChrome } from '@/components/NodeChrome';
 import { getTransformDiagnosticsAttrs } from '@/components/transformDiagnostics';
 import { resolveNodeVisualStyle } from '@/theme';
-import { ROLLOUT_FLAGS } from '@/config/rolloutFlags';
 import { loadProviderShapePreview } from '@/services/shapeLibrary/providerCatalog';
+import type { DomainLibraryCategory } from '@/services/domainLibrary';
 
 function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): React.ReactElement {
   const labelEdit = useInlineNodeTextEdit(id, 'label', data.label || '');
-  const provider = data.archProvider || 'custom';
+  const provider = (data.archProvider || 'custom') as DomainLibraryCategory | 'custom';
+  const providerLabel = provider === 'custom'
+    ? String(data.archProviderLabel || 'Custom')
+    : provider;
   const resourceType = data.archResourceType || 'service';
   const environment = data.archEnvironment || 'default';
+  const zone = data.archZone as string | undefined;
+  const trustDomain = data.archTrustDomain as string | undefined;
   const architectureMinHeight = environment ? 96 : 88;
   const activeColor = data.color || 'white';
   const activeColorMode = data.colorMode || 'subtle';
   const visualStyle = resolveNodeVisualStyle(activeColor, activeColorMode, data.customColor);
-  const resourceIcon = {
+  const resourceIcon: string = {
     group: '◼',
     junction: '◆',
     service: '▣',
+    person: '👤',
+    system: '⬜',
+    container: '⧉',
+    component: '⧈',
+    database_container: '⛁',
+    router: '⇄',
+    switch: '⬡',
+    firewall: '🛡',
+    load_balancer: '⇶',
+    cdn: '◉',
+    dns: '◎',
   }[resourceType] ?? '▣';
   const packId = typeof data.archIconPackId === 'string' ? data.archIconPackId : undefined;
   const shapeId = typeof data.archIconShapeId === 'string' ? data.archIconShapeId : undefined;
+  const customIconUrl = typeof data.customIconUrl === 'string' ? data.customIconUrl : undefined;
   const previewKey = packId && shapeId ? `${packId}:${shapeId}` : null;
   const [providerPreviewState, setProviderPreviewState] = useState<{ key: string | null; url: string | null }>({ key: null, url: null });
   const providerPreviewUrl = providerPreviewState.key === previewKey ? providerPreviewState.url : null;
+  const resolvedProviderIconUrl = provider === 'custom' && customIconUrl ? customIconUrl : providerPreviewUrl;
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!ROLLOUT_FLAGS.shapeLibraryV1 || !packId || !shapeId || !previewKey) {
+    if (!packId || !shapeId || !previewKey) {
       return;
     }
 
@@ -55,6 +73,7 @@ function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): Re
 
   return (
     <NodeChrome
+      nodeId={id}
       selected={Boolean(selected)}
       minWidth={180}
       minHeight={architectureMinHeight}
@@ -84,12 +103,12 @@ function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): Re
               color: visualStyle.iconColor,
             }}
           >
-            {providerPreviewUrl ? (
-              <img src={providerPreviewUrl} alt="" className="h-3.5 w-3.5 object-contain" loading="lazy" />
+            {resolvedProviderIconUrl ? (
+              <img src={resolvedProviderIconUrl} alt={`${providerLabel} ${resourceType} icon`} className="h-3.5 w-3.5 object-contain" loading="lazy" />
             ) : (
               <span>{resourceIcon}</span>
             )}
-            <span>{provider}</span>
+            <span>{providerLabel}</span>
           </span>
           <span className="font-semibold" style={{ color: visualStyle.subText }}>{resourceType}</span>
         </div>
@@ -104,14 +123,38 @@ function ArchitectureNode({ id, data, selected }: LegacyNodeProps<NodeData>): Re
           className="mt-1 text-sm font-semibold break-words"
           isSelected={Boolean(selected)}
         />
-        <div
-          className="mt-1 inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
-          style={{
-            backgroundColor: visualStyle.iconBg,
-            color: visualStyle.subText,
-          }}
-        >
-          {environment}
+        <div className="mt-1 flex flex-wrap items-center gap-1">
+          <span
+            className="inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+            style={{
+              backgroundColor: visualStyle.iconBg,
+              color: visualStyle.subText,
+            }}
+          >
+            {environment}
+          </span>
+          {zone && (
+            <span
+              className="inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+              style={{
+                backgroundColor: visualStyle.iconBg,
+                color: visualStyle.subText,
+              }}
+            >
+              {zone}
+            </span>
+          )}
+          {trustDomain && (
+            <span
+              className="inline-flex rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+              style={{
+                backgroundColor: visualStyle.iconBg,
+                color: visualStyle.subText,
+              }}
+            >
+              {trustDomain}
+            </span>
+          )}
         </div>
       </div>
     </NodeChrome>

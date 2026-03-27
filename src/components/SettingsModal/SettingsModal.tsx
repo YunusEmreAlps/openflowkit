@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, Settings, Keyboard } from 'lucide-react';
+import { X, Settings, Keyboard, WandSparkles } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { AISettings } from './AISettings';
 import { GeneralSettings } from './GeneralSettings';
 import { ShortcutsSettings } from './ShortcutsSettings';
 import { SidebarItem } from '../ui/SidebarItem';
@@ -9,17 +10,17 @@ import { SidebarItem } from '../ui/SidebarItem';
 interface SettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    initialTab?: 'general' | 'shortcuts';
+    initialTab?: 'general' | 'shortcuts' | 'ai';
 }
 
 interface OpenSettingsModalContentProps {
     onClose: () => void;
-    initialTab: 'general' | 'shortcuts';
+    initialTab: 'general' | 'shortcuts' | 'ai';
 }
 
 function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalContentProps): React.ReactElement {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<'general' | 'shortcuts'>(initialTab);
+    const [activeTab, setActiveTab] = useState<'general' | 'shortcuts' | 'ai'>(initialTab);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
@@ -41,7 +42,8 @@ function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalCont
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="settings-modal-title"
-                className="bg-white/95 backdrop-blur-xl w-full max-w-3xl max-h-full md:h-[80vh] rounded-[calc(var(--brand-radius)*1.5)] shadow-2xl border border-white/20 ring-1 ring-black/5 flex flex-col md:flex-row overflow-hidden animate-in zoom-in-95 duration-200"
+                aria-describedby="settings-modal-description"
+                className="bg-white/95 backdrop-blur-xl w-full max-w-3xl max-h-full md:h-[80vh] rounded-[var(--radius-xl)] shadow-[var(--shadow-overlay)] border border-white/20 ring-1 ring-black/5 flex flex-col md:flex-row overflow-hidden animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Sidebar */}
@@ -60,6 +62,15 @@ function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalCont
                     </SidebarItem>
 
                     <SidebarItem
+                        icon={<WandSparkles className="w-4 h-4" />}
+                        isActive={activeTab === 'ai'}
+                        onClick={() => setActiveTab('ai')}
+                        className="whitespace-nowrap w-auto md:w-full px-4 md:px-3 py-2 md:py-2.5 flex-none"
+                    >
+                        {t('settings.ai', 'AI')}
+                    </SidebarItem>
+
+                    <SidebarItem
                         icon={<Keyboard className="w-4 h-4" />}
                         isActive={activeTab === 'shortcuts'}
                         onClick={() => setActiveTab('shortcuts')}
@@ -75,10 +86,15 @@ function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalCont
                         <h2 id="settings-modal-title" className="text-lg font-semibold text-slate-800">
                             {{
                                 general: t('settingsModal.canvasSettings', 'Canvas Settings'),
+                                ai: t('settings.ai', 'AI'),
                                 shortcuts: t('settingsModal.keyboardShortcuts', 'Keyboard Shortcuts'),
                             }[activeTab]}
                         </h2>
+                        <p id="settings-modal-description" className="sr-only">
+                            {t('settingsModal.description', 'Configure canvas preferences and keyboard shortcuts.')}
+                        </p>
                         <button
+                            type="button"
                             ref={closeButtonRef}
                             onClick={onClose}
                             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
@@ -91,6 +107,7 @@ function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalCont
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <div className="p-6">
                             {activeTab === 'general' && <GeneralSettings />}
+                            {activeTab === 'ai' && <AISettings />}
                             {activeTab === 'shortcuts' && <ShortcutsSettings />}
                         </div>
                     </div>
@@ -98,7 +115,12 @@ function OpenSettingsModalContent({ onClose, initialTab }: OpenSettingsModalCont
             </div>
 
             {/* Backdrop click to close */}
-            <div className="absolute inset-0 -z-10" onClick={onClose} />
+            <button
+                type="button"
+                className="absolute inset-0 -z-10"
+                onClick={onClose}
+                aria-label={t('settingsModal.closeDialog', 'Close settings dialog')}
+            />
         </div>
     );
 }

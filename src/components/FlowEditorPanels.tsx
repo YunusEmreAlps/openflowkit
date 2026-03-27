@@ -8,6 +8,10 @@ import type { LayoutAlgorithm } from '@/services/elkLayout';
 import type { FlowTemplate } from '@/services/templates';
 import type { EdgeData, NodeData } from '@/lib/types';
 import type { DomainLibraryItem } from '@/services/domainLibrary';
+import type { SupportedLanguage } from '@/hooks/ai-generation/codeToArchitecture';
+import type { TerraformInputFormat } from '@/hooks/ai-generation/terraformToCloud';
+import type { AIReadinessState } from '@/hooks/ai-generation/readiness';
+
 import type { PropertiesPanel as PropertiesPanelComponent } from './PropertiesPanel';
 
 const LazyCommandBar = lazy(async () => {
@@ -44,7 +48,7 @@ export interface CommandBarPanelProps {
     ) => Promise<void>;
     onSelectTemplate: (template: FlowTemplate) => void;
     onOpenStudioAI: () => void;
-    onOpenStudioFlowMind: () => void;
+    onOpenStudioOpenFlow: () => void;
     onOpenStudioMermaid: () => void;
     onOpenStudioPlayback: () => void;
     initialView: CommandBarView;
@@ -54,10 +58,17 @@ export interface CommandBarPanelProps {
     onAddJourney?: () => void;
     onAddMindmap?: () => void;
     onAddArchitecture?: () => void;
+    onAddSequence?: () => void;
+    onAddClassNode?: () => void;
+    onAddEntityNode?: () => void;
     onAddImage: (imageUrl: string) => void;
     onAddBrowserWireframe: () => void;
     onAddMobileWireframe: () => void;
     onAddDomainLibraryItem?: (item: DomainLibraryItem) => void;
+    onCodeAnalysis?: (code: string, language: SupportedLanguage) => Promise<void>;
+    onSqlAnalysis?: (sql: string) => Promise<void>;
+    onTerraformAnalysis?: (input: string, format: TerraformInputFormat) => Promise<void>;
+    onOpenApiAnalysis?: (spec: string) => Promise<void>;
     showGrid: boolean;
     onToggleGrid: () => void;
     snapToGrid: boolean;
@@ -73,6 +84,7 @@ export interface SnapshotsPanelProps {
     onSaveSnapshot: (name: string) => void;
     onRestoreSnapshot: (snapshot: FlowSnapshot) => void;
     onDeleteSnapshot: (id: string) => void;
+    onCompareSnapshot?: (snapshot: FlowSnapshot) => void;
 }
 
 export interface PropertiesRailProps {
@@ -91,14 +103,31 @@ export interface PropertiesRailProps {
     onAddMindmapSibling: React.ComponentProps<typeof PropertiesPanelComponent>['onAddMindmapSibling'];
     onAddArchitectureService: React.ComponentProps<typeof PropertiesPanelComponent>['onAddArchitectureService'];
     onCreateArchitectureBoundary: React.ComponentProps<typeof PropertiesPanelComponent>['onCreateArchitectureBoundary'];
+    onApplyArchitectureTemplate: React.ComponentProps<typeof PropertiesPanelComponent>['onApplyArchitectureTemplate'];
+    onGenerateEntityFields: React.ComponentProps<typeof PropertiesPanelComponent>['onGenerateEntityFields'];
+    onSuggestArchitectureNode: React.ComponentProps<typeof PropertiesPanelComponent>['onSuggestArchitectureNode'];
+    onConvertEntitySelectionToClassDiagram: React.ComponentProps<typeof PropertiesPanelComponent>['onConvertEntitySelectionToClassDiagram'];
+    onOpenMermaidCodeEditor: React.ComponentProps<typeof PropertiesPanelComponent>['onOpenMermaidCodeEditor'];
     onClose: () => void;
 }
 
 export interface StudioRailProps {
     onClose: () => void;
     onApply: (nodes: FlowNode[], edges: FlowEdge[]) => void;
-    onAIGenerate: (prompt: string, imageBase64?: string) => Promise<void>;
+    onAIGenerate: (prompt: string, imageBase64?: string) => Promise<boolean>;
     isGenerating: boolean;
+    streamingText: string | null;
+    retryCount: number;
+    cancelGeneration: () => void;
+    pendingDiff: import('@/hooks/useAIGeneration').ImportDiff | null;
+    onConfirmDiff: () => void;
+    onDiscardDiff: () => void;
+    aiReadiness: AIReadinessState;
+    lastAIError: string | null;
+    onClearAIError: () => void;
+    selectedNode: FlowNode | null;
+    selectedNodeCount: number;
+    onViewProperties: () => void;
     chatMessages: ChatMessage[];
     onClearChat: () => void;
     activeTab: StudioTab;
@@ -118,6 +147,8 @@ export interface StudioRailProps {
         playbackSpeed: number;
         onPlaybackSpeedChange: (durationMs: number) => void;
     };
+    initialPrompt?: string;
+    onInitialPromptConsumed?: () => void;
 }
 
 export interface FlowEditorPanelsProps {
@@ -137,7 +168,7 @@ export function FlowEditorPanels({
     isHistoryOpen,
     editorMode,
 }: FlowEditorPanelsProps): React.ReactElement {
-    const showPropertiesRail = editorMode === 'canvas' && Boolean(properties.selectedNode || properties.selectedEdge);
+    const showPropertiesRail = editorMode === 'canvas' && Boolean(properties.selectedNode || properties.selectedEdge || properties.selectedNodes.length > 1);
     const showStudioRail = editorMode === 'studio';
     const railContent = showStudioRail ? (
         <Suspense fallback={null}>
@@ -148,6 +179,18 @@ export function FlowEditorPanels({
                 onApply={studio.onApply}
                 onAIGenerate={studio.onAIGenerate}
                 isGenerating={studio.isGenerating}
+                streamingText={studio.streamingText}
+                retryCount={studio.retryCount}
+                cancelGeneration={studio.cancelGeneration}
+                pendingDiff={studio.pendingDiff}
+                onConfirmDiff={studio.onConfirmDiff}
+                onDiscardDiff={studio.onDiscardDiff}
+                aiReadiness={studio.aiReadiness}
+                lastAIError={studio.lastAIError}
+                onClearAIError={studio.onClearAIError}
+                selectedNode={studio.selectedNode}
+                selectedNodeCount={studio.selectedNodeCount}
+                onViewProperties={studio.onViewProperties}
                 chatMessages={studio.chatMessages}
                 onClearChat={studio.onClearChat}
                 activeTab={studio.activeTab}
@@ -155,6 +198,8 @@ export function FlowEditorPanels({
                 codeMode={studio.codeMode}
                 onCodeModeChange={studio.onCodeModeChange}
                 playback={studio.playback}
+                initialPrompt={studio.initialPrompt}
+                onInitialPromptConsumed={studio.onInitialPromptConsumed}
             />
         </Suspense>
     ) : showPropertiesRail ? (
@@ -175,6 +220,11 @@ export function FlowEditorPanels({
                 onAddMindmapSibling={properties.onAddMindmapSibling}
                 onAddArchitectureService={properties.onAddArchitectureService}
                 onCreateArchitectureBoundary={properties.onCreateArchitectureBoundary}
+                onApplyArchitectureTemplate={properties.onApplyArchitectureTemplate}
+                onGenerateEntityFields={properties.onGenerateEntityFields}
+                onSuggestArchitectureNode={properties.onSuggestArchitectureNode}
+                onConvertEntitySelectionToClassDiagram={properties.onConvertEntitySelectionToClassDiagram}
+                onOpenMermaidCodeEditor={properties.onOpenMermaidCodeEditor}
                 onClose={properties.onClose}
             />
         </Suspense>
@@ -195,7 +245,7 @@ export function FlowEditorPanels({
                             onLayout={commandBar.onLayout}
                             onSelectTemplate={commandBar.onSelectTemplate}
                             onOpenStudioAI={commandBar.onOpenStudioAI}
-                            onOpenStudioFlowMind={commandBar.onOpenStudioFlowMind}
+                            onOpenStudioOpenFlow={commandBar.onOpenStudioOpenFlow}
                             onOpenStudioMermaid={commandBar.onOpenStudioMermaid}
                             onOpenStudioPlayback={commandBar.onOpenStudioPlayback}
                             initialView={commandBar.initialView}
@@ -205,10 +255,17 @@ export function FlowEditorPanels({
                             onAddJourney={commandBar.onAddJourney}
                             onAddMindmap={commandBar.onAddMindmap}
                             onAddArchitecture={commandBar.onAddArchitecture}
+                            onAddSequence={commandBar.onAddSequence}
+                            onAddClassNode={commandBar.onAddClassNode}
+                            onAddEntityNode={commandBar.onAddEntityNode}
                             onAddImage={commandBar.onAddImage}
                             onAddBrowserWireframe={commandBar.onAddBrowserWireframe}
                             onAddMobileWireframe={commandBar.onAddMobileWireframe}
                             onAddDomainLibraryItem={commandBar.onAddDomainLibraryItem}
+                            onCodeAnalysis={commandBar.onCodeAnalysis}
+                            onSqlAnalysis={commandBar.onSqlAnalysis}
+                            onTerraformAnalysis={commandBar.onTerraformAnalysis}
+                            onOpenApiAnalysis={commandBar.onOpenApiAnalysis}
                             settings={{
                                 showGrid: commandBar.showGrid,
                                 onToggleGrid: commandBar.onToggleGrid,
@@ -231,6 +288,7 @@ export function FlowEditorPanels({
                         onSaveSnapshot={snapshots.onSaveSnapshot}
                         onRestoreSnapshot={snapshots.onRestoreSnapshot}
                         onDeleteSnapshot={snapshots.onDeleteSnapshot}
+                        onCompareSnapshot={snapshots.onCompareSnapshot}
                     />
                 </Suspense>
             ) : null}

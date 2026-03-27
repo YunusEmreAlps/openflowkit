@@ -15,6 +15,8 @@ export interface HomeFlowCard {
 interface HomeDashboardProps {
     flows: HomeFlowCard[];
     onCreateNew: () => void;
+    onOpenTemplates: () => void;
+    onPromptWithAI: () => void;
     onImportJSON: () => void;
     onOpenFlow: (flowId: string) => void;
     onRenameFlow: (flowId: string) => void;
@@ -25,6 +27,8 @@ interface HomeDashboardProps {
 export function HomeDashboard({
     flows,
     onCreateNew,
+    onOpenTemplates,
+    onPromptWithAI,
     onImportJSON,
     onOpenFlow,
     onRenameFlow,
@@ -34,8 +38,8 @@ export function HomeDashboard({
     const { t } = useTranslation();
 
     return (
-        <div className="flex-1 overflow-y-auto px-10 py-12 animate-in fade-in duration-300">
-            <div className="flex items-end justify-between mb-12">
+        <div className="flex-1 overflow-y-auto px-4 py-6 animate-in fade-in duration-300 sm:px-6 md:px-10 md:py-12">
+            <div className="mb-8 flex flex-col gap-4 md:mb-12 md:flex-row md:items-end md:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold text-slate-900 tracking-tight mb-1">{t('home.title', 'Dashboard')}</h1>
                     <p className="text-[var(--brand-secondary)] text-sm">{t('home.description', 'Manage your flows and diagrams.')}</p>
@@ -62,43 +66,58 @@ export function HomeDashboard({
                 </div>
 
                 {flows.length === 0 ? (
-                    <div className="rounded-[24px] border border-dashed border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.9))] px-6 py-16 text-center shadow-sm">
+                    <div className="rounded-[var(--radius-xl)] border border-dashed border-slate-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(248,250,252,0.9))] px-6 py-16 text-center shadow-sm">
                         <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-[var(--brand-surface)] shadow-sm">
                             <Plus className="w-5 h-5 text-slate-400" />
                         </div>
                         <h3 className="mb-1 text-sm font-medium text-slate-900">{t('home.createFirstFlow', 'Create your first flow')}</h3>
                         <p className="mx-auto max-w-md text-xs leading-6 text-[var(--brand-secondary)]">
-                            {t('home.startFromScratch', 'Start from scratch or import an existing diagram.')}
+                            Build a useful diagram fast: start from a template, import Mermaid or SQL, or open Flowpilot on a blank canvas.
                         </p>
-                        <div className="mt-6 flex items-center justify-center gap-3">
+                        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+                            <Button
+                                onClick={onOpenTemplates}
+                                variant="primary"
+                                size="sm"
+                                data-testid="home-open-templates"
+                            >
+                                Browse Templates
+                            </Button>
                             <Button
                                 onClick={onImportJSON}
                                 variant="secondary"
                                 size="sm"
                                 data-testid="home-open-file"
                             >
-                                {t('common.openFile', 'Open File')}
+                                Import Diagram
+                            </Button>
+                            <Button
+                                onClick={onPromptWithAI}
+                                variant="secondary"
+                                size="sm"
+                            >
+                                Generate with Flowpilot
                             </Button>
                             <Button
                                 onClick={onCreateNew}
-                                variant="primary"
+                                variant="ghost"
                                 size="sm"
                             >
-                                {t('common.createNew', 'Create New')}
+                                Blank Canvas
                             </Button>
                         </div>
                         <div className="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-3 text-left sm:grid-cols-3">
-                            <div className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3">
-                                <p className="text-xs font-semibold text-slate-900">Start blank</p>
-                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Open a new workspace and sketch the flow from scratch.</p>
+                            <div className="rounded-[var(--radius-lg)] border border-slate-200/80 bg-white/70 px-4 py-3">
+                                <p className="text-xs font-semibold text-slate-900">Use builder templates</p>
+                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Start from release trains, cloud architectures, mind maps, and technical workflows.</p>
                             </div>
-                            <div className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3">
-                                <p className="text-xs font-semibold text-slate-900">Import existing work</p>
-                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Bring in a saved JSON flow when you want to keep iterating.</p>
+                            <div className="rounded-[var(--radius-lg)] border border-slate-200/80 bg-white/70 px-4 py-3">
+                                <p className="text-xs font-semibold text-slate-900">Import real source material</p>
+                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Bring in Mermaid, SQL, OpenAPI, JSON, or OpenFlow sources and keep editing visually.</p>
                             </div>
-                            <div className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3">
-                                <p className="text-xs font-semibold text-slate-900">Autosave by default</p>
-                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Diagram data stays local in this browser unless you export or open a collaboration room.</p>
+                            <div className="rounded-[var(--radius-lg)] border border-slate-200/80 bg-white/70 px-4 py-3">
+                                <p className="text-xs font-semibold text-slate-900">Local-first by default</p>
+                                <p className="mt-1 text-[11px] leading-5 text-slate-500">Diagram data stays in this browser unless you explicitly export or share it.</p>
                             </div>
                         </div>
                     </div>
@@ -108,7 +127,7 @@ export function HomeDashboard({
                             <div
                                 key={flow.id}
                                 onClick={() => onOpenFlow(flow.id)}
-                                className="group bg-[var(--brand-surface)] rounded-lg border border-slate-200 overflow-hidden cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all relative"
+                                className="group bg-[var(--brand-surface)] rounded-[var(--radius-lg)] border border-slate-200 overflow-hidden cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all relative"
                             >
                                 <div className="h-40 bg-slate-50 flex items-center justify-center border-b border-slate-100 relative overflow-hidden">
                                     <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
@@ -126,7 +145,7 @@ export function HomeDashboard({
                                                 event.stopPropagation();
                                                 onRenameFlow(flow.id);
                                             }}
-                                            className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                                            className="rounded-[var(--radius-sm)] border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                                             aria-label={t('common.rename', 'Rename')}
                                         >
                                             <Pencil className="h-3 w-3" />
@@ -137,7 +156,7 @@ export function HomeDashboard({
                                                 event.stopPropagation();
                                                 onDuplicateFlow(flow.id);
                                             }}
-                                            className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                                            className="rounded-[var(--radius-sm)] border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                                             aria-label={t('common.duplicate', 'Duplicate')}
                                         >
                                             <Copy className="h-3 w-3" />
@@ -148,7 +167,7 @@ export function HomeDashboard({
                                                 event.stopPropagation();
                                                 onDeleteFlow(flow.id);
                                             }}
-                                            className="rounded-md border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                                            className="rounded-[var(--radius-sm)] border border-slate-200 bg-white p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                                             aria-label={t('common.delete', 'Delete')}
                                         >
                                             <Trash2 className="h-3 w-3" />

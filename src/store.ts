@@ -26,6 +26,7 @@ export {
 export type {
     AIProvider,
     AISettings,
+    AISettingsStorageMode,
     CustomHeaderConfig,
     FlowState as FlowStoreState,
     ViewSettings,
@@ -46,7 +47,7 @@ export const useFlowStore = create<FlowState>()(
         {
             name: 'openflowkit-storage',
             storage: createFlowPersistStorage(),
-            version: 1,
+            version: 2,
             migrate: (persistedState) => migratePersistedFlowState(persistedState),
             partialize: (state) => partializePersistedFlowState(state),
         }

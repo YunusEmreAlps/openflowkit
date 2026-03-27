@@ -1,3 +1,6 @@
+import { DEFAULT_AI_SETTINGS } from '../defaults';
+import { sanitizeAISettings } from '../aiSettings';
+import { persistAISettings } from '../aiSettingsPersistence';
 import type { FlowState } from '../types';
 
 type SetFlowState = (partial: Partial<FlowState> | ((state: FlowState) => Partial<FlowState>)) => void;
@@ -13,9 +16,13 @@ export function createAIAndSelectionActions(set: SetFlowState): Pick<
     | 'clearMermaidDiagnostics'
 > {
     return {
-        setAISettings: (settings) => set((state) => ({
-            aiSettings: { ...state.aiSettings, ...settings },
-        })),
+        setAISettings: (settings) => set((state) => {
+            const nextAISettings = sanitizeAISettings({ ...state.aiSettings, ...settings }, DEFAULT_AI_SETTINGS);
+            persistAISettings(nextAISettings);
+            return {
+                aiSettings: nextAISettings,
+            };
+        }),
 
         setSelectedNodeId: (id) => set({ selectedNodeId: id }),
         setSelectedEdgeId: (id) => set({ selectedEdgeId: id }),

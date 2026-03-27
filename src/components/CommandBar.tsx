@@ -4,6 +4,11 @@ import { CommandBarProps, CommandView } from './command-bar/types';
 import { RootView } from './command-bar/RootView';
 import { useCommandBarCommands } from './command-bar/useCommandBarCommands';
 
+const LazyImportView = lazy(async () => {
+    const module = await import('./command-bar/ImportView');
+    return { default: module.ImportView };
+});
+
 const LazyTemplatesView = lazy(async () => {
     const module = await import('./command-bar/TemplatesView');
     return { default: module.TemplatesView };
@@ -49,7 +54,7 @@ function OpenCommandBarContent({
     onLayout,
     onSelectTemplate,
     onOpenStudioAI,
-    onOpenStudioFlowMind,
+    onOpenStudioOpenFlow,
     onOpenStudioMermaid,
     initialView = 'root',
     onAddAnnotation,
@@ -58,10 +63,17 @@ function OpenCommandBarContent({
     onAddJourney,
     onAddMindmap,
     onAddArchitecture,
+    onAddSequence,
+    onAddClassNode,
+    onAddEntityNode,
     onAddImage,
     onAddBrowserWireframe,
     onAddMobileWireframe,
     onAddDomainLibraryItem,
+    onCodeAnalysis,
+    onSqlAnalysis,
+    onTerraformAnalysis,
+    onOpenApiAnalysis,
     settings,
 }: OpenCommandBarContentProps): React.ReactElement {
     const [view, setView] = useState<CommandView>(initialView);
@@ -108,13 +120,16 @@ function OpenCommandBarContent({
         }
     }, [view, onClose]);
 
+    const hasImport = Boolean(onCodeAnalysis ?? onSqlAnalysis ?? onTerraformAnalysis ?? onOpenApiAnalysis);
+
     const commands = useCommandBarCommands({
         settings,
         onUndo,
         onRedo,
         onOpenStudioAI,
-        onOpenStudioFlowMind,
+        onOpenStudioOpenFlow,
         onOpenStudioMermaid,
+        hasImport,
     });
 
     return (
@@ -130,9 +145,13 @@ function OpenCommandBarContent({
                 role="dialog"
                 aria-modal="true"
                 aria-label="Command bar"
-                className="pointer-events-auto flex h-[500px] w-[640px] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-white/50 bg-white/96 shadow-[0_28px_80px_rgba(15,23,42,0.16)] ring-1 ring-black/5 backdrop-blur-2xl animate-in slide-in-from-bottom-4 duration-200"
+                aria-describedby="command-bar-description"
+                className="pointer-events-auto flex h-[500px] w-[640px] flex-col overflow-hidden rounded-[var(--radius-md)] border border-white/50 bg-white/96 shadow-[var(--shadow-overlay)] ring-1 ring-black/5 backdrop-blur-2xl animate-in slide-in-from-bottom-4 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
+                <p id="command-bar-description" className="sr-only">
+                    Search quick actions, templates, layout tools, and editor commands.
+                </p>
                 {view === 'root' && (
                     <RootView
                         commands={commands}
@@ -191,6 +210,9 @@ function OpenCommandBarContent({
                             onAddJourney={() => onAddJourney?.()}
                             onAddMindmap={() => onAddMindmap?.()}
                             onAddArchitecture={() => onAddArchitecture?.()}
+                            onAddSequence={() => onAddSequence?.()}
+                            onAddClassNode={() => onAddClassNode?.()}
+                            onAddEntityNode={() => onAddEntityNode?.()}
                             onAddImage={(imageUrl) => onAddImage?.(imageUrl)}
                             onAddBrowserWireframe={() => onAddBrowserWireframe?.()}
                             onAddMobileWireframe={() => onAddMobileWireframe?.()}
@@ -211,6 +233,18 @@ function OpenCommandBarContent({
                         <LazyPagesView
                             onClose={onClose}
                             handleBack={handleBack}
+                        />
+                    </Suspense>
+                )}
+                {view === 'import' && (
+                    <Suspense fallback={null}>
+                        <LazyImportView
+                            onClose={onClose}
+                            handleBack={handleBack}
+                            onCodeAnalysis={onCodeAnalysis}
+                            onSqlAnalysis={onSqlAnalysis}
+                            onTerraformAnalysis={onTerraformAnalysis}
+                            onOpenApiAnalysis={onOpenApiAnalysis}
                         />
                     </Suspense>
                 )}

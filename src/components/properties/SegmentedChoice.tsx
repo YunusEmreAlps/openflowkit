@@ -19,6 +19,20 @@ const GRID_COLUMNS: Record<number, string> = {
     4: 'grid-cols-4',
 };
 
+function getContainerPaddingClass(size: SegmentedChoiceProps['size']): string {
+    return size === 'sm' ? 'p-0.5' : 'p-0.75';
+}
+
+function getItemClassName(selected: boolean, size: SegmentedChoiceProps['size']): string {
+    const spacingClass = size === 'sm' ? 'min-h-8 px-2.5 py-1 text-[11px]' : 'min-h-10 px-3.5 py-2 text-[13px]';
+
+    return `flex items-center justify-center rounded-[var(--radius-xs)] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary-200)] focus-visible:ring-offset-1 ${spacingClass} ${
+        selected
+            ? 'bg-white text-[var(--brand-primary)] shadow-sm ring-1 ring-[var(--brand-primary-200)]'
+            : 'text-slate-500 hover:bg-white/85 hover:text-slate-700'
+    }`;
+}
+
 export function SegmentedChoice({
     items,
     selectedId,
@@ -27,10 +41,10 @@ export function SegmentedChoice({
     size = 'md',
 }: SegmentedChoiceProps): React.ReactElement {
     const gridClass = GRID_COLUMNS[columns] || 'grid-cols-3';
-    const sizeClass = size === 'sm' ? 'py-1.5 text-[11px]' : 'py-2 text-xs';
+    const paddingClass = getContainerPaddingClass(size);
 
     return (
-        <div className={`grid ${gridClass} gap-2`}>
+        <div className={`grid ${gridClass} gap-1 rounded-[var(--radius-sm)] border border-slate-200/80 bg-slate-100/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] ${paddingClass}`}>
             {items.map((item) => {
                 const selected = item.id === selectedId;
                 return (
@@ -38,11 +52,8 @@ export function SegmentedChoice({
                         key={item.id}
                         type="button"
                         onClick={() => onSelect(item.id)}
-                        className={`${sizeClass} rounded-[var(--brand-radius)] border font-medium transition-all ${
-                            selected
-                                ? 'bg-[var(--brand-primary-50)] border-[var(--brand-primary-200)] text-[var(--brand-primary-700)]'
-                                : 'bg-[var(--brand-surface)] border-slate-200 text-[var(--brand-secondary)]'
-                        }`}
+                        className={getItemClassName(selected, size)}
+                        aria-pressed={selected}
                     >
                         {item.label}
                     </button>

@@ -21,12 +21,14 @@ interface SidebarHeaderProps {
 interface SidebarBodyProps {
     children: React.ReactNode;
     className?: string;
+    scrollable?: boolean;
 }
 
 interface SidebarSegmentedTabsProps {
     tabs: SidebarTabItem[];
     activeTab: string;
     onTabChange: (tab: string) => void;
+    getTabTestId?: (tab: SidebarTabItem) => string | undefined;
 }
 
 function getSidebarTabButtonClass(isActive: boolean): string {
@@ -79,9 +81,15 @@ export function SidebarHeader({
     );
 }
 
-export function SidebarBody({ children, className = '' }: SidebarBodyProps): React.ReactElement {
+export function SidebarBody({
+    children,
+    className = '',
+    scrollable = true,
+}: SidebarBodyProps): React.ReactElement {
+    const overflowClassName = scrollable ? 'overflow-y-auto' : 'overflow-hidden';
+
     return (
-        <div className={`min-h-0 flex-1 overflow-y-auto px-4 py-3 custom-scrollbar ${className}`.trim()}>
+        <div className={`min-h-0 flex-1 ${overflowClassName} px-4 py-3 custom-scrollbar ${className}`.trim()}>
             {children}
         </div>
     );
@@ -91,6 +99,7 @@ export function SidebarSegmentedTabs({
     tabs,
     activeTab,
     onTabChange,
+    getTabTestId,
 }: SidebarSegmentedTabsProps): React.ReactElement {
     return (
         <div className="flex rounded-[var(--brand-radius)] border border-slate-200/60 bg-slate-50/70 p-1">
@@ -99,7 +108,8 @@ export function SidebarSegmentedTabs({
                     type="button"
                     key={id}
                     onClick={() => onTabChange(id)}
-                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-[calc(var(--brand-radius)-4px)] px-3 py-1.5 text-xs font-semibold transition-colors ${getSidebarTabButtonClass(activeTab === id)}`}
+                    data-testid={getTabTestId?.({ id, label, icon })}
+                    className={`flex flex-1 items-center justify-center gap-1.5 rounded-[var(--radius-xs)] px-3 py-1.5 text-xs font-semibold transition-colors ${getSidebarTabButtonClass(activeTab === id)}`}
                 >
                     {icon}
                     {label}

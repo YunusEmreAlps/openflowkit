@@ -19,6 +19,7 @@ const NODE_COMPONENT_FILES = [
   'src/components/custom-nodes/MindmapNode.tsx',
   'src/components/custom-nodes/JourneyNode.tsx',
   'src/components/custom-nodes/ArchitectureNode.tsx',
+  'src/components/custom-nodes/SequenceParticipantNode.tsx',
 ] as const;
 
 function readSource(path: string): string {
@@ -30,6 +31,7 @@ describe('node chrome coverage', () => {
     for (const path of NODE_COMPONENT_FILES) {
       const source = readSource(path);
       const usesNodeChrome = source.includes('NodeChrome');
+      const usesStructuredNodeHandles = source.includes('StructuredNodeHandles');
       const usesExplicitChrome =
         source.includes('NodeTransformControls')
         && source.includes('<Handle')
@@ -37,15 +39,14 @@ describe('node chrome coverage', () => {
         && source.includes('Position.Right')
         && source.includes('Position.Bottom')
         && source.includes('Position.Left');
-      expect(usesNodeChrome || usesExplicitChrome, path).toBe(true);
+      expect(usesNodeChrome || usesStructuredNodeHandles || usesExplicitChrome, path).toBe(true);
     }
   });
 
   it('keeps production node components on NodeChrome or loose-mode universal handles', () => {
     for (const path of NODE_COMPONENT_FILES) {
       const source = readSource(path);
-      if (source.includes('NodeChrome')) {
-        expect(source, path).toContain('NodeChrome');
+      if (source.includes('NodeChrome') || source.includes('StructuredNodeHandles')) {
         continue;
       }
 

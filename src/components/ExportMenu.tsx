@@ -12,47 +12,77 @@ const LazyExportMenuPanel = lazy(async () => {
 
 interface ExportMenuProps {
     onExportPNG: (format: 'png' | 'jpeg') => void;
+    onCopyImage: (format: 'png' | 'jpeg') => void;
     onExportSVG: () => void;
-    onExportAnimated: (format: 'video' | 'gif') => void;
+    onCopySVG: () => void;
+    onExportPDF: () => void;
+    onExportCinematic: (format: 'cinematic-video' | 'cinematic-gif') => void;
     onExportJSON: () => void;
+    onCopyJSON: () => void;
     onExportMermaid: () => void;
+    onDownloadMermaid: () => void;
     onExportPlantUML: () => void;
+    onDownloadPlantUML: () => void;
     onExportOpenFlowDSL: () => void;
+    onDownloadOpenFlowDSL: () => void;
     onExportFigma: () => void;
+    onDownloadFigma: () => void;
+    onShare: () => void;
 }
 
 export const ExportMenu: React.FC<ExportMenuProps> = ({
     onExportPNG,
+    onCopyImage,
     onExportSVG,
-    onExportAnimated,
+    onCopySVG,
+    onExportPDF,
+    onExportCinematic,
     onExportJSON,
+    onCopyJSON,
     onExportMermaid,
+    onDownloadMermaid,
     onExportPlantUML,
+    onDownloadPlantUML,
     onExportOpenFlowDSL,
+    onDownloadOpenFlowDSL,
     onExportFigma,
+    onDownloadFigma,
+    onShare,
 }) => {
     const { t } = useTranslation();
+    const exportLabel = t('export.title', 'Export');
     const { isOpen, menuRef, toggleMenu, handleSelect } = useExportMenu({
         onExportPNG,
+        onCopyImage,
         onExportSVG,
-        onExportAnimated,
+        onCopySVG,
+        onExportPDF,
+        onExportCinematic,
         onExportJSON,
+        onCopyJSON,
         onExportMermaid,
+        onDownloadMermaid,
         onExportPlantUML,
+        onDownloadPlantUML,
         onExportOpenFlowDSL,
+        onDownloadOpenFlowDSL,
         onExportFigma,
+        onDownloadFigma,
+        onShare,
     });
 
     return (
         <div className="relative" ref={menuRef}>
-            <Tooltip text={t('export.exportDiagram', 'Export Diagram')} side="bottom">
+            <Tooltip text={t('export.exportOrShare', 'Export or share this canvas')} side="bottom">
                 <Button
                     onClick={toggleMenu}
                     data-testid="topnav-export"
-                    className="h-9 px-4 text-sm"
+                    size="sm"
+                    aria-label={exportLabel}
+                    className="h-10 w-10 px-0 sm:h-9 sm:w-auto sm:px-3"
                 >
-                    <Download className="w-4 h-4 mr-2" />
-                    {t('export.title', 'Export')}
+                    <Download className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">{exportLabel}</span>
                 </Button>
             </Tooltip>
 

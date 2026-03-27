@@ -13,6 +13,7 @@ const LazyShareModal = lazy(async () => {
 
 interface CollaborationState {
     roomId: string;
+    inviteUrl: string;
     viewerCount: number;
     status: 'realtime' | 'waiting' | 'fallback';
     cacheState: 'unavailable' | 'syncing' | 'ready' | 'hydrated';
@@ -28,13 +29,22 @@ interface CollaborationState {
 interface TopNavActionsProps {
     onPlay: () => void;
     onExportPNG: (format?: 'png' | 'jpeg') => void;
+    onCopyImage: (format?: 'png' | 'jpeg') => void;
     onExportSVG: () => void;
-    onExportAnimated: (format: 'video' | 'gif') => void;
+    onCopySVG: () => void;
+    onExportPDF: () => void;
+    onExportCinematic: (format: 'cinematic-video' | 'cinematic-gif') => void;
     onExportJSON: () => void;
+    onCopyJSON: () => void;
     onExportMermaid: () => void;
+    onDownloadMermaid: () => void;
     onExportPlantUML: () => void;
+    onDownloadPlantUML: () => void;
     onExportOpenFlowDSL: () => void;
+    onDownloadOpenFlowDSL: () => void;
     onExportFigma: () => void;
+    onDownloadFigma: () => void;
+    onShare: () => void;
     collaboration?: CollaborationState;
     isBeveled: boolean;
 }
@@ -72,9 +82,9 @@ function getCollaborationStatusLabel(
 
     switch (status) {
         case 'realtime':
-            return `${t('share.status.realtime', { defaultValue: 'Realtime peer sync' })}${cacheLabel}`;
+            return `${t('share.status.realtime', { defaultValue: 'Live collaboration ready' })}${cacheLabel}`;
         case 'waiting':
-            return `${t('share.status.waiting', { defaultValue: 'Connecting to realtime sync' })}${cacheLabel}`;
+            return `${t('share.status.waiting', { defaultValue: 'Connecting live collaboration' })}${cacheLabel}`;
         default:
             return `${t('share.status.fallback', { defaultValue: 'Local-only mode' })}${cacheLabel}`;
     }
@@ -94,27 +104,42 @@ function getCollaborationStatusDotClass(status: CollaborationState['status']): s
 export function TopNavActions({
     onPlay,
     onExportPNG,
+    onCopyImage,
     onExportSVG,
-    onExportAnimated,
+    onCopySVG,
+    onExportPDF,
+    onExportCinematic,
     onExportJSON,
+    onCopyJSON,
     onExportMermaid,
+    onDownloadMermaid,
     onExportPlantUML,
+    onDownloadPlantUML,
     onExportOpenFlowDSL,
+    onDownloadOpenFlowDSL,
     onExportFigma,
+    onDownloadFigma,
+    onShare,
     collaboration,
     isBeveled,
 }: TopNavActionsProps): React.ReactElement {
     const { t } = useTranslation();
+    const playLabel = t('common.play', 'Preview');
     const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
     const viewerCount = collaboration?.viewerCount ?? 1;
     const visibleViewerCount = Math.min(viewerCount, 4);
     const visibleParticipants = collaboration?.participants.slice(0, visibleViewerCount) ?? [];
+    const shareButtonClassName = `ml-1 h-10 w-10 rounded-[var(--radius-md)] border text-slate-600 transition-all sm:h-9 sm:w-9 ${isBeveled
+        ? 'btn-beveled-secondary'
+        : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm hover:shadow'
+        }`;
+    const playButtonClassName = 'h-10 px-2.5 font-medium sm:h-9 sm:px-3';
 
     return (
-        <div className="flex items-center gap-3 min-w-[240px] justify-end">
-            <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
                 {collaboration && (
-                    <div className="flex items-center gap-2 mr-1 border-r border-slate-200/60 pr-3">
+                    <div className="mr-1 hidden items-center gap-2 border-r border-slate-200/60 pr-3 md:flex">
                         {/* Status Indicator */}
                         <Tooltip text={getCollaborationStatusLabel(collaboration.status, collaboration.cacheState, t)} side="bottom">
                             <div className={`w-2 h-2 rounded-full ${getCollaborationStatusDotClass(collaboration.status)}`} />
@@ -139,43 +164,51 @@ export function TopNavActions({
                             )}
                         </div>
 
-                        <Tooltip text={t('share.openDialog', 'Share dialog')} side="bottom">
+                        <Tooltip text={t('share.openDialog', 'Open sharing')} side="bottom">
                             <Button
                                 variant="icon"
                                 size="icon"
                                 onClick={() => setIsShareModalOpen(true)}
                                 data-testid="topnav-share"
-                                className={`h-8 w-8 ml-1 rounded-[var(--radius-md)] border text-slate-600 transition-all ${isBeveled
-                                    ? 'btn-beveled-secondary'
-                                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm hover:shadow'
-                                    }`}
+                                className={shareButtonClassName}
                                 icon={<Share2 className="w-4 h-4" />}
                             />
                         </Tooltip>
                     </div>
                 )}
 
-                <Tooltip text={t('nav.playbackMode', 'Playback Mode')} side="bottom">
+                <Tooltip text={t('nav.playbackMode', 'Preview playback')} side="bottom">
                     <Button
                         variant="secondary"
+                        size="sm"
                         onClick={onPlay}
                         data-testid="topnav-play"
-                        className="h-9 px-4 text-sm font-medium"
-                        icon={<Play className="w-3.5 h-3.5 mr-1" />}
+                        aria-label={playLabel}
+                        className={playButtonClassName}
+                        icon={<Play className="h-3.5 w-3.5 sm:mr-1" />}
                     >
-                        {t('common.play', 'Play')}
+                        <span className="hidden sm:inline">{playLabel}</span>
                     </Button>
                 </Tooltip>
 
                 <ExportMenu
                     onExportPNG={onExportPNG}
+                    onCopyImage={onCopyImage}
                     onExportSVG={onExportSVG}
-                    onExportAnimated={onExportAnimated}
+                    onCopySVG={onCopySVG}
+                    onExportPDF={onExportPDF}
+                    onExportCinematic={onExportCinematic}
                     onExportJSON={onExportJSON}
+                    onCopyJSON={onCopyJSON}
                     onExportMermaid={onExportMermaid}
+                    onDownloadMermaid={onDownloadMermaid}
                     onExportPlantUML={onExportPlantUML}
+                    onDownloadPlantUML={onDownloadPlantUML}
                     onExportOpenFlowDSL={onExportOpenFlowDSL}
+                    onDownloadOpenFlowDSL={onDownloadOpenFlowDSL}
                     onExportFigma={onExportFigma}
+                    onDownloadFigma={onDownloadFigma}
+                    onShare={onShare}
                 />
             </div>
 
@@ -186,8 +219,10 @@ export function TopNavActions({
                         onClose={() => setIsShareModalOpen(false)}
                         onCopyInvite={collaboration.onCopyShareLink}
                         roomId={collaboration.roomId}
+                        inviteUrl={collaboration.inviteUrl}
                         status={collaboration.status}
                         viewerCount={viewerCount}
+                        participants={collaboration.participants}
                     />
                 </Suspense>
             ) : null}
