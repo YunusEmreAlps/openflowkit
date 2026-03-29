@@ -1,27 +1,18 @@
 <div align="center">
 
-<img src="public/favicon.svg" width="80" alt="OpenFlowKit" />
+<br/>
+
+<img src="public/favicon.svg" width="72" alt="OpenFlowKit" />
 
 <br/>
 <br/>
 
-# OpenFlowKit
+<h1>OpenFlowKit</h1>
 
-### The open-source diagramming workspace built for developers.
+<h3>The open-source diagramming workspace engineers actually want to use.</h3>
 
-<br/>
-
-```
-Paste a GitHub URL    →  architecture diagram
-Paste SQL             →  entity-relationship diagram
-Paste Terraform       →  cloud infrastructure map
-Describe your system  →  watch it appear
-```
-
-<br/>
-
-**No account. No upload. No lock-in. Runs entirely in your browser.**<br/>
-**Every API key stays local. Every diagram is yours.**
+<p>Paste SQL → instant ERD. Paste Terraform state → cloud map. Paste a GitHub repo → architecture diagram (AI). Describe a system in plain English → watch it appear (BYOK).<br/>
+Editable, version-controllable diagrams — entirely in your browser.</p>
 
 <br/>
 
@@ -31,32 +22,46 @@ Describe your system  →  watch it appear
   <a href="https://github.com/Vrun-design/openflowkit/actions"><img src="https://img.shields.io/github/actions/workflow/status/Vrun-design/openflowkit/quality.yml?style=flat-square&label=CI" alt="CI" /></a>
   <img src="https://img.shields.io/badge/React-19-61dafb.svg?style=flat-square" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6.svg?style=flat-square" alt="TypeScript 5" />
+  <img src="https://img.shields.io/badge/Vite-6-646cff.svg?style=flat-square" alt="Vite 6" />
   <img src="https://img.shields.io/badge/PRs-Welcome-2dd4bf.svg?style=flat-square" alt="PRs Welcome" />
 </p>
 
+<br/>
+
 <p>
-  <a href="https://app.openflowkit.com"><strong>→ Try it live — no account needed</strong></a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="https://app.openflowkit.com"><b>→ Launch the App</b></a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="https://docs.openflowkit.com">Documentation</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
   <a href="https://openflowkit.com">Website</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://docs.openflowkit.com">Docs</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://github.com/Vrun-design/openflowkit/issues/new?template=bug_report.md">Report a Bug</a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="https://github.com/Vrun-design/openflowkit/issues/new?template=feature_request.md">Request a Feature</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="https://github.com/Vrun-design/openflowkit/issues">Issues</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="CONTRIBUTING.md">Contribute</a>
 </p>
+
+<br/>
+
+<!-- Add your hero screenshot or GIF below. Recommended: 1400×900px or a focused flow demo -->
+<!-- ![OpenFlowKit in action](assets/hero-demo.gif) -->
+
+<br/>
+
+<table>
+<tr>
+<td align="center"><b>🧑‍💻 Code → Diagram</b><br/><sub>GitHub · SQL · Terraform<br/>K8s · Docker Compose</sub></td>
+<td align="center"><b>🤖 AI Generation</b><br/><sub>9 providers · BYOK<br/>Streaming diff preview</sub></td>
+<td align="center"><b>`{}` Diagram as Code</b><br/><sub>Bidirectional live sync<br/>Git-friendly DSL</sub></td>
+<td align="center"><b>🎬 Cinematic Export</b><br/><sub>Animated video & GIF<br/>No upload required</sub></td>
+<td align="center"><b>👥 P2P Collaboration</b><br/><sub>WebRTC · No server<br/>Live cursors · Yjs</sub></td>
+</tr>
+</table>
 
 <br/>
 
 <a href="https://www.producthunt.com/products/openflowkit" target="_blank">
   <img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-topic-badge.svg?post_id=1081019&theme=light&period=weekly&topic_id=44" alt="OpenFlowKit on Product Hunt" width="200" height="43" />
 </a>
-
-<br/>
-<br/>
-
-<!-- Replace with actual screenshot or GIF -->
-![OpenFlowKit Demo](assets/hero-demo.gif)
 
 </div>
 
@@ -68,13 +73,13 @@ Describe your system  →  watch it appear
 
 Every diagramming tool makes a compromise. OpenFlowKit doesn't.
 
-| Tool | What's missing |
-|---|---|
-| **Excalidraw / tldraw** | Freeform whiteboards — no structured diagram types, no DSL, no code imports |
-| **Mermaid.js** | Code-only — no visual canvas, no AI, no interactive editor |
-| **Draw.io** | Decade-old UX — no AI integration, no developer import pipelines |
-| **Lucidchart / Miro** | Cloud lock-in — expensive, account required, your data lives on their servers |
-| **PlantUML** | Server-dependent rendering — no visual editor, no local-first model |
+| Tool                    | What's missing                                                                |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| **Excalidraw / tldraw** | Freeform whiteboards — no structured diagram types, no DSL, no code imports   |
+| **Mermaid.js**          | Code-only — no visual canvas, no AI, no interactive editor                    |
+| **Draw.io**             | Decade-old UX — no AI integration, no developer import pipelines              |
+| **Lucidchart / Miro**   | Cloud lock-in — expensive, account required, your data lives on their servers |
+| **PlantUML**            | Server-dependent rendering — no visual editor, no local-first model           |
 
 OpenFlowKit is the **only MIT-licensed tool** that combines a professional visual canvas, bidirectional diagram-as-code, AI generation from 9 providers, deterministic code imports, real-time P2P collaboration, and cinematic animated export — with zero server-side storage.
 
@@ -82,30 +87,28 @@ OpenFlowKit is the **only MIT-licensed tool** that combines a professional visua
 
 ## Feature highlights
 
-| | OpenFlowKit | Excalidraw | Draw.io | Mermaid | Lucidchart |
-|---|:---:|:---:|:---:|:---:|:---:|
-| Visual canvas editor | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Bidirectional diagram-as-code | ✅ | ❌ | ❌ | ✅ | ❌ |
-| AI generation (9 providers) | ✅ | ❌ | ❌ | ❌ | Limited |
-| GitHub repo → diagram | ✅ | ❌ | ❌ | ❌ | ❌ |
-| SQL → ERD (native parser) | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Terraform / K8s / Docker import | ✅ | ❌ | ❌ | ❌ | ❌ |
-| AWS / Azure / GCP / CNCF icons | ✅ | ❌ | ✅ | Partial | ✅ |
-| Real-time collaboration (P2P) | ✅ | ✅ | ❌ | ❌ | ✅ (cloud) |
-| Cinematic animated export | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Figma export (editable SVG) | ✅ | ❌ | ❌ | ❌ | ❌ |
-| No account required | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Open source (MIT) | ✅ | ✅ | ✅ | ✅ | ❌ |
+|                                 | OpenFlowKit | Excalidraw | Draw.io | Mermaid | Lucidchart |
+| ------------------------------- | :---------: | :--------: | :-----: | :-----: | :--------: |
+| Visual canvas editor            |     ✅      |     ✅     |   ✅    |   ❌    |     ✅     |
+| Bidirectional diagram-as-code   |     ✅      |     ❌     |   ❌    |   ✅    |     ❌     |
+| AI generation (9 providers)     |     ✅      |     ❌     |   ❌    |   ❌    |  Limited   |
+| GitHub repo → diagram           |     ✅      |     ❌     |   ❌    |   ❌    |     ❌     |
+| SQL → ERD (native parser)       |     ✅      |     ❌     |   ❌    |   ❌    |     ❌     |
+| Terraform / K8s / Docker import |     ✅      |     ❌     |   ❌    |   ❌    |     ❌     |
+| AWS / Azure / GCP / CNCF icons  |     ✅      |     ❌     |   ✅    | Partial |     ✅     |
+| Real-time collaboration (P2P)   |     ✅      |     ✅     |   ❌    |   ❌    | ✅ (cloud) |
+| Cinematic animated export       |     ✅      |     ❌     |   ❌    |   ❌    |     ❌     |
+| Figma export (editable SVG)     |     ✅      |     ❌     |   ❌    |   ❌    |     ❌     |
+| No account required             |     ✅      |     ✅     |   ✅    |   ✅    |     ❌     |
+| Open source (MIT)               |     ✅      |     ✅     |   ✅    |   ✅    |     ❌     |
 
 ---
 
-## Code → Diagram — no AI key required
+## Code → Diagram
 
-Drop in your existing artifacts. Most formats are handled by **deterministic native parsers** that run entirely in your browser — no API call, no roundtrip, instant result.
+Drop in your existing artifacts. Many formats are handled by **deterministic native parsers** that run entirely in your browser — no API call, no roundtrip, instant result. AI-powered imports produce richer diagrams but require an API key.
 
-```
-github.com/vercel/next.js       →  full architecture diagram
-```
+**Native parsers (no API key needed):**
 
 ```sql
 CREATE TABLE orders (
@@ -114,6 +117,7 @@ CREATE TABLE orders (
   status   ENUM('pending','paid','shipped') NOT NULL
 );
 ```
+
 → Typed ERD with inferred foreign-key edges and cardinalities. Rendered in milliseconds, no server involved.
 
 ```yaml
@@ -126,18 +130,28 @@ services:
   redis:
     image: redis:alpine
 ```
+
 → Service architecture with `depends_on` edges and port labels.
 
-| Source | Engine | API key? |
-|---|---|:---:|
-| GitHub repo URL | AI · 9 languages supported | Yes |
-| SQL DDL | Native parser | **No** |
-| Terraform `.tfstate` | Native parser | **No** |
-| Kubernetes YAML / Helm | Native parser | **No** |
-| Docker Compose | Native parser | **No** |
-| OpenAPI / Swagger spec | AI-assisted | Yes |
-| Source code (single file) | AI-assisted · 9 languages | Yes |
-| Mermaid | Native parser | **No** |
+**AI-powered imports (API key required):**
+
+```
+github.com/vercel/next.js  →  architecture diagram
+```
+
+→ Fetches the repo, analyzes code structure and dependencies, then generates an architecture diagram via AI. Quality depends on the model chosen.
+
+| Source                    | Engine                     | API key? |
+| ------------------------- | -------------------------- | :------: |
+| GitHub repo URL           | AI · 9 languages supported |   Yes    |
+| SQL DDL                   | **Native parser**          |  **No**  |
+| Terraform `.tfstate`      | **Native parser**          |  **No**  |
+| Terraform HCL             | AI-assisted                |   Yes    |
+| Kubernetes YAML / Helm    | **Native parser**          |  **No**  |
+| Docker Compose            | **Native parser**          |  **No**  |
+| OpenAPI / Swagger spec    | AI-assisted                |   Yes    |
+| Source code (single file) | AI-assisted · 9 languages  |   Yes    |
+| Mermaid                   | **Native parser**          |  **No**  |
 
 ---
 
@@ -147,17 +161,17 @@ Flowpilot sits directly in the editor. Describe a system, paste source code, upl
 
 **9 providers. Bring your own key. Switch any time.**
 
-| Provider | Default model | Why use it |
-|---|---|---|
-| Google Gemini | `gemini-2.5-flash-lite` | Free tier available, fast, browser-safe |
-| OpenAI | `gpt-5-mini` | Best reasoning for complex architectures |
-| Anthropic Claude | `claude-sonnet-4-6` | Excellent code and system understanding |
-| Groq | `llama-4-scout-17b-16e-instruct` | Fastest inference available |
-| Mistral | `mistral-medium-latest` | Strong European privacy-first alternative |
-| NVIDIA NIM | `llama-4-scout-17b-16e-instruct` | Enterprise GPU inference |
-| Cerebras | `gpt-oss-120b` | Fastest on WSE-3 silicon |
-| OpenRouter | `google/gemini-2.5-flash` | Access 100+ models through one key |
-| **Custom endpoint** | Any model | Ollama, LM Studio, or any OpenAI-compatible API |
+| Provider            | Default model                    | Why use it                                      |
+| ------------------- | -------------------------------- | ----------------------------------------------- |
+| Google Gemini       | `gemini-2.5-flash-lite`          | Free tier available, fast, browser-safe         |
+| OpenAI              | `gpt-5-mini`                     | Best reasoning for complex architectures        |
+| Anthropic Claude    | `claude-sonnet-4-6`              | Excellent code and system understanding         |
+| Groq                | `llama-4-scout-17b-16e-instruct` | Fastest inference available                     |
+| Mistral             | `mistral-medium-latest`          | Strong European privacy-first alternative       |
+| NVIDIA NIM          | `llama-4-scout-17b-16e-instruct` | Enterprise GPU inference                        |
+| Cerebras            | `gpt-oss-120b`                   | Fastest on WSE-3 silicon                        |
+| OpenRouter          | `google/gemini-2.5-flash`        | Access 100+ models through one key              |
+| **Custom endpoint** | Any model                        | Ollama, LM Studio, or any OpenAI-compatible API |
 
 No proxy. No middleman. Direct browser-to-provider requests.
 
@@ -221,14 +235,14 @@ P2P collaboration over WebRTC. Share a link, edit together in real time. Presenc
 
 ## Canvas built for keyboard-first developers
 
-| Shortcut | Action |
-|---|---|
+| Shortcut         | Action                                               |
+| ---------------- | ---------------------------------------------------- |
 | `⌘ K` / `Ctrl K` | Command bar — search, import, export, run any action |
-| `⌘ \` / `Ctrl \` | Toggle the live code panel |
-| `⌘ Z` / `Ctrl Z` | Full undo with complete history |
-| `⌘ D` / `Ctrl D` | Duplicate selection |
-| `⌘ G` / `Ctrl G` | Group selected nodes |
-| `⌘ /` / `Ctrl /` | Keyboard shortcuts reference |
+| `⌘ \` / `Ctrl \` | Toggle the live code panel                           |
+| `⌘ Z` / `Ctrl Z` | Full undo with complete history                      |
+| `⌘ D` / `Ctrl D` | Duplicate selection                                  |
+| `⌘ G` / `Ctrl G` | Group selected nodes                                 |
+| `⌘ /` / `Ctrl /` | Keyboard shortcuts reference                         |
 
 Plus: smart alignment guides, snap-to-grid, multi-select, layers panel, sections, architecture lint, light/dark/system theme, and full i18n in 7 languages.
 
@@ -254,12 +268,14 @@ Open [http://localhost:5173](http://localhost:5173). Done.
 OpenFlowKit is a pure static SPA. There is no backend. Deploy the `dist/` folder anywhere that serves HTML.
 
 **Cloudflare Pages / Netlify / Vercel:**
+
 ```bash
 npm run build
 # upload dist/ to your provider
 ```
 
 **Docker:**
+
 ```bash
 docker build -t openflowkit .
 docker run -p 8080:80 openflowkit
@@ -271,18 +287,18 @@ No database. No secrets. No infrastructure. One folder.
 
 ## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Framework | React 19 + TypeScript 5 |
-| Build | Vite 6 |
-| Canvas | React Flow (XYFlow) |
-| Auto-layout | ELK.js |
-| State | Zustand |
-| Storage | IndexedDB — local-first, no backend |
-| Styling | Tailwind CSS |
-| Collaboration | WebRTC (P2P, no relay server) |
-| i18n | react-i18next — 7 languages |
-| Testing | Vitest + Playwright |
+| Layer         | Technology                          |
+| ------------- | ----------------------------------- |
+| Framework     | React 19 + TypeScript 5             |
+| Build         | Vite 6                              |
+| Canvas        | React Flow (XYFlow)                 |
+| Auto-layout   | ELK.js                              |
+| State         | Zustand                             |
+| Storage       | IndexedDB — local-first, no backend |
+| Styling       | Tailwind CSS                        |
+| Collaboration | WebRTC (P2P, no relay server)       |
+| i18n          | react-i18next — 7 languages         |
+| Testing       | Vitest + Playwright                 |
 
 ---
 
@@ -301,30 +317,47 @@ npm run lint       # ESLint + TypeScript type-check
 
 **Good first issues** are tagged [`good first issue`](https://github.com/Vrun-design/openflowkit/labels/good%20first%20issue). Before opening a PR, please read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-If OpenFlowKit saves you time, the single best thing you can do is **[⭐ star it on GitHub](https://github.com/Vrun-design/openflowkit)**. It helps other developers find the project and keeps the momentum going.
-
----
-
-## License
-
-MIT — free to use, self-host, fork, and build on. See [LICENSE](LICENSE).
-
 ---
 
 <div align="center">
 
-Built by the [OpenFlowKit contributors](https://github.com/Vrun-design/openflowkit/graphs/contributors).
+<br/>
+
+**OpenFlowKit** is [MIT licensed](LICENSE), locally hosted, and built in the open.<br/>
+No cloud required. No account required. No lock-in.
 
 <br/>
 
-[![Stars](https://img.shields.io/github/stars/Vrun-design/openflowkit?style=social)](https://github.com/Vrun-design/openflowkit/stargazers)
+|                                                                                            |                                                                                                      |                                        |                                                                      |
+| :----------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------: | :------------------------------------: | :------------------------------------------------------------------: |
+|                      [**→ Launch App**](https://app.openflowkit.com)                       |                               [**Docs**](https://docs.openflowkit.com)                               | [**Website**](https://openflowkit.com) | [**Changelog**](https://github.com/Vrun-design/openflowkit/releases) |
+| [Bug Report](https://github.com/Vrun-design/openflowkit/issues/new?template=bug_report.md) | [Feature Request](https://github.com/Vrun-design/openflowkit/issues/new?template=feature_request.md) | [Contributing Guide](CONTRIBUTING.md)  |                    [Security Policy](SECURITY.md)                    |
 
 <br/>
 
-If this project is useful to you, a star means the world. Thank you. 🙏
+---
 
 <br/>
 
-**[→ Try OpenFlowKit — no account, no install](https://app.openflowkit.com)**
+**[If OpenFlowKit saves you time, the most impactful thing you can do is give it a star.](https://github.com/Vrun-design/openflowkit/stargazers)**<br/>
+**[It helps other developers find the project.](https://github.com/Vrun-design/openflowkit/stargazers)**
+
+<br/>
+
+[![Star OpenFlowKit on GitHub](https://img.shields.io/github/stars/Vrun-design/openflowkit?style=for-the-badge&logo=github&color=facc15&label=Star%20on%20GitHub)](https://github.com/Vrun-design/openflowkit/stargazers)
+
+<br/>
+
+<sub>
+React 19 &nbsp;·&nbsp; TypeScript 5 &nbsp;·&nbsp; Vite 6 &nbsp;·&nbsp; XYFlow &nbsp;·&nbsp; ELK.js &nbsp;·&nbsp; Zustand &nbsp;·&nbsp; Yjs &nbsp;·&nbsp; Framer Motion &nbsp;·&nbsp; Tailwind CSS &nbsp;·&nbsp; Cloudflare Pages
+</sub>
+
+<br/>
+
+<sub>
+MIT Licensed &nbsp;·&nbsp; Local-first &nbsp;·&nbsp; No telemetry &nbsp;·&nbsp; No account &nbsp;·&nbsp; No server-side storage &nbsp;·&nbsp; No lock-in
+</sub>
+
+<br/>
 
 </div>
