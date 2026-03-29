@@ -685,8 +685,12 @@
       "algorithm": "Algorithm",
       "layered": "Layered",
       "layeredDesc": "Hierarchical, good for flows",
+      "hierarchical": "Hierarchical",
+      "hierarchicalDesc": "Best default for most flows. Balanced readability and edge crossings.",
       "tree": "Tree",
       "treeDesc": "Strict parent-child structure",
+      "treeOptimized": "Tree",
+      "treeOptimizedDesc": "Strict parent-child layout for org charts and dependency trees.",
       "force": "Force",
       "forceDesc": "Organic, physics-based",
       "radial": "Radial",
@@ -700,6 +704,10 @@
       "compact": "Compact",
       "normal": "Normal",
       "loose": "Loose",
+      "orthogonalCompact": "Compact",
+      "orthogonalCompactDesc": "Dense left-to-right structure for medium and high-density diagrams.",
+      "orthogonalSpacious": "Spacious",
+      "orthogonalSpaciousDesc": "Extra whitespace for clarity in presentations and reviews.",
       "applyLayout": "Apply Layout"
     },
     "designSystem": {
