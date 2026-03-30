@@ -141,12 +141,14 @@
     "gif": "GIF de reproducción",
     "hintPlaybackGif": "Bucle corto para docs/redes",
     "share": "Compartir lienzo en vivo",
+    "shareEmbed": "Compartir e incrustar",
     "hintShareViewer": "Enlace de invitación para esta sala",
+    "hintShareEmbed": "Enlace de visor de solo lectura",
     "readmeEmbed": "README Embed",
     "hintReadmeEmbed": "Copy Markdown snippet",
     "sectionImage": "Image",
-    "sectionVideo": "Video & Animation",
-    "sectionCode": "Code & Data",
+    "sectionVideo": "Video",
+    "sectionCode": "Code",
     "shareSection": "Compartir lienzo",
     "revealVideo": "Reveal Video",
     "hintRevealVideo": "Nodes fade in sequentially (WebM/MP4)",
@@ -240,6 +242,7 @@
     }
   },
   "home": {
+    "appName": "OpenFlowKit",
     "title": "Panel",
     "description": "Administre sus flujos y diagramas.",
     "recentFiles": "Archivos recientes",
@@ -263,7 +266,22 @@
       "confirmation": "¿Eliminar \"{{name}}\"?",
       "hint": "Esto no se puede deshacer a menos que tengas una copia exportada u otra copia.",
       "closeDialog": "Cerrar el diálogo de eliminar flujo"
-    }
+    },
+    "suggestionBlank": "Lienzo en blanco",
+    "suggestionBlankDesc": "Saltar directamente al editor",
+    "suggestionAI": "Flowpilot IA",
+    "suggestionAIDesc": "Empezar desde un mensaje",
+    "suggestionImport": "Importar",
+    "suggestionImportDesc": "Traer trabajo existente",
+    "suggestionTemplates": "Plantillas",
+    "suggestionTemplatesDesc": "Empezar desde un patrón probado",
+    "continueTitle": "Continuar con una acción reciente",
+    "homeEmptyTitle": "Crea tu primer flujo",
+    "homeEmptySubtitle": "Diseña arquitecturas de nivel empresarial al instante. Comienza con un lienzo en blanco, describe tu infraestructura con nuestro constructor de IA, o usa una plantilla adaptada.",
+    "homeBlankCanvas": "Lienzo en blanco",
+    "homeFlowpilotAI": "Flowpilot IA",
+    "homeTemplates": "Plantillas",
+    "homeImportFile": "O importar un archivo existente"
   },
   "settings": {
     "title": "Configuración",
@@ -295,33 +313,29 @@
     "help": "Ayuda"
   },
   "properties": {
-    "title": "Propiedades",
-    "nodeType": "Tipo de nodo",
-    "label": "Etiqueta",
-    "description": "Descripción",
+    "title": "Properties",
+    "shape": "Shape",
     "color": "Color",
-    "icon": "Ícono",
-    "size": "Tamaño",
-    "shape": "Forma",
-    "bulkShape": "Forma múltiple",
-    "bulkColor": "Color múltiple",
-    "bulkIcon": "Ícono múltiple",
-    "labelTransform": "Transformación de etiqueta",
-    "prefixOptional": "Prefijo (opcional)",
-    "suffixOptional": "Sufijo (opcional)",
-    "findReplace": "Buscar y reemplazar",
-    "findLabel": "Buscar",
-    "findPlaceholder": "Texto a buscar",
-    "replaceLabel": "Reemplazar por",
-    "replacePlaceholder": "Texto de reemplazo",
-    "useRegex": "Usar expresión regular",
-    "previewSummary": "Resumen previo",
-    "bulkApplySummary": "Se actualizarán {{count}} elementos seleccionados",
-    "selectFieldToApply": "Seleccione al menos un campo para aplicar.",
-    "applyToSelectedNodes": "Aplicar a los elementos seleccionados",
-    "imageSettings": "Configuración de imagen",
-    "transparency": "Transparencia",
-    "rotation": "Rotación"
+    "icon": "Icon",
+    "rotation": "Rotation",
+    "transparency": "Transparency",
+    "imageSettings": "Image Settings",
+    "bulkShape": "Bulk Shape",
+    "bulkColor": "Bulk Color",
+    "bulkIcon": "Bulk Icon",
+    "labelTransform": "Label Transform",
+    "findReplace": "Find & Replace",
+    "findLabel": "Find",
+    "findPlaceholder": "Find text",
+    "replaceLabel": "Replace",
+    "replacePlaceholder": "Replace with",
+    "prefixOptional": "Prefix (optional)",
+    "suffixOptional": "Suffix (optional)",
+    "useRegex": "Use Regex",
+    "applyToSelectedNodes": "Apply to selected nodes",
+    "selectFieldToApply": "Select a field to apply",
+    "previewSummary": "Preview summary",
+    "selectionSummary": "Resumen de selección"
   },
   "saveStatus": {
     "saved": "Guardado"
@@ -346,7 +360,9 @@
     "title": "Historial",
     "undo": "Deshacer",
     "redo": "Rehacer",
-    "clear": "Limpiar historial"
+    "clear": "Limpiar historial",
+    "undoUnavailable": "Nada que deshacer aún.",
+    "redoUnavailable": "Nada que rehacer ahora."
   },
   "errors": {
     "generic": "Algo salió mal",
@@ -378,7 +394,12 @@
     "feature4Desc": "Export into beautiful, fully animated presentation diagrams.",
     "analyticsTitle": "Anonymous Analytics",
     "analyticsDesc": "We collect diagnostic data. We never read your diagrams or prompts.",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "shortcutCommandBar": "Abrir centro de comandos",
+    "shortcutHelp": "Ver atajos de teclado",
+    "shortcutCanvas": "Agregar nodo en lienzo",
+    "shortcutsTitle": "Comienza rápido con atajos",
+    "shortcutsBadge": "Primero el teclado"
   },
   "footer": {
     "mitLicensed": "Licencia MIT"
@@ -653,7 +674,7 @@
       "strokeWidth": "Ancho de trazo",
       "largeGraphSafety": "Protección para grafos grandes",
       "largeGraphSafetyAuto": "Auto",
-      "largeGraphSafetyOn": "Activado",
+      "largeGraphSafetyOn": "Seguridad de gráfico grande Activada",
       "largeGraphSafetyOff": "Desactivado",
       "exportModeDeterministic": "Determinista",
       "exportModeLegacy": "Heredado",
@@ -712,11 +733,12 @@
         "sql": "Pega aquí las sentencias CREATE TABLE...",
         "infra": "Pega aquí el JSON del estado de Terraform, YAML de Kubernetes, Docker Compose o Terraform HCL...",
         "openapi": "Pega aquí tu YAML o JSON de OpenAPI / Swagger...",
-        "code": "Pega aquí tu código fuente..."
+        "code": "Pega aquí tu código fuente...",
+        "mermaid": "Pega aquí el código del diagrama Mermaid..."
       },
       "infraFormats": {
-        "terraformState": "Terraform State (.tfstate)",
-        "kubernetes": "Kubernetes YAML",
+        "terraformState": "Estado de Terraform",
+        "kubernetes": "Kubernetes",
         "dockerCompose": "Docker Compose",
         "terraformHcl": "Terraform HCL (AI)"
       },
@@ -735,7 +757,9 @@
         "infra": "Infra",
         "openapi": "OpenAPI",
         "code": "Code",
-        "codebase": "Repositorio"
+        "codebase": "Repositorio",
+        "mindmap": "Mapa mental",
+        "markdown": "Markdown"
       },
       "title": "Importar desde datos",
       "description": "Importa código, infraestructura, SQL o especificaciones de API en tu diagrama.",
@@ -800,27 +824,25 @@
     "flowpilotConfigurations": "Configuración de Flowpilot",
     "keyboardShortcuts": "Atajos de teclado",
     "canvas": {
-      "title": "Lienzo",
-      "showGrid": "Mostrar cuadrícula",
-      "showGridDesc": "Mostrar cuadrícula de puntos",
-      "snapToGrid": "Ajustar a cuadrícula",
-      "snapToGridDesc": "Alinear nodos al mover",
-      "miniMap": "Mini mapa",
-      "miniMapDesc": "Mostrar mini mapa abajo a la derecha",
-      "architectureStrictMode": "Modo estricto de arquitectura",
-      "architectureStrictModeDesc": "Bloquea la importación Mermaid cuando los diagnósticos de arquitectura incluyen problemas de recuperación/validación",
-      "alignmentGuides": "Guías de alineación",
-      "alignmentGuidesDesc": "Muestra guías inteligentes al arrastrar nodos",
-      "routingProfile": "Perfil de enrutamiento",
+      "title": "Canvas",
+      "showGrid": "Show Grid",
+      "showGridDesc": "Display a dot grid on the canvas",
+      "snapToGrid": "Snap to Grid",
+      "snapToGridDesc": "Snap nodes to the grid when moving",
+      "alignmentGuides": "Alignment Guides",
+      "alignmentGuidesDesc": "Show smart guide lines while dragging nodes",
+      "routingProfile": "Routing Profile",
       "routingProfileStandard": "Estándar",
       "routingProfileInfrastructure": "Infraestructura",
-      "routingProfileHint": "El modo infraestructura favorece rutas ortogonales para mapas de servicios.",
-      "edgeBundling": "Agrupar aristas paralelas",
-      "edgeBundlingDesc": "Mantener conexiones paralelas en carriles compartidos"
+      "routingProfileHint": "El modo infraestructura sesga rutas ortogonales para mapas de servicios.",
+      "edgeBundling": "Agrupar bordes hermanos",
+      "edgeBundlingDesc": "Mantener conexiones paralelas en carriles compartidos",
+      "architectureStrictMode": "Modo Estricto de Arquitectura",
+      "architectureStrictModeDesc": "Bloquear importación de Mermaid cuando los diagnósticos de arquitectura incluyan problemas de recuperación/validación"
     },
     "ai": {
       "provider": "Proveedor",
-      "model": "Modelo",
+      "model": "Modelo de IA",
       "apiKey": "Clave API",
       "customBaseUrl": "URL base personalizada",
       "optional": "Opcional",
@@ -887,6 +909,135 @@
         "browserFriendly": "Listo para navegador",
         "proxyLikely": "Probablemente requiere proxy",
         "mixed": "Depende del endpoint"
+      },
+      "models": {
+        "gemini": {
+          "gemini-2": {
+            "5-flash-lite": {
+              "label": "Gemini 2.5 Flash Lite"
+            },
+            "5-flash": {
+              "label": "Gemini 2.5 Flash"
+            },
+            "5-pro": {
+              "label": "Gemini 2.5 Pro"
+            }
+          },
+          "gemini-3-flash": {
+            "label": "Gemini 3 Flash"
+          },
+          "gemini-3-pro": {
+            "label": "Gemini 3 Pro"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 Mini"
+          },
+          "gpt-5": {
+            "2": {
+              "label": "GPT-5.2"
+            },
+            "label": "GPT-5"
+          },
+          "o4-mini": {
+            "label": "O4-Mini"
+          },
+          "o3": {
+            "label": "O3"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "llama-3": {
+            "3-70b-versatile": {
+              "label": "Llama 3.3 70B"
+            }
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek V3-2"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT OSS 120B"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen 3 235B"
+          },
+          "zai-glm-4": {
+            "7": {
+              "label": "Zai GLM 4.7"
+            }
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large"
+          },
+          "codestral-latest": {
+            "label": "Codestral"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large"
+          }
+        }
+      },
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama"
+        },
+        "lmStudio": {
+          "name": "LM Studio"
+        },
+        "together": {
+          "name": "Together AI"
+        }
       }
     },
     "brand": {
@@ -927,7 +1078,19 @@
     "analytics": {
       "enableTitle": "Analíticas de inicio anónimas",
       "enableDescription": "Compartir datos básicos de uso de forma anónima (opcional)"
-    }
+    },
+    "search": "Buscar...",
+    "appearance": "Apariencia",
+    "account": "Cuenta",
+    "about": "Acerca de",
+    "language": "Idioma",
+    "theme": "Tema",
+    "fontSize": "Tamaño de fuente",
+    "fontFamily": "Familia de fuente",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "reset": "Restablecer",
+    "confirm": "Confirmar"
   },
   "customNodes": {
     "browserContent": "Contenido del navegador",
@@ -996,7 +1159,8 @@
     "note": "Nota adhesiva",
     "noteDesc": "Documentación",
     "releaseToConnect": "Soltar para conectar",
-    "close": "Cerrar menú de conexión"
+    "close": "Cerrar menú de conexión",
+    "label": "Menú de conexión de nodos"
   },
   "errorBoundary": {
     "title": "Algo salió mal",
@@ -1025,7 +1189,12 @@
     "namedVersions": "Versiones con nombre",
     "noNamedSnapshots": "Aún no hay versiones con nombre.",
     "autosavedVersions": "Puntos de control autoguardados",
-    "noAutoSnapshots": "Aún no hay puntos de control autoguardados."
+    "noAutoSnapshots": "Aún no hay puntos de control autoguardados.",
+    "undoTimelinePosition": "Step {{current}} of {{total}} in the current history stack.",
+    "undoTimelineScrubber": "Scrub through recent undo history",
+    "undoTimeline": "Undo Timeline",
+    "undoTimelineAtEarliest": "You are at the earliest captured state.",
+    "undoTimelineAtLatest": "You are at the latest state."
   },
   "templatesPanel": {
     "title": "Plantillas de flujo",
@@ -1052,31 +1221,6 @@
     "connection": "Conexión",
     "noSelection": "Nada seleccionado",
     "selectHint": "Haz clic en un nodo o una arista para editar sus propiedades"
-  },
-  "properties": {
-    "title": "Properties",
-    "shape": "Shape",
-    "color": "Color",
-    "icon": "Icon",
-    "rotation": "Rotation",
-    "transparency": "Transparency",
-    "imageSettings": "Image Settings",
-    "bulkShape": "Bulk Shape",
-    "bulkColor": "Bulk Color",
-    "bulkIcon": "Bulk Icon",
-    "labelTransform": "Label Transform",
-    "findReplace": "Find & Replace",
-    "findLabel": "Find",
-    "findPlaceholder": "Find text",
-    "replaceLabel": "Replace",
-    "replacePlaceholder": "Replace with",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
-    "useRegex": "Use Regex",
-    "applyToSelectedNodes": "Apply to selected nodes",
-    "selectFieldToApply": "Select a field to apply",
-    "previewSummary": "Preview summary",
-    "selectionSummary": "Resumen de selección"
   },
   "flowCanvas": {
     "strictModePasteBlocked": "El modo estricto de arquitectura bloqueó el pegado de Mermaid. Abre la vista de código, corrige los diagnósticos y vuelve a intentarlo."
@@ -1107,9 +1251,9 @@
   },
   "share": {
     "close": "Close",
-    "title": "Compartir diseño",
+    "title": "Compartir",
     "betaBadge": "Beta",
-    "description": "Invita a colaboradores a ver y editar este flujo contigo en tiempo real.",
+    "description": "Compartir este lienzo",
     "roomId": "ID de la sala",
     "link": "Enlace para compartir",
     "copied": "Copied Link!",
@@ -1133,7 +1277,20 @@
       "copyFailed": "No se pudo copiar el enlace para compartir.",
       "linkCopied": "Se copió el enlace de colaboración.",
       "copyManual": "El acceso al portapapeles está bloqueado. Copia el enlace manualmente desde el diálogo de compartir."
-    }
+    },
+    "embed": "Insertar",
+    "embedCode": "Código de inserción",
+    "export": "Exportar",
+    "settings": "Configuración de compartir",
+    "anyoneWithLink": "Cualquiera con el enlace",
+    "viewOnly": "Solo lectura",
+    "canEdit": "Puede editar",
+    "disable": "Desactivar compartir",
+    "enable": "Activar compartir",
+    "invite": "Invitar",
+    "pending": "Pendiente",
+    "revoke": "Revocar",
+    "expired": "Expirado"
   },
   "connectionPanel": {
     "architecture": "Arquitectura",
@@ -1145,6 +1302,65 @@
     "deleteConnection": "Eliminar conexión"
   },
   "sidebar": {
-    "close": "Cerrar barra lateral"
+    "close": "Cerrar barra lateral",
+    "searchPlaceholder": "Buscar...",
+    "noResults": "Sin resultados",
+    "nodes": "Nodos",
+    "components": "Componentes",
+    "snippets": "Fragmentos",
+    "addons": "Complementos"
+  },
+  "contextMenu": {
+    "label": "Menú contextual del lienzo"
+  },
+  "canvas": {
+    "addNodeShortcut": "Agregar nodo",
+    "aiChatPlaceholder": "Crear algo...",
+    "nodes": "Nodos",
+    "connections": "Conexiones",
+    "elements": "Elementos",
+    "selection": "Selección",
+    "noSelection": "Sin selección",
+    "alignNodes": "Alinear nodos",
+    "distributeNodes": "Distribuir nodos",
+    "alignLeft": "Alinear a la izquierda",
+    "alignCenter": "Alinear al centro",
+    "alignRight": "Alinear a la derecha",
+    "alignTop": "Alinear arriba",
+    "alignMiddle": "Alinear al medio",
+    "alignBottom": "Alinear abajo",
+    "distributeHorizontally": "Distribuir horizontalmente",
+    "distributeVertically": "Distribuir verticalmente",
+    "zoomToFit": "Ajustar zoom",
+    "zoomToSelection": "Zoom a selección",
+    "locked": "Bloqueado",
+    "unlock": "Desbloquear",
+    "lock": "Bloquear",
+    "bringToFront": "Traer al frente",
+    "sendToBack": "Enviar atrás",
+    "group": "Agrupar",
+    "ungroup": "Desagrupar"
+  },
+  "mindmap": {
+    "addChild": "Agregar subtema",
+    "addSibling": "Agregar tema hermano",
+    "addParent": "Agregar tema padre",
+    "delete": "Eliminar",
+    "insertAfter": "Insertar después",
+    "insertBefore": "Insertar antes"
+  },
+  "aiModel": {
+    "title": "Modelo de IA",
+    "provider": "Proveedor",
+    "model": "Modelo",
+    "temperature": "Temperatura",
+    "maxTokens": "Máximo de tokens",
+    "buttons": {
+      "retry": "Reintentar",
+      "stop": "Detener",
+      "clear": "Limpiar"
+    },
+    "thinking": "Pensando...",
+    "error": "Error de IA"
   }
 }

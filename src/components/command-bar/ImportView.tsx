@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Cloud, Code2, Database, FolderOpen, Network, Upload } from 'lucide-react';
+import { Cloud, Code2, Database, FolderOpen, GitBranch, Network, Upload, X } from 'lucide-react';
+import { useRecentImports, type RecentImport } from '@/hooks/useRecentImports';
 import { useTranslation } from 'react-i18next';
 import { SegmentedTabs, type SegmentedTabItem } from '@/components/ui/SegmentedTabs';
 import { type SupportedLanguage } from '@/hooks/ai-generation/codeToArchitecture';
@@ -9,12 +10,17 @@ import { ViewHeader } from './ViewHeader';
 import {
   type ImportCategory,
   MAX_INPUT_BYTES,
-  detectCategoryFromExtension,
+  detectCategoryFromContent,
   detectInfraFormat,
   detectLanguage,
   formatBytes,
 } from './importDetection';
-import { type NativeParseResult, parseSqlNative, parseInfraNative, parseCodebaseNative } from './importNativeParsers';
+import {
+  type NativeParseResult,
+  parseSqlNative,
+  parseInfraNative,
+  parseCodebaseNative,
+} from './importNativeParsers';
 import { CodebaseImportSection } from './CodebaseImportSection';
 import type { CodebaseAnalysis } from '@/hooks/ai-generation/codebaseAnalyzer';
 import type { InfraFormat } from '@/services/infraSync/types';
@@ -29,16 +35,58 @@ import {
   IMPORT_CATEGORY_DEFINITIONS,
   createLanguageOptions,
 } from './importViewModel';
-import {
-  ImportActionRow,
-  ImportTextAreaPanel,
-  ImportTopControls,
-} from './ImportViewPanels';
+import { ImportActionRow, ImportTextAreaPanel, ImportTopControls } from './ImportViewPanels';
 import {
   ImportErrorNotice,
   ImportFileBadge,
   NativeParseResultCard,
 } from './ImportSurfacePrimitives';
+
+// ── Recent imports chip list ─────────────────────────────────────────
+
+interface RecentImportChipsProps {
+  recents: RecentImport[];
+  onSelect: (r: RecentImport) => void;
+  onRemove: (id: string) => void;
+}
+
+function RecentImportChips({
+  recents,
+  onSelect,
+  onRemove,
+}: RecentImportChipsProps): React.ReactElement {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--brand-secondary)]/60">
+        Recent
+      </span>
+      <div className="flex flex-wrap gap-1.5">
+        {recents.map((r) => (
+          <div
+            key={r.id}
+            className="group flex items-center gap-1 rounded-full border border-[var(--color-brand-border)] bg-[var(--brand-surface)] px-2.5 py-1 text-[11px] text-[var(--brand-text)] hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-100)]/20 cursor-pointer transition-colors"
+            onClick={() => onSelect(r)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && onSelect(r)}
+          >
+            <span className="max-w-[140px] truncate">{r.source}</span>
+            <button
+              className="ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-400"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(r.id);
+              }}
+              aria-label="Remove recent import"
+            >
+              <X className="h-2.5 w-2.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ── Constants ───────────────────────────────────────────────────────
 
@@ -48,6 +96,7 @@ const CATEGORY_ICONS = {
   openapi: Network,
   code: Code2,
   codebase: FolderOpen,
+  mermaid: GitBranch,
 } satisfies Record<ImportCategory, typeof Database>;
 
 function renderCategoryIcon(Icon: typeof Database): React.ReactElement {
@@ -65,6 +114,14 @@ interface ImportViewProps {
   onOpenApiAnalysis?: CommandBarProps['onOpenApiAnalysis'];
   onApplyDsl?: CommandBarProps['onApplyDsl'];
   onCodebaseAnalysis?: CommandBarProps['onCodebaseAnalysis'];
+}
+
+function normalizeImportCategory(category: ImportCategory | null): ImportCategory | null {
+  if (category === 'mermaid') {
+    return 'code';
+  }
+
+  return category;
 }
 
 export function ImportView({
@@ -94,6 +151,7 @@ export function ImportView({
   const [codebaseAnalysis, setCodebaseAnalysis] = useState<CodebaseAnalysis | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const appliedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const { recents, addRecent, removeRecent } = useRecentImports(category);
 
   const resetResults = useCallback(() => {
     setNativeResult(null);
@@ -140,16 +198,15 @@ export function ImportView({
         return;
       }
       setFileInfo({ name: file.name, size: file.size });
-      const detected = detectCategoryFromExtension(file.name);
-      if (detected) setCategory(detected);
-      if (detected === 'code') setLanguage(detectLanguage(file.name));
-      if (detected === 'infra') setInfraFormat(detectInfraFormat(file.name, ''));
 
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = (e.target?.result as string) ?? '';
         setInput(text);
         resetResults();
+        const detected = normalizeImportCategory(detectCategoryFromContent(file.name, text));
+        if (detected) setCategory(detected);
+        if (detected === 'code') setLanguage(detectLanguage(file.name));
         if (detected === 'infra') setInfraFormat(detectInfraFormat(file.name, text));
       };
       reader.readAsText(file);
@@ -198,19 +255,33 @@ export function ImportView({
         result = parseInfraNative(input, infraFormat as InfraFormat);
       } else if (category === 'codebase') {
         if (!codebaseAnalysis) {
-          setError(t('commandBar.import.errors.nativeNotAvailable', 'Native parsing not available for this type.'));
+          setError(
+            t(
+              'commandBar.import.errors.nativeNotAvailable',
+              'Native parsing not available for this type.'
+            )
+          );
           setIsParsing(false);
           return;
         }
         result = parseCodebaseNative(codebaseAnalysis);
       } else {
-        setError(t('commandBar.import.errors.nativeNotAvailable', 'Native parsing not available for this type.'));
+        setError(
+          t(
+            'commandBar.import.errors.nativeNotAvailable',
+            'Native parsing not available for this type.'
+          )
+        );
         setIsParsing(false);
         return;
       }
       setNativeResult(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('commandBar.import.errors.parsingFailed', 'Parsing failed.'));
+      setError(
+        err instanceof Error
+          ? err.message
+          : t('commandBar.import.errors.parsingFailed', 'Parsing failed.')
+      );
     } finally {
       setIsParsing(false);
     }
@@ -219,10 +290,11 @@ export function ImportView({
   const handleApply = useCallback(() => {
     if (!nativeResult || !onApplyDsl) return;
     onApplyDsl(nativeResult.dsl);
+    addRecent(fileInfo?.name ?? category, input);
     setAppliedFeedback(true);
     clearTimeout(appliedTimeoutRef.current);
     appliedTimeoutRef.current = setTimeout(() => setAppliedFeedback(false), 2000);
-  }, [nativeResult, onApplyDsl]);
+  }, [nativeResult, onApplyDsl, addRecent, fileInfo, category, input]);
 
   const handleAiGenerate = useCallback(async () => {
     if (category !== 'codebase' && !input.trim()) return;
@@ -237,12 +309,21 @@ export function ImportView({
       else if (category === 'codebase' && onCodebaseAnalysis && codebaseAnalysis)
         await onCodebaseAnalysis(codebaseAnalysis);
       else {
-        setError(t('commandBar.import.errors.aiUnavailable', 'AI analysis not available for this type.'));
+        setError(
+          t('commandBar.import.errors.aiUnavailable', 'AI analysis not available for this type.')
+        );
         setIsAiRunning(false);
         return;
       }
+      if (category !== 'codebase' && input.trim()) {
+        addRecent(fileInfo?.name ?? category, input);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('commandBar.import.errors.aiFailed', 'AI generation failed.'));
+      setError(
+        err instanceof Error
+          ? err.message
+          : t('commandBar.import.errors.aiFailed', 'AI generation failed.')
+      );
     } finally {
       setIsAiRunning(false);
     }
@@ -251,12 +332,14 @@ export function ImportView({
     category,
     language,
     infraFormat,
+    fileInfo,
     onCodeAnalysis,
     onSqlAnalysis,
     onTerraformAnalysis,
     onOpenApiAnalysis,
     onCodebaseAnalysis,
     codebaseAnalysis,
+    addRecent,
     t,
   ]);
 
@@ -356,6 +439,17 @@ export function ImportView({
               })}
               onInputChange={handleInputChange}
               onDrop={handleDrop}
+            />
+          ) : null}
+
+          {recents.length > 0 && category !== 'codebase' ? (
+            <RecentImportChips
+              recents={recents}
+              onSelect={(r) => {
+                setInput(r.preview);
+                resetResults();
+              }}
+              onRemove={removeRecent}
             />
           ) : null}
 

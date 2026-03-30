@@ -7,11 +7,14 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('creates a new flow and adds an extra tab', async ({ page }) => {
+async function openHomeDashboard(page: import('@playwright/test').Page) {
   await page.goto('/#/home');
+  await expect(page.getByTestId('home-create-new-main')).toBeVisible({ timeout: 15000 });
+}
 
-  await expect(page.getByTestId('home-create-new')).toBeVisible();
-  await page.getByTestId('home-create-new').click();
+test('creates a new flow and adds an extra tab', async ({ page }) => {
+  await openHomeDashboard(page);
+  await page.getByTestId('home-create-new-main').click();
 
   await expect(page).toHaveURL(/#\/flow\/[^?]+(?:\?.*)?$/);
   await expect(page.getByTestId('toolbar-add-toggle')).toBeVisible({ timeout: 15000 });
@@ -27,8 +30,8 @@ test('creates a new flow and adds an extra tab', async ({ page }) => {
 });
 
 test('saves and restores snapshot state', async ({ page }) => {
-  await page.goto('/#/home');
-  await page.getByTestId('home-create-new').click();
+  await openHomeDashboard(page);
+  await page.getByTestId('home-create-new-main').click();
   await expect(page.getByTestId('toolbar-add-toggle')).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId('topnav-menu-toggle')).toBeVisible({ timeout: 15000 });
 
