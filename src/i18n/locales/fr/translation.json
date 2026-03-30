@@ -87,7 +87,7 @@
     "saveStatus": "État de sauvegarde locale",
     "autoSaved": "Enregistré localement à {{time}}.",
     "privacyShort": "Vos diagrammes restent sur cet appareil et n’atteignent pas nos serveurs.",
-    "beta": "BÊTA",
+    "beta": "BETA",
     "versionHistory": "Historique des versions",
     "loadJSON": "Charger JSON",
     "playbackMode": "Mode lecture",
@@ -141,12 +141,14 @@
     "gif": "GIF de lecture",
     "hintPlaybackGif": "Boucle courte pour docs/réseaux sociaux",
     "share": "Partager le canevas en direct",
+    "shareEmbed": "Partager et intégrer",
     "hintShareViewer": "Lien d’invitation pour cette salle",
+    "hintShareEmbed": "Lien de visualisation en lecture seule",
     "readmeEmbed": "README Embed",
     "hintReadmeEmbed": "Copy Markdown snippet",
     "sectionImage": "Image",
-    "sectionVideo": "Video & Animation",
-    "sectionCode": "Code & Data",
+    "sectionVideo": "Video",
+    "sectionCode": "Code",
     "shareSection": "Partager le canevas",
     "revealVideo": "Reveal Video",
     "hintRevealVideo": "Nodes fade in sequentially (WebM/MP4)",
@@ -240,6 +242,7 @@
     }
   },
   "home": {
+    "appName": "OpenFlowKit",
     "title": "Tableau de bord",
     "description": "Gérez vos flux et diagrammes.",
     "recentFiles": "Fichiers récents",
@@ -263,7 +266,22 @@
       "confirmation": "Supprimer \"{{name}}\" ?",
       "hint": "Cette action est irréversible sauf si vous avez un export de sauvegarde ou une autre copie.",
       "closeDialog": "Fermer la boîte de dialogue de suppression du flux"
-    }
+    },
+    "suggestionBlank": "Canevas vierge",
+    "suggestionBlankDesc": "aller directement dans l'éditeur",
+    "suggestionAI": "Flowpilot IA",
+    "suggestionAIDesc": "Commencer à partir d'une invite",
+    "suggestionImport": "Importer",
+    "suggestionImportDesc": "Importer un travail existant",
+    "suggestionTemplates": "Modèles",
+    "suggestionTemplatesDesc": "Commencer à partir d'un modèle éprouvé",
+    "continueTitle": "Continuer avec une action récente",
+    "homeEmptyTitle": "Créez votre premier flux",
+    "homeEmptySubtitle": "Concevez des architectures de qualité entreprise instantanément. Commencez avec un canevas vierge, décrivez votre infrastructure avec notre constructeur IA, ou utilisez un modèle adapté.",
+    "homeBlankCanvas": "Canevas vierge",
+    "homeFlowpilotAI": "Flowpilot IA",
+    "homeTemplates": "Modèles",
+    "homeImportFile": "Ou importer un fichier existant"
   },
   "settings": {
     "title": "Paramètres",
@@ -295,33 +313,29 @@
     "help": "Aide"
   },
   "properties": {
-    "title": "Propriétés",
-    "nodeType": "Type de nœud",
-    "label": "Étiquette",
-    "description": "Description",
-    "color": "Couleur",
-    "icon": "Icône",
-    "size": "Taille",
-    "shape": "Forme",
-    "bulkShape": "Forme groupée",
-    "bulkColor": "Couleur groupée",
-    "bulkIcon": "Icône groupée",
-    "labelTransform": "Transformation d'étiquette",
-    "prefixOptional": "Préfixe (optionnel)",
-    "suffixOptional": "Suffixe (optionnel)",
-    "findReplace": "Rechercher et remplacer",
-    "findLabel": "Rechercher",
-    "findPlaceholder": "Texte à rechercher",
-    "replaceLabel": "Remplacer par",
-    "replacePlaceholder": "Texte de remplacement",
-    "useRegex": "Utiliser une expression régulière",
-    "previewSummary": "Aperçu",
-    "bulkApplySummary": "{{count}} éléments sélectionnés seront mis à jour",
-    "selectFieldToApply": "Sélectionnez au moins un champ à appliquer.",
-    "applyToSelectedNodes": "Appliquer aux éléments sélectionnés",
-    "imageSettings": "Paramètres de l'image",
-    "transparency": "Transparence",
-    "rotation": "Rotation"
+    "title": "Properties",
+    "shape": "Shape",
+    "color": "Color",
+    "icon": "Icon",
+    "rotation": "Rotation",
+    "transparency": "Transparency",
+    "imageSettings": "Image Settings",
+    "bulkShape": "Bulk Shape",
+    "bulkColor": "Bulk Color",
+    "bulkIcon": "Bulk Icon",
+    "labelTransform": "Label Transform",
+    "findReplace": "Find & Replace",
+    "findLabel": "Find",
+    "findPlaceholder": "Find text",
+    "replaceLabel": "Replace",
+    "replacePlaceholder": "Replace with",
+    "prefixOptional": "Prefix (optional)",
+    "suffixOptional": "Suffix (optional)",
+    "useRegex": "Use Regex",
+    "applyToSelectedNodes": "Apply to selected nodes",
+    "selectFieldToApply": "Select a field to apply",
+    "previewSummary": "Preview summary",
+    "selectionSummary": "Résumé de la sélection"
   },
   "saveStatus": {
     "saved": "Enregistré"
@@ -346,7 +360,9 @@
     "title": "Historique",
     "undo": "Annuler",
     "redo": "Rétablir",
-    "clear": "Effacer l'historique"
+    "clear": "Effacer l'historique",
+    "undoUnavailable": "Rien à annuler pour le moment.",
+    "redoUnavailable": "Rien à refaire pour le moment."
   },
   "errors": {
     "generic": "Quelque chose s'est mal passé",
@@ -378,7 +394,12 @@
     "feature4Desc": "Export into beautiful, fully animated presentation diagrams.",
     "analyticsTitle": "Anonymous Analytics",
     "analyticsDesc": "We collect diagnostic data. We never read your diagrams or prompts.",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "shortcutCommandBar": "Ouvrir le centre de commandes",
+    "shortcutHelp": "Voir les raccourcis clavier",
+    "shortcutCanvas": "Ajouter un nœud sur le canevas",
+    "shortcutsTitle": "Démarrez rapidement avec les raccourcis",
+    "shortcutsBadge": "Clavier d'abord"
   },
   "footer": {
     "mitLicensed": "Licence MIT"
@@ -653,7 +674,7 @@
       "strokeWidth": "Épaisseur du trait",
       "largeGraphSafety": "Protection grands graphes",
       "largeGraphSafetyAuto": "Auto",
-      "largeGraphSafetyOn": "Activé",
+      "largeGraphSafetyOn": "Sécurité grand graphique On",
       "largeGraphSafetyOff": "Désactivé",
       "exportModeDeterministic": "Déterministe",
       "exportModeLegacy": "Hérité",
@@ -712,11 +733,12 @@
         "sql": "Collez ici les instructions CREATE TABLE...",
         "infra": "Collez ici l'état Terraform en JSON, du YAML Kubernetes, Docker Compose ou Terraform HCL...",
         "openapi": "Collez ici votre YAML ou JSON OpenAPI / Swagger...",
-        "code": "Collez ici votre code source..."
+        "code": "Collez ici votre code source...",
+        "mermaid": "Collez ici le code du diagramme Mermaid..."
       },
       "infraFormats": {
-        "terraformState": "Terraform State (.tfstate)",
-        "kubernetes": "Kubernetes YAML",
+        "terraformState": "État Terraform",
+        "kubernetes": "Kubernetes",
         "dockerCompose": "Docker Compose",
         "terraformHcl": "Terraform HCL (AI)"
       },
@@ -735,13 +757,16 @@
         "infra": "Infra",
         "openapi": "OpenAPI",
         "code": "Code",
-        "codebase": "Dépôt"
+        "codebase": "Dépôt",
+        "mindmap": "Carte mentale",
+        "markdown": "Markdown"
       },
       "title": "Importer depuis des données",
       "description": "Importez du code, de l'infrastructure, du SQL ou des spécifications d'API dans votre diagramme.",
       "uploadFile": "Téléverser un fichier",
       "parsing": "Analyse en cours...",
       "parse": "Analyser",
+      "parseNativeProject": "Generate Native Diagram",
       "analyzing": "Analyse en cours...",
       "aiActions": {
         "generateErd": "Générer le MCD (IA)",
@@ -799,27 +824,25 @@
     "flowpilotConfigurations": "Configuration Flowpilot",
     "keyboardShortcuts": "Raccourcis clavier",
     "canvas": {
-      "title": "Canevas",
-      "showGrid": "Afficher la grille",
-      "showGridDesc": "Afficher une grille de points",
-      "snapToGrid": "Aligner sur la grille",
-      "snapToGridDesc": "Aligner les nœuds sur la grille",
-      "miniMap": "Mini carte",
-      "miniMapDesc": "Afficher la mini carte en bas à droite",
-      "architectureStrictMode": "Mode strict d’architecture",
-      "architectureStrictModeDesc": "Bloque l’import Mermaid lorsque les diagnostics d’architecture incluent des problèmes de récupération/validation",
-      "alignmentGuides": "Guides d’alignement",
-      "alignmentGuidesDesc": "Affiche des repères intelligents pendant le déplacement des nœuds",
-      "routingProfile": "Profil de routage",
+      "title": "Canvas",
+      "showGrid": "Show Grid",
+      "showGridDesc": "Display a dot grid on the canvas",
+      "snapToGrid": "Snap to Grid",
+      "snapToGridDesc": "Snap nodes to the grid when moving",
+      "alignmentGuides": "Alignment Guides",
+      "alignmentGuidesDesc": "Show smart guide lines while dragging nodes",
+      "routingProfile": "Routing Profile",
       "routingProfileStandard": "Standard",
       "routingProfileInfrastructure": "Infrastructure",
       "routingProfileHint": "Le mode infrastructure privilégie les routes orthogonales pour les cartes de services.",
-      "edgeBundling": "Regrouper les arêtes parallèles",
-      "edgeBundlingDesc": "Conserver les connexions parallèles sur des voies partagées"
+      "edgeBundling": "Regrouper les bords siblings",
+      "edgeBundlingDesc": "Garder les connexions parallèles sur des voies partagées",
+      "architectureStrictMode": "Mode Strict Architecture",
+      "architectureStrictModeDesc": "Bloquer l'import Mermaid lorsque les diagnostics d'architecture incluent des problèmes de récupération/validation"
     },
     "ai": {
       "provider": "Fournisseur",
-      "model": "Modèle",
+      "model": "Modèle IA",
       "apiKey": "Clé API",
       "customBaseUrl": "URL de base personnalisée",
       "optional": "Optionnel",
@@ -886,6 +909,135 @@
         "browserFriendly": "Compatible navigateur",
         "proxyLikely": "Proxy probable",
         "mixed": "Dépend du point de terminaison"
+      },
+      "models": {
+        "gemini": {
+          "gemini-2": {
+            "5-flash-lite": {
+              "label": "Gemini 2.5 Flash Lite"
+            },
+            "5-flash": {
+              "label": "Gemini 2.5 Flash"
+            },
+            "5-pro": {
+              "label": "Gemini 2.5 Pro"
+            }
+          },
+          "gemini-3-flash": {
+            "label": "Gemini 3 Flash"
+          },
+          "gemini-3-pro": {
+            "label": "Gemini 3 Pro"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 Mini"
+          },
+          "gpt-5": {
+            "2": {
+              "label": "GPT-5.2"
+            },
+            "label": "GPT-5"
+          },
+          "o4-mini": {
+            "label": "O4-Mini"
+          },
+          "o3": {
+            "label": "O3"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "llama-3": {
+            "3-70b-versatile": {
+              "label": "Llama 3.3 70B"
+            }
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek V3-2"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT OSS 120B"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen 3 235B"
+          },
+          "zai-glm-4": {
+            "7": {
+              "label": "Zai GLM 4.7"
+            }
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large"
+          },
+          "codestral-latest": {
+            "label": "Codestral"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large"
+          }
+        }
+      },
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama"
+        },
+        "lmStudio": {
+          "name": "LM Studio"
+        },
+        "together": {
+          "name": "Together AI"
+        }
       }
     },
     "brand": {
@@ -926,7 +1078,19 @@
     "analytics": {
       "enableTitle": "Analyses de lancement anonymes",
       "enableDescription": "Partager des données d’usage de base de manière anonyme (optionnel)"
-    }
+    },
+    "search": "Rechercher...",
+    "appearance": "Apparence",
+    "account": "Compte",
+    "about": "À propos",
+    "language": "Langue",
+    "theme": "Thème",
+    "fontSize": "Taille de police",
+    "fontFamily": "Police",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "confirm": "Confirmer"
   },
   "customNodes": {
     "browserContent": "Contenu du navigateur",
@@ -995,7 +1159,8 @@
     "note": "Note adhésive",
     "noteDesc": "Documentation",
     "releaseToConnect": "Relâcher pour connecter",
-    "close": "Fermer le menu de connexion"
+    "close": "Fermer le menu de connexion",
+    "label": "Menu de connexion des nœuds"
   },
   "errorBoundary": {
     "title": "Quelque chose s'est mal passé",
@@ -1024,7 +1189,12 @@
     "namedVersions": "Versions nommées",
     "noNamedSnapshots": "Aucune version nommée pour le moment.",
     "autosavedVersions": "Points de contrôle sauvegardés automatiquement",
-    "noAutoSnapshots": "Aucun point de contrôle sauvegardé automatiquement pour le moment."
+    "noAutoSnapshots": "Aucun point de contrôle sauvegardé automatiquement pour le moment.",
+    "undoTimelinePosition": "Step {{current}} of {{total}} in the current history stack.",
+    "undoTimelineScrubber": "Scrub through recent undo history",
+    "undoTimeline": "Undo Timeline",
+    "undoTimelineAtEarliest": "You are at the earliest captured state.",
+    "undoTimelineAtLatest": "You are at the latest state."
   },
   "templatesPanel": {
     "title": "Modèles de flux",
@@ -1051,31 +1221,6 @@
     "connection": "Connexion",
     "noSelection": "Aucune sélection",
     "selectHint": "Cliquez sur un nœud ou une arête pour modifier ses propriétés"
-  },
-  "properties": {
-    "title": "Properties",
-    "shape": "Shape",
-    "color": "Color",
-    "icon": "Icon",
-    "rotation": "Rotation",
-    "transparency": "Transparency",
-    "imageSettings": "Image Settings",
-    "bulkShape": "Bulk Shape",
-    "bulkColor": "Bulk Color",
-    "bulkIcon": "Bulk Icon",
-    "labelTransform": "Label Transform",
-    "findReplace": "Find & Replace",
-    "findLabel": "Find",
-    "findPlaceholder": "Find text",
-    "replaceLabel": "Replace",
-    "replacePlaceholder": "Replace with",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
-    "useRegex": "Use Regex",
-    "applyToSelectedNodes": "Apply to selected nodes",
-    "selectFieldToApply": "Select a field to apply",
-    "previewSummary": "Preview summary",
-    "selectionSummary": "Résumé de la sélection"
   },
   "flowCanvas": {
     "strictModePasteBlocked": "Le mode strict d’architecture a bloqué le collage Mermaid. Ouvrez la vue Code, corrigez les diagnostics, puis réessayez."
@@ -1106,9 +1251,9 @@
   },
   "share": {
     "close": "Close",
-    "title": "Partager le design",
+    "title": "Partager",
     "betaBadge": "Bêta",
-    "description": "Invitez des collaborateurs à consulter et modifier ce flux avec vous en temps réel.",
+    "description": "Partager ce canevas",
     "roomId": "ID de salle",
     "link": "Lien de partage",
     "copied": "Copied Link!",
@@ -1132,7 +1277,20 @@
       "copyFailed": "Impossible de copier le lien de partage.",
       "linkCopied": "Le lien de collaboration a été copié.",
       "copyManual": "L’accès au presse-papiers est bloqué. Copiez le lien manuellement depuis la boîte de dialogue de partage."
-    }
+    },
+    "embed": "Intégrer",
+    "embedCode": "Code d'intégration",
+    "export": "Exporter",
+    "settings": "Paramètres de partage",
+    "anyoneWithLink": "Toute personne avec le lien",
+    "viewOnly": "Lecture seule",
+    "canEdit": "Peut modifier",
+    "disable": "Désactiver le partage",
+    "enable": "Activer le partage",
+    "invite": "Inviter",
+    "pending": "En attente",
+    "revoke": "Révoquer",
+    "expired": "Expiré"
   },
   "connectionPanel": {
     "architecture": "Architecture",
@@ -1144,6 +1302,65 @@
     "deleteConnection": "Supprimer la connexion"
   },
   "sidebar": {
-    "close": "Fermer la barre latérale"
+    "close": "Fermer la barre latérale",
+    "searchPlaceholder": "Rechercher...",
+    "noResults": "Aucun résultat",
+    "nodes": "Nœuds",
+    "components": "Composants",
+    "snippets": "Extraits",
+    "addons": "Add-ons"
+  },
+  "contextMenu": {
+    "label": "Menu contextuel du canevas"
+  },
+  "canvas": {
+    "addNodeShortcut": "Ajouter un nœud",
+    "aiChatPlaceholder": "Créer quelque chose...",
+    "nodes": "Nœuds",
+    "connections": "Connexions",
+    "elements": "Éléments",
+    "selection": "Sélection",
+    "noSelection": "Aucune sélection",
+    "alignNodes": "Aligner les nœuds",
+    "distributeNodes": "Distribuer les nœuds",
+    "alignLeft": "Aligner à gauche",
+    "alignCenter": "Aligner au centre",
+    "alignRight": "Aligner à droite",
+    "alignTop": "Aligner en haut",
+    "alignMiddle": "Aligner au milieu",
+    "alignBottom": "Aligner en bas",
+    "distributeHorizontally": "Distribuer horizontalement",
+    "distributeVertically": "Distribuer verticalement",
+    "zoomToFit": "Zoom pour ajuster",
+    "zoomToSelection": "Zoom sur la sélection",
+    "locked": "Verrouillé",
+    "unlock": "Déverrouiller",
+    "lock": "Verrouiller",
+    "bringToFront": "Mettre au premier plan",
+    "sendToBack": "Envoyer à l'arrière",
+    "group": "Grouper",
+    "ungroup": "Dissocier"
+  },
+  "mindmap": {
+    "addChild": "Ajouter un sous-sujet",
+    "addSibling": "Ajouter un sujet frère",
+    "addParent": "Ajouter un sujet parent",
+    "delete": "Supprimer",
+    "insertAfter": "Insérer après",
+    "insertBefore": "Insérer avant"
+  },
+  "aiModel": {
+    "title": "Modèle IA",
+    "provider": "Fournisseur",
+    "model": "Modèle",
+    "temperature": "Température",
+    "maxTokens": "Jetons max",
+    "buttons": {
+      "retry": "Réessayer",
+      "stop": "Arrêter",
+      "clear": "Effacer"
+    },
+    "thinking": "Réflexion...",
+    "error": "Erreur IA"
   }
 }

@@ -6,6 +6,7 @@ import { useFlowStore } from '@/store';
 import type { FlowTab } from '@/lib/types';
 import type { FlowDocument } from '@/services/storage/flowDocumentModel';
 import { WELCOME_MODAL_ENABLED_STORAGE_KEY, WELCOME_SEEN_STORAGE_KEY } from './home/welcomeModalState';
+import { recordOnboardingEvent } from '@/services/onboarding/events';
 
 vi.mock('react-i18next', async (importOriginal) => {
     const actual = await importOriginal<typeof import('react-i18next')>();
@@ -96,7 +97,7 @@ describe('HomePage integration flows', () => {
         expect(screen.queryByRole('button', { name: /Product Discovery Workshop Map/i })).toBeNull();
     });
 
-    it('exposes template and flowpilot entry points in the empty dashboard state', async () => {
+  it('exposes template and flowpilot entry points in the empty dashboard state', async () => {
         const onLaunchWithTemplates = vi.fn();
         const onLaunchWithAI = vi.fn();
         useFlowStore.setState({
@@ -115,6 +116,27 @@ describe('HomePage integration flows', () => {
 
         expect(onLaunchWithTemplates).toHaveBeenCalledTimes(1);
         expect(onLaunchWithAI).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows recent onboarding action suggestions in the empty dashboard', async () => {
+        useFlowStore.setState({
+            documents: [],
+            activeDocumentId: '',
+            tabs: [],
+            activeTabId: null,
+            nodes: [],
+            edges: [],
+        });
+        recordOnboardingEvent('welcome_prompt_selected', { source: 'welcome-modal' });
+        recordOnboardingEvent('welcome_template_selected', { source: 'welcome-modal' });
+
+        await renderHomePage();
+
+        expect(screen.getByText('Continue with a recent action')).toBeTruthy();
+        const suggestionPanel = screen.getByTestId('home-recent-actions');
+
+        expect(within(suggestionPanel).getByRole('button', { name: /Flowpilot AI/i })).toBeTruthy();
+        expect(within(suggestionPanel).getByRole('button', { name: /Templates/i })).toBeTruthy();
     });
 
     it('opens persisted flows from the dashboard list', async () => {

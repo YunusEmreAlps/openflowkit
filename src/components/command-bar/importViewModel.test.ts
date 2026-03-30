@@ -8,6 +8,7 @@ import {
   getImportCategoryLabel,
   getImportPlaceholders,
   getInfraFormatOptions,
+  IMPORT_CATEGORY_DEFINITIONS,
 } from './importViewModel';
 
 const t = ((key: string, fallback?: string) => fallback ?? key) as TFunction<
@@ -21,6 +22,9 @@ describe('importViewModel', () => {
     expect(getImportCategoryLabel(t, 'codebase')).toBe('Repo');
     expect(getImportCategoryDefinition('infra').hasNative).toBe(true);
     expect(getImportCategoryDefinition('openapi').hasNative).toBe(false);
+    expect(IMPORT_CATEGORY_DEFINITIONS.some((definition) => definition.id === 'mermaid')).toBe(
+      false
+    );
   });
 
   it('builds placeholders and options for the import view controls', () => {

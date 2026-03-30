@@ -134,6 +134,7 @@
     "openflowdsl": "Export as {{appName}} DSL",
     "figma": "Export to Figma",
     "share": "Share live canvas",
+    "shareEmbed": "Share & Embed",
     "exportDiagram": "Export Diagram",
     "exportAs": "Export As",
     "headingFormat": "Export Format",
@@ -158,11 +159,12 @@
     "hintCinematicVideo": "Dark launch-style build",
     "hintCinematicGif": "Dark social-ready loop",
     "hintShareViewer": "Invite link for this room",
+    "hintShareEmbed": "Read-only viewer link",
     "readmeEmbed": "README Embed",
     "hintReadmeEmbed": "Copy Markdown snippet",
     "sectionImage": "Image",
-    "sectionVideo": "Video & Animation",
-    "sectionCode": "Code & Data",
+    "sectionVideo": "Video",
+    "sectionCode": "Code",
     "chooseFormat": "Choose format",
     "speed": "Speed",
     "resolution": "Resolution",
@@ -264,6 +266,7 @@
     }
   },
   "home": {
+    "appName": "OpenFlowKit",
     "title": "Dashboard",
     "description": "Manage your flows and diagrams.",
     "recentFiles": "Recent Files",
@@ -281,6 +284,21 @@
       "hint": "Names are local to this browser profile unless you export or sync them elsewhere.",
       "closeDialog": "Close rename flow dialog"
     },
+    "continueTitle": "Continue with a recent action",
+    "homeEmptyTitle": "Create your first flow",
+    "homeEmptySubtitle": "Design enterprise-grade architectures instantly. Start from a blank canvas, describe your infrastructure with our AI builder, or use a tailored template.",
+    "homeBlankCanvas": "Blank Canvas",
+    "homeFlowpilotAI": "Flowpilot AI",
+    "homeTemplates": "Templates",
+    "homeImportFile": "Or import an existing file",
+    "suggestionBlank": "Blank canvas",
+    "suggestionBlankDesc": "Jump straight into the editor",
+    "suggestionAI": "Flowpilot AI",
+    "suggestionAIDesc": "Start from a prompt",
+    "suggestionImport": "Import",
+    "suggestionImportDesc": "Bring in existing work",
+    "suggestionTemplates": "Templates",
+    "suggestionTemplatesDesc": "Start from a proven pattern",
     "deleteFlow": {
       "title": "Delete flow",
       "description": "This removes the local autosaved flow from this device.",
@@ -320,32 +338,28 @@
   },
   "properties": {
     "title": "Properties",
-    "nodeType": "Node Type",
-    "label": "Label",
-    "description": "Description",
+    "shape": "Shape",
     "color": "Color",
     "icon": "Icon",
-    "size": "Size",
-    "shape": "Shape",
+    "rotation": "Rotation",
+    "transparency": "Transparency",
+    "imageSettings": "Image Settings",
     "bulkShape": "Bulk Shape",
     "bulkColor": "Bulk Color",
     "bulkIcon": "Bulk Icon",
     "labelTransform": "Label Transform",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
     "findReplace": "Find & Replace",
     "findLabel": "Find",
-    "findPlaceholder": "Text to find",
-    "replaceLabel": "Replace with",
-    "replacePlaceholder": "Replacement text",
-    "useRegex": "Use Regular Expression",
-    "previewSummary": "Preview summary",
-    "bulkApplySummary": "Will update {{count}} selected nodes",
-    "selectFieldToApply": "Select at least one field to apply.",
+    "findPlaceholder": "Find text",
+    "replaceLabel": "Replace",
+    "replacePlaceholder": "Replace with",
+    "prefixOptional": "Prefix (optional)",
+    "suffixOptional": "Suffix (optional)",
+    "useRegex": "Use Regex",
     "applyToSelectedNodes": "Apply to selected nodes",
-    "imageSettings": "Image Settings",
-    "transparency": "Transparency",
-    "rotation": "Rotation"
+    "selectFieldToApply": "Select a field to apply",
+    "previewSummary": "Preview summary",
+    "selectionSummary": "Selection summary"
   },
   "saveStatus": {
     "saved": "Saved"
@@ -376,7 +390,9 @@
     "title": "History",
     "undo": "Undo",
     "redo": "Redo",
-    "clear": "Clear History"
+    "clear": "Clear History",
+    "undoUnavailable": "Nothing to undo yet.",
+    "redoUnavailable": "Nothing to redo right now."
   },
   "errors": {
     "generic": "Something went wrong",
@@ -408,6 +424,11 @@
     "feature4Desc": "Export into beautiful, fully animated presentation diagrams.",
     "analyticsTitle": "Anonymous Analytics",
     "analyticsDesc": "We collect diagnostic data. We never read your diagrams or prompts.",
+    "shortcutsTitle": "Start fast with shortcuts",
+    "shortcutsBadge": "Keyboard-first",
+    "shortcutCommandBar": "Open command center",
+    "shortcutHelp": "View keyboard shortcuts",
+    "shortcutCanvas": "Add a node on canvas",
     "getStarted": "Get Started"
   },
   "footer": {
@@ -758,6 +779,7 @@
       "description": "Import code, infrastructure, SQL, or API specs into your diagram.",
       "uploadFile": "Upload file",
       "parse": "Parse",
+      "parseNativeProject": "Generate Native Diagram",
       "parsing": "Parsing...",
       "analyzing": "Analyzing...",
       "previewDsl": "Preview DSL",
@@ -781,7 +803,8 @@
         "sql": "Paste CREATE TABLE statements here...",
         "infra": "Paste Terraform state JSON, Kubernetes YAML, Docker Compose, or Terraform HCL here...",
         "openapi": "Paste your OpenAPI / Swagger YAML or JSON here...",
-        "code": "Paste your source code here..."
+        "code": "Paste your source code here...",
+        "mermaid": "Paste Mermaid diagram code here..."
       },
       "infraFormats": {
         "terraformState": "Terraform State (.tfstate)",
@@ -1312,7 +1335,11 @@
   "annotationNode": {
     "placeholder": "*Double click to edit note*"
   },
+  "contextMenu": {
+    "label": "Canvas context menu"
+  },
   "connectMenu": {
+    "label": "Connect node menu",
     "createNewNode": "Create New Shape",
     "process": "Rounded Shape",
     "processDesc": "General-purpose block",
@@ -1354,7 +1381,12 @@
     "restoreVersion": "Restore version",
     "deleteVersion": "Delete version",
     "nodes": "{{count}} nodes",
-    "edges": "{{count}} edges"
+    "edges": "{{count}} edges",
+    "undoTimelinePosition": "Step {{current}} of {{total}} in the current history stack.",
+    "undoTimelineScrubber": "Scrub through recent undo history",
+    "undoTimeline": "Undo Timeline",
+    "undoTimelineAtEarliest": "You are at the earliest captured state.",
+    "undoTimelineAtLatest": "You are at the latest state."
   },
   "templatesPanel": {
     "title": "Flow Templates",
@@ -1381,31 +1413,6 @@
     "connection": "Connection",
     "noSelection": "Nothing selected",
     "selectHint": "Click a node or edge to edit its properties"
-  },
-  "properties": {
-    "title": "Properties",
-    "shape": "Shape",
-    "color": "Color",
-    "icon": "Icon",
-    "rotation": "Rotation",
-    "transparency": "Transparency",
-    "imageSettings": "Image Settings",
-    "bulkShape": "Bulk Shape",
-    "bulkColor": "Bulk Color",
-    "bulkIcon": "Bulk Icon",
-    "labelTransform": "Label Transform",
-    "findReplace": "Find & Replace",
-    "findLabel": "Find",
-    "findPlaceholder": "Find text",
-    "replaceLabel": "Replace",
-    "replacePlaceholder": "Replace with",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
-    "useRegex": "Use Regex",
-    "applyToSelectedNodes": "Apply to selected nodes",
-    "selectFieldToApply": "Select a field to apply",
-    "previewSummary": "Preview summary",
-    "selectionSummary": "Selection summary"
   },
   "connectionPanel": {
     "architecture": "Architecture",

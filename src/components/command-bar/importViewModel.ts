@@ -44,7 +44,7 @@ export const IMPORT_CATEGORY_DEFINITIONS: ImportCategoryDefinition[] = [
     id: 'codebase',
     fallbackLabel: 'Repo',
     labelKey: 'commandBar.import.categories.codebase',
-    hasNative: false,
+    hasNative: true,
     hasAI: true,
   },
 ];
@@ -71,12 +71,11 @@ export function getImportPlaceholders(
     ),
     code: t('commandBar.import.placeholders.code', 'Paste your source code here...'),
     codebase: '',
+    mermaid: t('commandBar.import.placeholders.mermaid', 'Paste Mermaid diagram code here...'),
   };
 }
 
-export function getInfraFormatOptions(
-  t: TFunction<'translation', undefined>
-): SelectOption[] {
+export function getInfraFormatOptions(t: TFunction<'translation', undefined>): SelectOption[] {
   return [
     {
       value: 'terraform-state',
@@ -109,9 +108,7 @@ export function getImportCategoryLabel(
   return t(definition.labelKey, definition.fallbackLabel);
 }
 
-export function getImportCategoryDefinition(
-  category: ImportCategory
-): ImportCategoryDefinition {
+export function getImportCategoryDefinition(category: ImportCategory): ImportCategoryDefinition {
   return (
     IMPORT_CATEGORY_DEFINITIONS.find((item) => item.id === category) ??
     IMPORT_CATEGORY_DEFINITIONS[0]
@@ -132,7 +129,9 @@ export function getImportAiActionLabel(
     case 'code':
       return t('commandBar.import.aiActions.analyzeArchitecture', 'Analyze Architecture');
     case 'codebase':
-      return t('commandBar.import.aiActions.analyzeProject', 'Analyze Project');
+      return t('commandBar.import.aiActions.analyzeProject', 'Enhance with AI');
+    case 'mermaid':
+      return '';
     default:
       return category;
   }

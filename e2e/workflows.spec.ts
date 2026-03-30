@@ -13,7 +13,8 @@ test.beforeEach(async ({ page }) => {
 
 async function createNewFlow(page: import('@playwright/test').Page) {
   await page.goto('/#/home');
-  await page.getByTestId('home-create-new').click();
+  await expect(page.getByTestId('home-create-new-main')).toBeVisible({ timeout: 15000 });
+  await page.getByTestId('home-create-new-main').click();
   await expect(page).toHaveURL(/#\/flow\/[^?]+(?:\?.*)?$/);
   await expect(page.getByTestId('toolbar-add-toggle')).toBeVisible({ timeout: 15000 });
   await expect(page.getByTestId('flow-page-tab').first()).toBeVisible();
@@ -198,14 +199,14 @@ test('command bar opens with Cmd+K', async ({ page }) => {
   await createNewFlow(page);
 
   await page.keyboard.press('ControlOrMeta+k');
-  await expect(page.getByPlaceholder(/search/i)).toBeVisible();
+  await expect(page.getByRole('combobox', { name: /search command bar actions/i })).toBeVisible();
 });
 
 test('command bar fuzzy search works', async ({ page }) => {
   await createNewFlow(page);
   await page.keyboard.press('ControlOrMeta+k');
 
-  await page.getByPlaceholder(/search/i).fill('arc');
+  await page.getByRole('combobox', { name: /search command bar actions/i }).fill('arc');
   await expect(page.getByText(/architecture/i).first()).toBeVisible();
 });
 

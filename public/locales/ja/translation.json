@@ -141,12 +141,14 @@
     "gif": "再生GIF",
     "hintPlaybackGif": "ドキュメントやSNS向けの短いループ",
     "share": "ライブキャンバスを共有",
+    "shareEmbed": "共有と埋め込み",
     "hintShareViewer": "このルームへの招待リンク",
+    "hintShareEmbed": "読み取り専用ビューアーリンク",
     "readmeEmbed": "README Embed",
     "hintReadmeEmbed": "Copy Markdown snippet",
     "sectionImage": "Image",
-    "sectionVideo": "Video & Animation",
-    "sectionCode": "Code & Data",
+    "sectionVideo": "Video",
+    "sectionCode": "Code",
     "shareSection": "キャンバスを共有",
     "revealVideo": "Reveal Video",
     "hintRevealVideo": "Nodes fade in sequentially (WebM/MP4)",
@@ -240,6 +242,7 @@
     }
   },
   "home": {
+    "appName": "オープンフローキット",
     "title": "ダッシュボード",
     "description": "フローと図を管理します。",
     "recentFiles": "最近のファイル",
@@ -263,7 +266,22 @@
       "confirmation": "「{{name}}」を削除しますか？",
       "hint": "エクスポートしたバックアップまたは別のコピーがない限り、この操作は元に戻せません。",
       "closeDialog": "フロー削除ダイアログを閉じる"
-    }
+    },
+    "suggestionBlank": "空白のキャンバス",
+    "suggestionBlankDesc": "エディタに直接ジャンプ",
+    "suggestionAI": "フローパイロット人工知能",
+    "suggestionAIDesc": "プロンプトから始める",
+    "suggestionImport": "インポート",
+    "suggestionImportDesc": "既存の作品を持ち込む",
+    "suggestionTemplates": "テンプレート",
+    "suggestionTemplatesDesc": "実証済みのパターンから始める",
+    "continueTitle": "最近の操作を続ける",
+    "homeEmptyTitle": "最初のフローを作成",
+    "homeEmptySubtitle": "エンタープライズグレードのアーキテクチャを即座に設計。空白のキャンバスから始めるか、AIビルダーでインフラを描述するか、カスタマイズテンプレートを使用してください。",
+    "homeBlankCanvas": "空白のキャンバス",
+    "homeFlowpilotAI": "フローパイロット人工知能",
+    "homeTemplates": "テンプレート",
+    "homeImportFile": "または既存のファイルをインポート"
   },
   "settings": {
     "title": "設定",
@@ -295,33 +313,29 @@
     "help": "ヘルプ"
   },
   "properties": {
-    "title": "プロパティ",
-    "nodeType": "ノードタイプ",
-    "label": "ラベル",
-    "description": "説明",
-    "color": "色",
-    "icon": "アイコン",
-    "size": "サイズ",
-    "shape": "図形",
-    "bulkShape": "複数図形",
-    "bulkColor": "一括カラー",
-    "bulkIcon": "一括アイコン",
-    "labelTransform": "ラベル変換",
-    "prefixOptional": "接頭辞（任意）",
-    "suffixOptional": "接尾辞（任意）",
-    "findReplace": "検索と置換",
-    "findLabel": "検索",
-    "findPlaceholder": "検索するテキスト",
-    "replaceLabel": "置換後の文字列",
-    "replacePlaceholder": "置換テキスト",
-    "useRegex": "正規表現を使用",
-    "previewSummary": "プレビュー",
-    "bulkApplySummary": "選択中の {{count}} 項目を更新します",
-    "selectFieldToApply": "適用する項目を少なくとも 1 つ選択してください。",
-    "applyToSelectedNodes": "選択した項目に適用",
-    "imageSettings": "画像設定",
-    "transparency": "透明度",
-    "rotation": "回転"
+    "title": "Properties",
+    "shape": "Shape",
+    "color": "Color",
+    "icon": "Icon",
+    "rotation": "Rotation",
+    "transparency": "Transparency",
+    "imageSettings": "Image Settings",
+    "bulkShape": "Bulk Shape",
+    "bulkColor": "Bulk Color",
+    "bulkIcon": "Bulk Icon",
+    "labelTransform": "Label Transform",
+    "findReplace": "Find & Replace",
+    "findLabel": "Find",
+    "findPlaceholder": "Find text",
+    "replaceLabel": "Replace",
+    "replacePlaceholder": "Replace with",
+    "prefixOptional": "Prefix (optional)",
+    "suffixOptional": "Suffix (optional)",
+    "useRegex": "Use Regex",
+    "applyToSelectedNodes": "Apply to selected nodes",
+    "selectFieldToApply": "Select a field to apply",
+    "previewSummary": "Preview summary",
+    "selectionSummary": "選択の概要"
   },
   "saveStatus": {
     "saved": "保存済み"
@@ -346,7 +360,9 @@
     "title": "履歴",
     "undo": "元に戻す",
     "redo": "やり直す",
-    "clear": "履歴をクリア"
+    "clear": "履歴をクリア",
+    "undoUnavailable": "まだ元に戻すものがありません。",
+    "redoUnavailable": "やり直すものがありません。"
   },
   "errors": {
     "generic": "問題が発生しました",
@@ -378,7 +394,12 @@
     "feature4Desc": "Export into beautiful, fully animated presentation diagrams.",
     "analyticsTitle": "Anonymous Analytics",
     "analyticsDesc": "We collect diagnostic data. We never read your diagrams or prompts.",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "shortcutCommandBar": "コマンドセンターを開く",
+    "shortcutHelp": "キーボードショートカットを表示",
+    "shortcutCanvas": "キャンバスにノードを追加",
+    "shortcutsTitle": "ショートカットで素早く開始",
+    "shortcutsBadge": "キーボードファースト"
   },
   "footer": {
     "mitLicensed": "MITライセンス"
@@ -437,7 +458,7 @@
     "description": "究極のホワイトラベルキャンバス。",
     "diagramAsCode": "コードとしての図",
     "diagramAsCodeDesc": "Mermaid.jsとDSLをサポート。",
-    "flowpilotAI": "Flowpilot",
+    "flowpilotAI": "Flowpilot 人工知能",
     "aiAssistant": "AIアシスタント",
     "flowpilotAIDesc": "ガイド付きAI編集で図を調整します。",
     "addRedisCache": "DBの前にRedisキャッシュを追加する。",
@@ -495,7 +516,7 @@
     "communityDesc": "OpenFlowKitを活用している開発者に参加しましょう。",
     "roadmap": "ロードマップ",
     "coreRenderer": "コアレンダラー",
-    "flowpilotAI": "Flowpilot"
+    "flowpilotAI": "Flowpilot 人工知能"
   },
   "demo": {
     "livePreview": "ライブプレビュー",
@@ -636,7 +657,7 @@
     "visuals": {
       "title": "接続スタイル",
       "edgeStyle": "エッジスタイル",
-      "bezier": "ベジェ",
+      "bezier": "ベジェ曲線",
       "bezierDesc": "滑らかな曲線",
       "straight": "直線",
       "straightDesc": "直接接続",
@@ -653,7 +674,7 @@
       "strokeWidth": "線の太さ",
       "largeGraphSafety": "大規模グラフ保護",
       "largeGraphSafetyAuto": "自動",
-      "largeGraphSafetyOn": "オン",
+      "largeGraphSafetyOn": "大規模グラフ安全モードオン",
       "largeGraphSafetyOff": "オフ",
       "exportModeDeterministic": "決定的",
       "exportModeLegacy": "従来方式",
@@ -712,11 +733,12 @@
         "sql": "ここに CREATE TABLE 文を貼り付けてください...",
         "infra": "ここに Terraform state JSON、Kubernetes YAML、Docker Compose、または Terraform HCL を貼り付けてください...",
         "openapi": "ここに OpenAPI / Swagger の YAML または JSON を貼り付けてください...",
-        "code": "ここにソースコードを貼り付けてください..."
+        "code": "ここにソースコードを貼り付けてください...",
+        "mermaid": "ここに Mermaid 図のコードを貼り付けてください..."
       },
       "infraFormats": {
-        "terraformState": "Terraform State (.tfstate)",
-        "kubernetes": "Kubernetes YAML",
+        "terraformState": "Terraform状態",
+        "kubernetes": "Kubernetes",
         "dockerCompose": "Docker Compose",
         "terraformHcl": "Terraform HCL (AI)"
       },
@@ -735,13 +757,16 @@
         "infra": "Infra",
         "openapi": "OpenAPI",
         "code": "Code",
-        "codebase": "リポジトリ"
+        "codebase": "リポジトリ",
+        "mindmap": "マインドマップ",
+        "markdown": "Markdown"
       },
       "title": "データからインポート",
       "description": "コード、インフラ、SQL、または API 仕様を図に取り込みます。",
       "uploadFile": "ファイルをアップロード",
       "parsing": "解析中...",
       "parse": "解析",
+      "parseNativeProject": "Generate Native Diagram",
       "analyzing": "分析中...",
       "aiActions": {
         "generateErd": "ERD を生成 (AI)",
@@ -792,34 +817,32 @@
   "settingsModal": {
     "title": "設定",
     "general": "一般",
-    "flowpilotAI": "Flowpilot",
+    "flowpilotAI": "Flowpilot 人工知能",
     "shortcuts": "ショートカット",
     "running": "{appName} 実行中",
     "generalSettings": "一般設定",
     "flowpilotConfigurations": "Flowpilot設定",
     "keyboardShortcuts": "キーボードショートカット",
     "canvas": {
-      "title": "キャンバス",
-      "showGrid": "グリッドを表示",
-      "showGridDesc": "ドットグリッドを表示",
-      "snapToGrid": "グリッドにスナップ",
-      "snapToGridDesc": "ノードを自動でスナップ",
-      "miniMap": "ミニマップ",
-      "miniMapDesc": "右下にミニマップを表示",
-      "architectureStrictMode": "アーキテクチャ厳格モード",
-      "architectureStrictModeDesc": "アーキテクチャ診断に回復/検証の問題が含まれる場合、Mermaid のインポートをブロックします",
-      "alignmentGuides": "整列ガイド",
-      "alignmentGuidesDesc": "ノードをドラッグ中にスマートガイド線を表示します",
-      "routingProfile": "ルーティングプロファイル",
+      "title": "Canvas",
+      "showGrid": "Show Grid",
+      "showGridDesc": "Display a dot grid on the canvas",
+      "snapToGrid": "Snap to Grid",
+      "snapToGridDesc": "Snap nodes to the grid when moving",
+      "alignmentGuides": "Alignment Guides",
+      "alignmentGuidesDesc": "Show smart guide lines while dragging nodes",
+      "routingProfile": "Routing Profile",
       "routingProfileStandard": "標準",
       "routingProfileInfrastructure": "インフラストラクチャ",
-      "routingProfileHint": "インフラストラクチャモードでは、サービスマップ向けに直交ルートを優先します。",
-      "edgeBundling": "平行エッジを束ねる",
-      "edgeBundlingDesc": "平行接続を共通レーン上に維持する"
+      "routingProfileHint": "インフラストラクチャモードはサービスマップのために直交ルートを優先します。",
+      "edgeBundling": "兄弟エッジをバンドル",
+      "edgeBundlingDesc": "並行接続を共有レーンに保つ",
+      "architectureStrictMode": "アーキテクチャStrictモード",
+      "architectureStrictModeDesc": "アーキテクチャ診断が回復/検証の問題を含む場合、Mermaidインポートをブロック"
     },
     "ai": {
       "provider": "プロバイダー",
-      "model": "モデル",
+      "model": "AIモデル",
       "apiKey": "APIキー",
       "customBaseUrl": "カスタムURL",
       "optional": "任意",
@@ -886,6 +909,135 @@
         "browserFriendly": "ブラウザ向け",
         "proxyLikely": "プロキシが必要な可能性",
         "mixed": "エンドポイント次第"
+      },
+      "models": {
+        "gemini": {
+          "gemini-2": {
+            "5-flash-lite": {
+              "label": "Gemini 2.5 Flash Lite"
+            },
+            "5-flash": {
+              "label": "Gemini 2.5 Flash"
+            },
+            "5-pro": {
+              "label": "Gemini 2.5 Pro"
+            }
+          },
+          "gemini-3-flash": {
+            "label": "Gemini 3 Flash"
+          },
+          "gemini-3-pro": {
+            "label": "Gemini 3 Pro"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 Mini"
+          },
+          "gpt-5": {
+            "2": {
+              "label": "GPT-5.2"
+            },
+            "label": "GPT-5"
+          },
+          "o4-mini": {
+            "label": "O4-Mini"
+          },
+          "o3": {
+            "label": "O3"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "llama-3": {
+            "3-70b-versatile": {
+              "label": "Llama 3.3 70B"
+            }
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek V3-2"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT OSS 120B"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen 3 235B"
+          },
+          "zai-glm-4": {
+            "7": {
+              "label": "Zai GLM 4.7"
+            }
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large"
+          },
+          "codestral-latest": {
+            "label": "Codestral"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large"
+          }
+        }
+      },
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama"
+        },
+        "lmStudio": {
+          "name": "LM Studio"
+        },
+        "together": {
+          "name": "Together AI"
+        }
       }
     },
     "brand": {
@@ -926,7 +1078,19 @@
     "analytics": {
       "enableTitle": "匿名の起動分析",
       "enableDescription": "匿名の基本的な利用データを共有します（任意）"
-    }
+    },
+    "search": "検索...",
+    "appearance": "外観",
+    "account": "アカウント",
+    "about": "概要",
+    "language": "言語",
+    "theme": "テーマ",
+    "fontSize": "フォントサイズ",
+    "fontFamily": "フォント",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "reset": "リセット",
+    "confirm": "確認"
   },
   "customNodes": {
     "browserContent": "ブラウザコンテンツ",
@@ -995,7 +1159,8 @@
     "note": "付箋",
     "noteDesc": "ドキュメント",
     "releaseToConnect": "接続するには離す",
-    "close": "接続メニューを閉じる"
+    "close": "接続メニューを閉じる",
+    "label": "ノード接続メニュー"
   },
   "errorBoundary": {
     "title": "問題が発生しました",
@@ -1024,7 +1189,12 @@
     "namedVersions": "名前付きバージョン",
     "noNamedSnapshots": "まだ名前付きバージョンはありません。",
     "autosavedVersions": "自動保存チェックポイント",
-    "noAutoSnapshots": "まだ自動保存チェックポイントはありません。"
+    "noAutoSnapshots": "まだ自動保存チェックポイントはありません。",
+    "undoTimelinePosition": "Step {{current}} of {{total}} in the current history stack.",
+    "undoTimelineScrubber": "Scrub through recent undo history",
+    "undoTimeline": "Undo Timeline",
+    "undoTimelineAtEarliest": "You are at the earliest captured state.",
+    "undoTimelineAtLatest": "You are at the latest state."
   },
   "templatesPanel": {
     "title": "フローテンプレート",
@@ -1051,31 +1221,6 @@
     "connection": "接続",
     "noSelection": "何も選択されていません",
     "selectHint": "ノードまたはエッジをクリックしてプロパティを編集してください"
-  },
-  "properties": {
-    "title": "Properties",
-    "shape": "Shape",
-    "color": "Color",
-    "icon": "Icon",
-    "rotation": "Rotation",
-    "transparency": "Transparency",
-    "imageSettings": "Image Settings",
-    "bulkShape": "Bulk Shape",
-    "bulkColor": "Bulk Color",
-    "bulkIcon": "Bulk Icon",
-    "labelTransform": "Label Transform",
-    "findReplace": "Find & Replace",
-    "findLabel": "Find",
-    "findPlaceholder": "Find text",
-    "replaceLabel": "Replace",
-    "replacePlaceholder": "Replace with",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
-    "useRegex": "Use Regex",
-    "applyToSelectedNodes": "Apply to selected nodes",
-    "selectFieldToApply": "Select a field to apply",
-    "previewSummary": "Preview summary",
-    "selectionSummary": "選択の概要"
   },
   "flowCanvas": {
     "strictModePasteBlocked": "アーキテクチャ厳格モードにより Mermaid の貼り付けがブロックされました。コードビューを開き、診断を修正してから再試行してください。"
@@ -1106,9 +1251,9 @@
   },
   "share": {
     "close": "閉じる",
-    "title": "デザインを共有",
+    "title": "共有",
     "betaBadge": "ベータ",
-    "description": "共同編集者を招待して、このフローをリアルタイムで閲覧・編集してもらえます。",
+    "description": "このキャンバスを共有",
     "roomId": "ルームID",
     "link": "共有リンク",
     "copied": "リンクをコピーしました！",
@@ -1132,7 +1277,20 @@
       "copyFailed": "共有リンクをコピーできませんでした。",
       "linkCopied": "共同編集リンクをコピーしました。",
       "copyManual": "クリップボードへのアクセスがブロックされています。共有ダイアログからリンクを手動でコピーしてください。"
-    }
+    },
+    "embed": "埋め込み",
+    "embedCode": "埋め込みコード",
+    "export": "エクスポート",
+    "settings": "共有設定",
+    "anyoneWithLink": "リンクを持つ任何人",
+    "viewOnly": "表示のみ",
+    "canEdit": "編集可能",
+    "disable": "共有を無効化",
+    "enable": "共有を有効化",
+    "invite": "招待",
+    "pending": "保留中",
+    "revoke": "取り消し",
+    "expired": "期限切れ"
   },
   "connectionPanel": {
     "architecture": "アーキテクチャ",
@@ -1144,6 +1302,65 @@
     "deleteConnection": "接続を削除"
   },
   "sidebar": {
-    "close": "サイドバーを閉じる"
+    "close": "サイドバーを閉じる",
+    "searchPlaceholder": "検索...",
+    "noResults": "結果なし",
+    "nodes": "ノード",
+    "components": "コンポーネント",
+    "snippets": "スニペット",
+    "addons": "アドオン"
+  },
+  "contextMenu": {
+    "label": "キャンバスコンテキストメニュー"
+  },
+  "canvas": {
+    "addNodeShortcut": "ノードを追加",
+    "aiChatPlaceholder": "何かを作成...",
+    "nodes": "ノード",
+    "connections": "接続",
+    "elements": "要素",
+    "selection": "選択",
+    "noSelection": "選択なし",
+    "alignNodes": "ノードを整列",
+    "distributeNodes": "ノードを分布",
+    "alignLeft": "左揃え",
+    "alignCenter": "中央揃え",
+    "alignRight": "右揃え",
+    "alignTop": "上揃え",
+    "alignMiddle": "中間揃え",
+    "alignBottom": "下揃え",
+    "distributeHorizontally": "水平に分布",
+    "distributeVertically": "垂直に分布",
+    "zoomToFit": "フィットにズーム",
+    "zoomToSelection": "選択にズーム",
+    "locked": "ロック済み",
+    "unlock": "ロック解除",
+    "lock": "ロック",
+    "bringToFront": "最前面へ",
+    "sendToBack": "最背面へ",
+    "group": "グループ化",
+    "ungroup": "グループ解除"
+  },
+  "mindmap": {
+    "addChild": "サブトピックを追加",
+    "addSibling": "兄弟トピックを追加",
+    "addParent": "親トピックを追加",
+    "delete": "削除",
+    "insertAfter": "後に挿入",
+    "insertBefore": "前に挿入"
+  },
+  "aiModel": {
+    "title": "AIモデル",
+    "provider": "プロバイダー",
+    "model": "モデル",
+    "temperature": "温度",
+    "maxTokens": "最大トークン数",
+    "buttons": {
+      "retry": "再試行",
+      "stop": "停止",
+      "clear": "クリア"
+    },
+    "thinking": "思考中...",
+    "error": "AIエラー"
   }
 }

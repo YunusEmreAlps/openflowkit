@@ -141,12 +141,14 @@
     "gif": "Wiedergabe-GIF",
     "hintPlaybackGif": "Kurze Schleife für Doku/Social",
     "share": "Live-Canvas teilen",
+    "shareEmbed": "Teilen & Einbetten",
     "hintShareViewer": "Einladungslink für diesen Raum",
+    "hintShareEmbed": "Nur-Lese-Link für Viewer",
     "readmeEmbed": "README Embed",
     "hintReadmeEmbed": "Copy Markdown snippet",
     "sectionImage": "Image",
-    "sectionVideo": "Video & Animation",
-    "sectionCode": "Code & Data",
+    "sectionVideo": "Video",
+    "sectionCode": "Code",
     "shareSection": "Canvas teilen",
     "revealVideo": "Reveal Video",
     "hintRevealVideo": "Nodes fade in sequentially (WebM/MP4)",
@@ -240,6 +242,7 @@
     }
   },
   "home": {
+    "appName": "OpenFlowKit",
     "title": "Dashboard",
     "description": "Verwalten Sie Ihre Flüsse und Diagramme.",
     "recentFiles": "Letzte Dateien",
@@ -263,7 +266,22 @@
       "confirmation": "\"{{name}}\" löschen?",
       "hint": "Dies kann nicht rückgängig gemacht werden, es sei denn, Sie haben ein exportiertes Backup oder eine weitere Kopie.",
       "closeDialog": "Dialog zum Löschen des Flows schließen"
-    }
+    },
+    "suggestionBlank": "Leere Leinwand",
+    "suggestionBlankDesc": "Direkt in den Editor einsteigen",
+    "suggestionAI": "Flowpilot KI",
+    "suggestionAIDesc": "Mit einer Eingabe beginnen",
+    "suggestionImport": "Importieren",
+    "suggestionImportDesc": "Bestehende Arbeit einbringen",
+    "suggestionTemplates": "Vorlagen",
+    "suggestionTemplatesDesc": "Mit einem bewährten Muster beginnen",
+    "continueTitle": "Mit einer kürzlichen Aktion fortfahren",
+    "homeEmptyTitle": "Erstellen Sie Ihren ersten Flow",
+    "homeEmptySubtitle": "Entwerfen Sie sofort Enterprise-Architekturen. Beginnen Sie mit einer leeren Leinwand, beschreiben Sie Ihre Infrastruktur mit unserem KI-Builder oder verwenden Sie eine maßgeschneiderte Vorlage.",
+    "homeBlankCanvas": "Leere Leinwand",
+    "homeFlowpilotAI": "Flowpilot KI",
+    "homeTemplates": "Vorlagen",
+    "homeImportFile": "Oder eine bestehende Datei importieren"
   },
   "settings": {
     "title": "Einstellungen",
@@ -295,33 +313,29 @@
     "help": "Hilfe"
   },
   "properties": {
-    "title": "Eigenschaften",
-    "nodeType": "Knotentyp",
-    "label": "Bezeichnung",
-    "description": "Beschreibung",
-    "color": "Farbe",
-    "icon": "Symbol",
-    "size": "Größe",
-    "shape": "Form",
-    "bulkShape": "Mehrere Formen",
-    "bulkColor": "Mehrere Farben",
-    "bulkIcon": "Mehrere Symbole",
-    "labelTransform": "Text-Transformation",
-    "prefixOptional": "Präfix (optional)",
+    "title": "Properties",
+    "shape": "Shape",
+    "color": "Color",
+    "icon": "Icon",
+    "rotation": "Rotation",
+    "transparency": "Transparency",
+    "imageSettings": "Image Settings",
+    "bulkShape": "Bulk Shape",
+    "bulkColor": "Bulk Color",
+    "bulkIcon": "Bulk Icon",
+    "labelTransform": "Label Transform",
+    "findReplace": "Find & Replace",
+    "findLabel": "Find",
+    "findPlaceholder": "Find text",
+    "replaceLabel": "Replace",
+    "replacePlaceholder": "Replace with",
+    "prefixOptional": "Prefix (optional)",
     "suffixOptional": "Suffix (optional)",
-    "findReplace": "Suchen und Ersetzen",
-    "findLabel": "Suchen",
-    "findPlaceholder": "Zu suchender Text",
-    "replaceLabel": "Ersetzen durch",
-    "replacePlaceholder": "Ersetzungstext",
-    "useRegex": "Regulären Ausdruck verwenden",
-    "previewSummary": "Vorschau",
-    "bulkApplySummary": "{{count}} ausgewählte Elemente werden aktualisiert",
-    "selectFieldToApply": "Wählen Sie mindestens ein Feld zum Anwenden aus.",
-    "applyToSelectedNodes": "Auf ausgewählte Elemente anwenden",
-    "imageSettings": "Bildeinstellungen",
-    "transparency": "Transparenz",
-    "rotation": "Drehung"
+    "useRegex": "Use Regex",
+    "applyToSelectedNodes": "Apply to selected nodes",
+    "selectFieldToApply": "Select a field to apply",
+    "previewSummary": "Preview summary",
+    "selectionSummary": "Auswahlübersicht"
   },
   "saveStatus": {
     "saved": "Gespeichert"
@@ -346,7 +360,9 @@
     "title": "Verlauf",
     "undo": "Rückgängig",
     "redo": "Wiederholen",
-    "clear": "Verlauf löschen"
+    "clear": "Verlauf löschen",
+    "undoUnavailable": "Noch nichts rückgängig zu machen.",
+    "redoUnavailable": "Im Moment nichts zu wiederholen."
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen",
@@ -378,7 +394,12 @@
     "feature4Desc": "Export into beautiful, fully animated presentation diagrams.",
     "analyticsTitle": "Anonymous Analytics",
     "analyticsDesc": "We collect diagnostic data. We never read your diagrams or prompts.",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "shortcutCommandBar": "Befehlszentrale öffnen",
+    "shortcutHelp": "Tastenkürzel anzeigen",
+    "shortcutCanvas": "Knoten auf Leinwand hinzufügen",
+    "shortcutsTitle": "Schnellstart mit Tastenkürzeln",
+    "shortcutsBadge": "Tastatur zuerst"
   },
   "footer": {
     "mitLicensed": "MIT-Lizenz"
@@ -653,7 +674,7 @@
       "strokeWidth": "Strichbreite",
       "largeGraphSafety": "Große-Graph-Schutz",
       "largeGraphSafetyAuto": "Automatisch",
-      "largeGraphSafetyOn": "Ein",
+      "largeGraphSafetyOn": "Großgraph-Sicherheit An",
       "largeGraphSafetyOff": "Aus",
       "exportModeDeterministic": "Deterministisch",
       "exportModeLegacy": "Legacy",
@@ -712,11 +733,12 @@
         "sql": "Füge hier CREATE-TABLE-Anweisungen ein...",
         "infra": "Füge hier Terraform-State-JSON, Kubernetes-YAML, Docker Compose oder Terraform-HCL ein...",
         "openapi": "Füge hier dein OpenAPI-/Swagger-YAML oder -JSON ein...",
-        "code": "Füge hier deinen Quellcode ein..."
+        "code": "Füge hier deinen Quellcode ein...",
+        "mermaid": "Füge hier Mermaid-Diagrammcode ein..."
       },
       "infraFormats": {
-        "terraformState": "Terraform-State (.tfstate)",
-        "kubernetes": "Kubernetes YAML",
+        "terraformState": "Terraform-Zustand",
+        "kubernetes": "Kubernetes",
         "dockerCompose": "Docker Compose",
         "terraformHcl": "Terraform HCL (AI)"
       },
@@ -735,13 +757,16 @@
         "infra": "Infra",
         "openapi": "OpenAPI",
         "code": "Code",
-        "codebase": "Repository"
+        "codebase": "Repository",
+        "mindmap": "Mindmap",
+        "markdown": "Markdown"
       },
       "title": "Aus Daten importieren",
       "description": "Importiere Code, Infrastruktur, SQL oder API-Spezifikationen in dein Diagramm.",
       "uploadFile": "Datei hochladen",
       "parsing": "Wird geparst...",
       "parse": "Parsen",
+      "parseNativeProject": "Generate Native Diagram",
       "analyzing": "Wird analysiert...",
       "aiActions": {
         "generateErd": "ERD generieren (KI)",
@@ -793,33 +818,31 @@
     "title": "Einstellungen",
     "general": "Allgemein",
     "flowpilotAI": "Flowpilot",
-    "shortcuts": "Kürzel",
+    "shortcuts": "Tastenkürzel",
     "running": "{appName} wird ausgeführt",
     "generalSettings": "Allgemeine Einstellungen",
     "flowpilotConfigurations": "Flowpilot-Konfiguration",
     "keyboardShortcuts": "Tastaturkürzel",
     "canvas": {
       "title": "Canvas",
-      "showGrid": "Raster anzeigen",
-      "showGridDesc": "Punktraster auf dem Canvas",
-      "snapToGrid": "Am Raster ausrichten",
-      "snapToGridDesc": "Knoten beim Bewegen einrasten",
-      "miniMap": "Minimap",
-      "miniMapDesc": "Minimap unten rechts",
-      "architectureStrictMode": "Architektur-Strict-Mode",
-      "architectureStrictModeDesc": "Blockiert den Mermaid-Import, wenn Architekturdiagnosen Wiederherstellungs-/Validierungsprobleme enthalten",
-      "alignmentGuides": "Ausrichtungshilfen",
-      "alignmentGuidesDesc": "Zeigt intelligente Hilfslinien beim Ziehen von Knoten",
-      "routingProfile": "Routing-Profil",
+      "showGrid": "Show Grid",
+      "showGridDesc": "Display a dot grid on the canvas",
+      "snapToGrid": "Snap to Grid",
+      "snapToGridDesc": "Snap nodes to the grid when moving",
+      "alignmentGuides": "Alignment Guides",
+      "alignmentGuidesDesc": "Show smart guide lines while dragging nodes",
+      "routingProfile": "Routing Profile",
       "routingProfileStandard": "Standard",
       "routingProfileInfrastructure": "Infrastruktur",
       "routingProfileHint": "Der Infrastrukturmodus bevorzugt orthogonale Routen für Servicediagramme.",
-      "edgeBundling": "Parallele Kanten bündeln",
-      "edgeBundlingDesc": "Parallele Verbindungen auf gemeinsamen Spuren halten"
+      "edgeBundling": "Geschwisterkanten bündeln",
+      "edgeBundlingDesc": "Parallele Verbindungen auf gemeinsamen Spuren halten",
+      "architectureStrictMode": "Architektur-Strict-Modus",
+      "architectureStrictModeDesc": "Mermaid-Import blockieren, wenn Architekturdiagnosen Wiederherstellungs-/Validierungsprobleme enthalten"
     },
     "ai": {
       "provider": "Anbieter",
-      "model": "Modell",
+      "model": "KI-Modell",
       "apiKey": "API-Schlüssel",
       "customBaseUrl": "Benutzerdefinierte Basis-URL",
       "optional": "Optional",
@@ -886,6 +909,135 @@
         "browserFriendly": "Browser-tauglich",
         "proxyLikely": "Proxy wahrscheinlich",
         "mixed": "Abhängig vom Endpunkt"
+      },
+      "models": {
+        "gemini": {
+          "gemini-2": {
+            "5-flash-lite": {
+              "label": "Gemini 2.5 Flash Lite"
+            },
+            "5-flash": {
+              "label": "Gemini 2.5 Flash"
+            },
+            "5-pro": {
+              "label": "Gemini 2.5 Pro"
+            }
+          },
+          "gemini-3-flash": {
+            "label": "Gemini 3 Flash"
+          },
+          "gemini-3-pro": {
+            "label": "Gemini 3 Pro"
+          }
+        },
+        "openai": {
+          "gpt-5-mini": {
+            "label": "GPT-5 Mini"
+          },
+          "gpt-5": {
+            "2": {
+              "label": "GPT-5.2"
+            },
+            "label": "GPT-5"
+          },
+          "o4-mini": {
+            "label": "O4-Mini"
+          },
+          "o3": {
+            "label": "O3"
+          }
+        },
+        "claude": {
+          "claude-haiku-4-5": {
+            "label": "Claude Haiku 4.5"
+          },
+          "claude-sonnet-4-5": {
+            "label": "Claude Sonnet 4.5"
+          },
+          "claude-sonnet-4-6": {
+            "label": "Claude Sonnet 4.6"
+          },
+          "claude-opus-4-6": {
+            "label": "Claude Opus 4.6"
+          }
+        },
+        "groq": {
+          "meta-llama/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "meta-llama/llama-4-maverick-17b-128e-instruct": {
+            "label": "Llama 4 Maverick"
+          },
+          "qwen/qwen3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "llama-3": {
+            "3-70b-versatile": {
+              "label": "Llama 3.3 70B"
+            }
+          }
+        },
+        "nvidia": {
+          "meta/llama-4-scout-17b-16e-instruct": {
+            "label": "Llama 4 Scout"
+          },
+          "nvidia/nemotron-nano-12b-v2-vl": {
+            "label": "Nemotron Nano 12B"
+          },
+          "deepseek/deepseek-v3-2": {
+            "label": "DeepSeek V3-2"
+          },
+          "qwen/qwq-32b": {
+            "label": "QwQ 32B"
+          },
+          "moonshotai/kimi-k2-thinking": {
+            "label": "Kimi K2 Thinking"
+          }
+        },
+        "cerebras": {
+          "gpt-oss-120b": {
+            "label": "GPT OSS 120B"
+          },
+          "qwen-3-32b": {
+            "label": "Qwen 3 32B"
+          },
+          "qwen-3-235b-a22b": {
+            "label": "Qwen 3 235B"
+          },
+          "zai-glm-4": {
+            "7": {
+              "label": "Zai GLM 4.7"
+            }
+          }
+        },
+        "mistral": {
+          "mistral-small-latest": {
+            "label": "Mistral Small"
+          },
+          "mistral-medium-latest": {
+            "label": "Mistral Medium"
+          },
+          "mistral-large-latest": {
+            "label": "Mistral Large"
+          },
+          "codestral-latest": {
+            "label": "Codestral"
+          },
+          "pixtral-large-latest": {
+            "label": "Pixtral Large"
+          }
+        }
+      },
+      "customEndpoints": {
+        "ollama": {
+          "name": "Ollama"
+        },
+        "lmStudio": {
+          "name": "LM Studio"
+        },
+        "together": {
+          "name": "Together AI"
+        }
       }
     },
     "brand": {
@@ -926,7 +1078,19 @@
     "analytics": {
       "enableTitle": "Anonyme Start-Analysen",
       "enableDescription": "Anonyme grundlegende Nutzungsdaten teilen (optional)"
-    }
+    },
+    "search": "Suchen...",
+    "appearance": "Erscheinungsbild",
+    "account": "Konto",
+    "about": "Über",
+    "language": "Sprache",
+    "theme": "Design",
+    "fontSize": "Schriftgröße",
+    "fontFamily": "Schriftart",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "reset": "Zurücksetzen",
+    "confirm": "Bestätigen"
   },
   "customNodes": {
     "browserContent": "Browser-Inhalt",
@@ -995,7 +1159,8 @@
     "note": "Haftnotiz",
     "noteDesc": "Dokumentation",
     "releaseToConnect": "Loslassen zum Verbinden",
-    "close": "Verbindungsmenü schließen"
+    "close": "Verbindungsmenü schließen",
+    "label": "Knotenverbindungsmenü"
   },
   "errorBoundary": {
     "title": "Etwas ist schiefgelaufen",
@@ -1024,7 +1189,12 @@
     "namedVersions": "Benannte Versionen",
     "noNamedSnapshots": "Noch keine benannten Versionen.",
     "autosavedVersions": "Automatisch gespeicherte Prüfpunkte",
-    "noAutoSnapshots": "Noch keine automatisch gespeicherten Prüfpunkte."
+    "noAutoSnapshots": "Noch keine automatisch gespeicherten Prüfpunkte.",
+    "undoTimelinePosition": "Step {{current}} of {{total}} in the current history stack.",
+    "undoTimelineScrubber": "Scrub through recent undo history",
+    "undoTimeline": "Undo Timeline",
+    "undoTimelineAtEarliest": "You are at the earliest captured state.",
+    "undoTimelineAtLatest": "You are at the latest state."
   },
   "templatesPanel": {
     "title": "Flow-Vorlagen",
@@ -1051,31 +1221,6 @@
     "connection": "Verbindung",
     "noSelection": "Nichts ausgewählt",
     "selectHint": "Klicken Sie auf einen Knoten oder eine Kante, um deren Eigenschaften zu bearbeiten"
-  },
-  "properties": {
-    "title": "Properties",
-    "shape": "Shape",
-    "color": "Color",
-    "icon": "Icon",
-    "rotation": "Rotation",
-    "transparency": "Transparency",
-    "imageSettings": "Image Settings",
-    "bulkShape": "Bulk Shape",
-    "bulkColor": "Bulk Color",
-    "bulkIcon": "Bulk Icon",
-    "labelTransform": "Label Transform",
-    "findReplace": "Find & Replace",
-    "findLabel": "Find",
-    "findPlaceholder": "Find text",
-    "replaceLabel": "Replace",
-    "replacePlaceholder": "Replace with",
-    "prefixOptional": "Prefix (optional)",
-    "suffixOptional": "Suffix (optional)",
-    "useRegex": "Use Regex",
-    "applyToSelectedNodes": "Apply to selected nodes",
-    "selectFieldToApply": "Select a field to apply",
-    "previewSummary": "Preview summary",
-    "selectionSummary": "Auswahlübersicht"
   },
   "flowCanvas": {
     "strictModePasteBlocked": "Der Architektur-Strict-Mode hat das Mermaid-Einfügen blockiert. Öffnen Sie die Code-Ansicht, beheben Sie die Diagnosen und versuchen Sie es erneut."
@@ -1106,9 +1251,9 @@
   },
   "share": {
     "close": "Close",
-    "title": "Design teilen",
+    "title": "Teilen",
     "betaBadge": "Beta",
-    "description": "Laden Sie Mitwirkende ein, diesen Flow gemeinsam mit Ihnen in Echtzeit anzusehen und zu bearbeiten.",
+    "description": "Diese Leinwand teilen",
     "roomId": "Raum-ID",
     "link": "Freigabelink",
     "copied": "Copied Link!",
@@ -1132,7 +1277,20 @@
       "copyFailed": "Freigabelink konnte nicht kopiert werden.",
       "linkCopied": "Zusammenarbeitslink wurde kopiert.",
       "copyManual": "Der Zugriff auf die Zwischenablage ist blockiert. Kopieren Sie den Link manuell aus dem Freigabedialog."
-    }
+    },
+    "embed": "Einbetten",
+    "embedCode": "Einbettungscode",
+    "export": "Exportieren",
+    "settings": "Freigabeeinstellungen",
+    "anyoneWithLink": "Jeder mit Link",
+    "viewOnly": "Nur ansehen",
+    "canEdit": "Kann bearbeiten",
+    "disable": "Freigabe deaktivieren",
+    "enable": "Freigabe aktivieren",
+    "invite": "Einladen",
+    "pending": "Ausstehend",
+    "revoke": "Widerrufen",
+    "expired": "Abgelaufen"
   },
   "connectionPanel": {
     "architecture": "Architektur",
@@ -1144,6 +1302,65 @@
     "deleteConnection": "Verbindung löschen"
   },
   "sidebar": {
-    "close": "Seitenleiste schließen"
+    "close": "Seitenleiste schließen",
+    "searchPlaceholder": "Suchen...",
+    "noResults": "Keine Ergebnisse",
+    "nodes": "Knoten",
+    "components": "Komponenten",
+    "snippets": "Snippets",
+    "addons": "Add-ons"
+  },
+  "contextMenu": {
+    "label": "Canvas-Kontextmenü"
+  },
+  "canvas": {
+    "addNodeShortcut": "Knoten hinzufügen",
+    "aiChatPlaceholder": "Etwas erstellen...",
+    "nodes": "Knoten",
+    "connections": "Verbindungen",
+    "elements": "Elemente",
+    "selection": "Auswahl",
+    "noSelection": "Keine Auswahl",
+    "alignNodes": "Knoten ausrichten",
+    "distributeNodes": "Knoten verteilen",
+    "alignLeft": "Links ausrichten",
+    "alignCenter": "Zentriert ausrichten",
+    "alignRight": "Rechts ausrichten",
+    "alignTop": "Oben ausrichten",
+    "alignMiddle": "Mitte ausrichten",
+    "alignBottom": "Unten ausrichten",
+    "distributeHorizontally": "Horizontal verteilen",
+    "distributeVertically": "Vertikal verteilen",
+    "zoomToFit": "Einpassen zoom",
+    "zoomToSelection": "Auf Auswahl zoomen",
+    "locked": "Gesperrt",
+    "unlock": "Entsperren",
+    "lock": "Sperren",
+    "bringToFront": "Nach vorne bringen",
+    "sendToBack": "Nach hinten senden",
+    "group": "Gruppieren",
+    "ungroup": "Gruppierung aufheben"
+  },
+  "mindmap": {
+    "addChild": "Unterthema hinzufügen",
+    "addSibling": "Geschwisterthema hinzufügen",
+    "addParent": "Übergeordnetes Thema hinzufügen",
+    "delete": "Löschen",
+    "insertAfter": "Danach einfügen",
+    "insertBefore": "Davor einfügen"
+  },
+  "aiModel": {
+    "title": "KI-Modell",
+    "provider": "Anbieter",
+    "model": "Modell",
+    "temperature": "Temperatur",
+    "maxTokens": "Maximale Token",
+    "buttons": {
+      "retry": "Erneut versuchen",
+      "stop": "Stopp",
+      "clear": "Löschen"
+    },
+    "thinking": "Denkt nach...",
+    "error": "KI-Fehler"
   }
 }
