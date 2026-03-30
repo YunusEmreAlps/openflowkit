@@ -1,4 +1,8 @@
 import { captureAnalyticsEvent } from '@/services/analytics/analytics';
+import {
+  parseOnboardingEventLog,
+  parseOnboardingFirstSeenMap,
+} from './eventSchemas';
 
 export type OnboardingEventName =
   | 'welcome_template_selected'
@@ -44,8 +48,7 @@ function readEventLog(): OnboardingEvent[] {
   if (!raw) return [];
 
   try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as OnboardingEvent[]) : [];
+    return parseOnboardingEventLog(JSON.parse(raw));
   } catch {
     return [];
   }
@@ -56,10 +59,7 @@ function readFirstSeenMap(): Partial<Record<OnboardingEventName, true>> {
   if (!raw) return {};
 
   try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object'
-      ? (parsed as Partial<Record<OnboardingEventName, true>>)
-      : {};
+    return parseOnboardingFirstSeenMap(JSON.parse(raw));
   } catch {
     return {};
   }
@@ -101,6 +101,50 @@ export function recordOnboardingEvent(
 
 export function getOnboardingEvents(): OnboardingEvent[] {
   return readEventLog();
+}
+
+export interface OnboardingActionSuggestion {
+  action: 'blank' | 'ai' | 'import' | 'templates';
+  eventName: OnboardingEventName;
+  lastUsedAt: string;
+}
+
+const ACTION_EVENT_PRIORITY: Record<OnboardingActionSuggestion['action'], OnboardingEventName[]> = {
+  blank: ['welcome_blank_selected'],
+  ai: ['welcome_prompt_selected'],
+  import: ['welcome_import_selected'],
+  templates: ['welcome_template_selected', 'template_inserted'],
+};
+
+export function getRecentOnboardingActionSuggestions(
+  limit = 3
+): OnboardingActionSuggestion[] {
+  const events = readEventLog().slice().reverse();
+  const suggestions: OnboardingActionSuggestion[] = [];
+  const seenActions = new Set<OnboardingActionSuggestion['action']>();
+
+  for (const event of events) {
+    const action = (Object.entries(ACTION_EVENT_PRIORITY).find(([, eventNames]) =>
+      eventNames.includes(event.name)
+    )?.[0] ?? null) as OnboardingActionSuggestion['action'] | null;
+
+    if (!action || seenActions.has(action)) {
+      continue;
+    }
+
+    seenActions.add(action);
+    suggestions.push({
+      action,
+      eventName: event.name,
+      lastUsedAt: event.at,
+    });
+
+    if (suggestions.length >= limit) {
+      break;
+    }
+  }
+
+  return suggestions;
 }
 
 export function clearOnboardingEvents(): void {
