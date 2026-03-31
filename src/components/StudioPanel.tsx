@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { ArrowRight, Code2, Shield, WandSparkles } from 'lucide-react';
+import { ArrowRight, Code2, WandSparkles } from 'lucide-react';
 import { FLOWPILOT_NAME } from '@/lib/brand';
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import type { ChatMessage } from '@/services/aiService';
@@ -18,11 +18,6 @@ const LazyStudioCodePanel = lazy(async () => {
     return { default: module.StudioCodePanel };
 });
 
-const LazyLintRulesPanel = lazy(async () => {
-    const module = await import('./architecture-lint/LintRulesPanel');
-    return { default: module.LintRulesPanel };
-});
-
 const STUDIO_TABS: Array<{
     id: StudioTab;
     icon: typeof WandSparkles;
@@ -30,10 +25,9 @@ const STUDIO_TABS: Array<{
 }> = [
     { id: 'ai', icon: WandSparkles, label: FLOWPILOT_NAME },
     { id: 'code', icon: Code2, label: 'Code' },
-    { id: 'lint', icon: Shield, label: 'Lint Rules' },
 ];
 
-function getEffectiveStudioTab(activeTab: StudioTab): 'ai' | 'code' | 'lint' {
+function getEffectiveStudioTab(activeTab: StudioTab): 'ai' | 'code' {
     if (activeTab === 'infra' || activeTab === 'playback') {
         return 'ai';
     }
@@ -177,10 +171,6 @@ export function StudioPanel({
                             mode={codeMode}
                             onModeChange={onCodeModeChange}
                         />
-                    </Suspense>
-                ) : effectiveTab === 'lint' ? (
-                    <Suspense fallback={null}>
-                        <LazyLintRulesPanel />
                     </Suspense>
                 ) : null}
             </SidebarBody>

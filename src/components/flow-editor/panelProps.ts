@@ -31,6 +31,7 @@ export interface CommandBarPanelBuilderParams {
   openStudioAI: () => void;
   openStudioCode: (codeMode: StudioCodeMode) => void;
   openStudioPlayback: () => void;
+  openArchitectureRulesPanel: () => void;
   commandBarView: CommandBarView;
   handleAddAnnotation: () => void;
   handleAddSection: () => void;
@@ -133,6 +134,10 @@ export interface BuildFlowEditorPanelsPropsParams {
   snapshots: SnapshotsPanelBuilderParams;
   properties: PropertiesRailBuilderParams;
   studio: StudioRailBuilderParams;
+  architectureRules: {
+    isOpen: boolean;
+    closeArchitectureRulesPanel: () => void;
+  };
   isHistoryOpen: boolean;
   editorMode: FlowEditorMode;
 }
@@ -161,6 +166,7 @@ export function buildCommandBarPanelProps({
   openStudioAI,
   openStudioCode,
   openStudioPlayback,
+  openArchitectureRulesPanel,
   commandBarView,
   handleAddAnnotation,
   handleAddSection,
@@ -198,6 +204,7 @@ export function buildCommandBarPanelProps({
     onOpenStudioOpenFlow: () => openStudioCode('openflow'),
     onOpenStudioMermaid: () => openStudioCode('mermaid'),
     onOpenStudioPlayback: openStudioPlayback,
+    onOpenArchitectureRules: openArchitectureRulesPanel,
     initialView: commandBarView,
     onAddAnnotation: handleAddAnnotation,
     onAddSection: handleAddSection,
@@ -372,6 +379,7 @@ export function buildFlowEditorPanelsProps({
   snapshots,
   properties,
   studio,
+  architectureRules,
   isHistoryOpen,
   editorMode,
 }: BuildFlowEditorPanelsPropsParams): FlowEditorPanelsProps {
@@ -380,6 +388,10 @@ export function buildFlowEditorPanelsProps({
     snapshots: buildSnapshotsPanelProps(snapshots),
     properties: buildPropertiesRailProps(properties),
     studio: buildStudioRailProps(studio),
+    architectureRules: {
+      isOpen: architectureRules.isOpen,
+      onClose: architectureRules.closeArchitectureRulesPanel,
+    },
     isHistoryOpen,
     editorMode,
   };

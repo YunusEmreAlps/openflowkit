@@ -114,6 +114,11 @@ const LazyStudioPanel = lazy(async () => {
   return { default: module.StudioPanel };
 });
 
+const LazyArchitectureRulesPanel = lazy(async () => {
+  const module = await import('./ArchitectureRulesPanel');
+  return { default: module.ArchitectureRulesPanel };
+});
+
 export interface CommandBarPanelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -131,6 +136,7 @@ export interface CommandBarPanelProps {
   onOpenStudioOpenFlow: () => void;
   onOpenStudioMermaid: () => void;
   onOpenStudioPlayback: () => void;
+  onOpenArchitectureRules: () => void;
   initialView: CommandBarView;
   onAddAnnotation: () => void;
   onAddSection: () => void;
@@ -258,6 +264,10 @@ export interface FlowEditorPanelsProps {
   snapshots: SnapshotsPanelProps;
   properties: PropertiesRailProps;
   studio: StudioRailProps;
+  architectureRules: {
+    isOpen: boolean;
+    onClose: () => void;
+  };
   isHistoryOpen: boolean;
   editorMode: FlowEditorMode;
 }
@@ -267,6 +277,7 @@ export function FlowEditorPanels({
   snapshots,
   properties,
   studio,
+  architectureRules,
   isHistoryOpen,
   editorMode,
 }: FlowEditorPanelsProps): React.ReactElement {
@@ -303,6 +314,7 @@ export function FlowEditorPanels({
               onOpenStudioOpenFlow={commandBar.onOpenStudioOpenFlow}
               onOpenStudioMermaid={commandBar.onOpenStudioMermaid}
               onOpenStudioPlayback={commandBar.onOpenStudioPlayback}
+              onOpenArchitectureRules={commandBar.onOpenArchitectureRules}
               initialView={commandBar.initialView}
               onAddAnnotation={commandBar.onAddAnnotation}
               onAddSection={commandBar.onAddSection}
@@ -408,6 +420,27 @@ export function FlowEditorPanels({
                 initialPrompt={studio.initialPrompt}
                 onInitialPromptConsumed={studio.onInitialPromptConsumed}
               />
+            </Suspense>
+          </RightRail>
+        </ErrorBoundary>
+      ) : null}
+
+      {architectureRules.isOpen ? (
+        <ErrorBoundary
+          className="h-full"
+          fallback={
+            <RightRail>
+              <PanelErrorFallback
+                title="Architecture rules unavailable"
+                description="The architecture rules panel failed to render. Close it and reopen when you need it again."
+                onClose={architectureRules.onClose}
+              />
+            </RightRail>
+          }
+        >
+          <RightRail>
+            <Suspense fallback={<RailPanelSkeleton title="Architecture Rules" lines={6} />}>
+              <LazyArchitectureRulesPanel onClose={architectureRules.onClose} />
             </Suspense>
           </RightRail>
         </ErrorBoundary>

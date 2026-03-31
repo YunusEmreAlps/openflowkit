@@ -26,6 +26,7 @@ interface BuildFlowEditorControllerShellParams {
     isCommandBarOpen: boolean;
     isHistoryOpen: boolean;
     editorMode: FlowEditorMode;
+    isArchitectureRulesOpen: boolean;
     handleExportJSON: () => void;
     onLayout: (
         direction?: 'TB' | 'LR' | 'RL' | 'BT',
@@ -42,6 +43,7 @@ interface BuildFlowEditorControllerStudioParams {
     setStudioTab: (tab: StudioTab) => void;
     setStudioCodeMode: (mode: StudioCodeMode) => void;
     setStudioMode: () => void;
+    openArchitectureRulesPanel: () => void;
     closeCommandBar: () => void;
     setCanvasMode: () => void;
     setSelectedNodeId: (id: string | null) => void;

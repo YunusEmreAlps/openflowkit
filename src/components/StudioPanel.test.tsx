@@ -11,10 +11,6 @@ vi.mock('./StudioCodePanel', () => ({
   StudioCodePanel: () => <div data-testid="studio-code-panel" />,
 }));
 
-vi.mock('./architecture-lint/LintRulesPanel', () => ({
-  LintRulesPanel: () => <div data-testid="studio-lint-panel" />,
-}));
-
 function createProps(): React.ComponentProps<typeof StudioPanel> {
   return {
     onClose: vi.fn(),
@@ -67,7 +63,6 @@ describe('StudioPanel', () => {
 
     expect(screen.getByText('Flowpilot')).toBeTruthy();
     expect(screen.getByText('Code')).toBeTruthy();
-    expect(screen.getByText('Lint Rules')).toBeTruthy();
     expect(await screen.findByTestId('studio-ai-panel')).toBeTruthy();
   });
 });

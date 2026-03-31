@@ -49,6 +49,7 @@ export interface CommandBarProps {
   onOpenStudioOpenFlow?: () => void;
   onOpenStudioMermaid?: () => void;
   onOpenStudioPlayback?: () => void;
+  onOpenArchitectureRules?: () => void;
   initialView?: CommandView;
   onAddAnnotation?: () => void;
   onAddSection?: () => void;
