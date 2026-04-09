@@ -146,6 +146,12 @@ Paste this → you get the Express wordmark, PostgreSQL elephant, Redis logo, an
 4. **Enricher** assigns colors, icons, and provider SVGs to every node
 5. **ELK layout** arranges everything cleanly
 
+### Mermaid quality gates
+
+- `npm run test:mermaid` runs the broad Mermaid parser/plugin/round-trip gate
+- `npm run test:mermaid:layout` runs the layout, import-state, and recovery corpus gate
+- `npm run test:mermaid:gold` runs both together
+
 ### AI generation (API key required)
 
 Describe your system in plain English. AI generates a diagram on the canvas with correct icons applied automatically.

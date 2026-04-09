@@ -324,6 +324,39 @@ describe('mermaidParser', () => {
     });
   });
 
+  it('applies style directives to dotted node ids', () => {
+    const input = `
+            flowchart TD
+            api.gateway[Gateway]
+            style api.gateway fill:#dff,stroke:#08c,color:#024
+        `;
+    const result = parseMermaid(input);
+
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.id === 'api.gateway')?.style).toMatchObject({
+      backgroundColor: '#dff',
+      borderColor: '#08c',
+      color: '#024',
+    });
+  });
+
+  it('preserves nested flowchart subgraph parenting', () => {
+    const input = `
+            flowchart TD
+            subgraph platform[Platform]
+              subgraph api[API]
+                gateway[Gateway] --> service[Service]
+              end
+            end
+        `;
+    const result = parseMermaid(input);
+
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.id === 'api')?.parentId).toBe('platform');
+    expect(result.nodes.find((node) => node.id === 'gateway')?.parentId).toBe('api');
+    expect(result.nodes.find((node) => node.id === 'service')?.parentId).toBe('api');
+  });
+
   it('should handle duplicate edges between same pair', () => {
     const input = `
             flowchart TD

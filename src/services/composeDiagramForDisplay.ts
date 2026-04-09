@@ -2,8 +2,10 @@ import type { DiagramType, FlowEdge, FlowNode } from '@/lib/types';
 import { autoFitSectionsToChildren } from '@/hooks/node-operations/sectionOperations';
 import type { LayoutAlgorithm, LayoutOptions } from '@/services/elkLayout';
 import { relayoutMindmapComponent, syncMindmapEdges } from '@/lib/mindmapLayout';
+import { relayoutSequenceDiagram } from '@/services/sequenceLayout';
 
-interface ComposeDiagramForDisplayOptions extends Pick<LayoutOptions, 'spacing'> {
+interface ComposeDiagramForDisplayOptions
+  extends Pick<LayoutOptions, 'spacing' | 'source' | 'contentDensity'> {
   direction?: LayoutOptions['direction'];
   algorithm?: LayoutAlgorithm;
   diagramType?: DiagramType | string;
@@ -55,12 +57,18 @@ export async function composeDiagramForDisplay(
     return relayoutAllMindmapComponents(nodes, edges);
   }
 
+  if (options.diagramType === 'sequence') {
+    return relayoutSequenceDiagram(nodes, edges);
+  }
+
   const { getElkLayout } = await import('@/services/elkLayout');
   const layouted = await getElkLayout(nodes, edges, {
     direction: options.direction ?? 'TB',
     algorithm: options.algorithm,
     spacing: options.spacing ?? 'normal',
+    contentDensity: options.contentDensity,
     diagramType: options.diagramType,
+    source: options.source,
   });
 
   return {

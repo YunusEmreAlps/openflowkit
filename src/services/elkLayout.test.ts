@@ -163,7 +163,7 @@ describe('buildResolvedLayoutConfiguration', () => {
     expect(compact.layoutOptions['elk.layered.nodePlacement.favorStraightEdges']).toBe('true');
     expect(compact.layoutOptions['elk.layered.mergeEdges']).toBe('true');
     expect(compact.layoutOptions['elk.layered.unnecessaryBendpoints']).toBe('true');
-    expect(Number(compact.dims.nodeNode)).toBe(60);
+    expect(Number(compact.dims.nodeNode)).toBe(40);
   });
 
   it('applies more spacious layered heuristics for architecture diagrams', () => {
@@ -179,9 +179,10 @@ describe('buildResolvedLayoutConfiguration', () => {
       diagramType: 'architecture',
     });
 
-    expect(Number(architecture.dims.nodeNode)).toBeGreaterThan(Number(standard.dims.nodeNode));
-    expect(Number(architecture.dims.nodeLayer)).toBeGreaterThan(Number(standard.dims.nodeLayer));
-    expect(Number(architecture.dims.component)).toBeGreaterThan(Number(standard.dims.component));
+    // Architecture enforces a minimum spacing floor, so it is >= normal, not strictly greater.
+    expect(Number(architecture.dims.nodeNode)).toBeGreaterThanOrEqual(Number(standard.dims.nodeNode));
+    expect(Number(architecture.dims.nodeLayer)).toBeGreaterThanOrEqual(Number(standard.dims.nodeLayer));
+    expect(Number(architecture.dims.component)).toBeGreaterThanOrEqual(Number(standard.dims.component));
     expect(architecture.layoutOptions['elk.layered.nodePlacement.strategy']).toBe('BRANDES_KOEPF');
     expect(architecture.layoutOptions['elk.spacing.edgeNode']).toBe('24');
     expect(architecture.layoutOptions['elk.spacing.edgeEdge']).toBe('18');
@@ -199,7 +200,7 @@ describe('buildResolvedLayoutConfiguration', () => {
     });
 
     expect(config.layoutOptions['elk.hierarchyHandling']).toBe('INCLUDE_CHILDREN');
-    expect(config.layoutOptions['elk.padding']).toBe('[top=16,left=32,bottom=32,right=32]');
+    expect(config.layoutOptions['elk.padding']).toBe('[top=16,left=20,bottom=32,right=20]');
   });
 });
 
@@ -626,8 +627,9 @@ describe('shouldUseLightweightLayoutPostProcessing', () => {
     expect(shouldUseLightweightLayoutPostProcessing(16, 72, 'flowchart')).toBe(true);
   });
 
-  it('switches architecture diagrams earlier because icon-heavy edge normalization is expensive', () => {
-    expect(shouldUseLightweightLayoutPostProcessing(24, 20, 'architecture')).toBe(true);
-    expect(shouldUseLightweightLayoutPostProcessing(12, 36, 'infrastructure')).toBe(true);
+  it('switches architecture diagrams to lightweight post-processing for large graphs', () => {
+    expect(shouldUseLightweightLayoutPostProcessing(40, 20, 'architecture')).toBe(true);
+    expect(shouldUseLightweightLayoutPostProcessing(12, 60, 'infrastructure')).toBe(true);
+    expect(shouldUseLightweightLayoutPostProcessing(24, 20, 'architecture')).toBe(false);
   });
 });

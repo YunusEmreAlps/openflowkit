@@ -20,6 +20,16 @@ function isErField(value: unknown): value is ErField {
   return Boolean(value) && typeof value === 'object' && 'name' in (value as Record<string, unknown>);
 }
 
+function formatMermaidReferenceTarget(field: ErField): string | null {
+  const referencesTable = field.referencesTable?.trim();
+  if (!referencesTable) {
+    return null;
+  }
+
+  const referencesField = field.referencesField?.trim();
+  return referencesField ? `${referencesTable}.${referencesField}` : referencesTable;
+}
+
 export function parseErField(input: string): ErField {
   const normalizedInput = input.trim();
   if (!normalizedInput) {
@@ -108,8 +118,9 @@ export function stringifyMermaidErField(field: ErField): string {
   if (field.isForeignKey) segments.push('FK');
   if (field.isUnique) segments.push('UK');
   if (field.isNotNull) segments.push('NN');
-  if (field.referencesTable?.trim()) {
-    segments.push('REFERENCES', field.referencesTable.trim());
+  const referenceTarget = formatMermaidReferenceTarget(field);
+  if (referenceTarget) {
+    segments.push('REFERENCES', referenceTarget);
   }
 
   return segments.join(' ').trim();

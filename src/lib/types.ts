@@ -171,7 +171,7 @@ export interface SequenceNodeData {
   seqFragment?: {
     type: 'alt' | 'loop' | 'opt' | 'par' | 'break' | 'critical';
     condition: string;
-    branchKind?: 'start' | 'else' | 'and';
+    branchKind?: 'start' | 'else' | 'and' | 'option';
     edgeIds: string[];
   } | null;
   seqFragmentId?: string;
@@ -258,7 +258,7 @@ export interface EdgeData {
   seqFragment?: {
     type: 'alt' | 'loop' | 'opt' | 'par' | 'break' | 'critical';
     condition: string;
-    branchKind?: 'start' | 'else' | 'and';
+    branchKind?: 'start' | 'else' | 'and' | 'option';
     edgeIds: string[];
   } | null;
   waypoint?: {

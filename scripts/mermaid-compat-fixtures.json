@@ -84,6 +84,13 @@
     "source": "classDiagram\nclass Repository~T~\nclass User\nRepository~T~ \"1\" --> \"*\" User : stores"
   },
   {
+    "name": "class-generic-multi-param",
+    "family": "classDiagram",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "classDiagram\nclass Map~K, V~\nclass Entry\nMap~K, V~ --> Entry : stores"
+  },
+  {
     "name": "class-invalid-relation",
     "family": "classDiagram",
     "expectedOfficial": "environment_limited",
@@ -112,6 +119,13 @@
     "source": "erDiagram\nORDER {\n  uuid customer_id FK REFERENCES CUSTOMER\n  string external_id UK\n}"
   },
   {
+    "name": "er-field-dotted-reference",
+    "family": "erDiagram",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "erDiagram\nORDER {\n  uuid customer_id FK REFERENCES billing.Customer.id\n}"
+  },
+  {
     "name": "mindmap-basic",
     "family": "mindmap",
     "expectedOfficial": "valid",
@@ -124,6 +138,13 @@
     "expectedOfficial": "valid",
     "expectedEditableGate": "supported_family",
     "source": "mindmap\n  root((Root))\n    feature[[Child A]]\n    decision{{Child B}}"
+  },
+  {
+    "name": "mindmap-dotted-aliases",
+    "family": "mindmap",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "mindmap\n  platform.root((Root))\n    platform.api[[Child A]]\n    platform.branch(Child B)"
   },
   {
     "name": "journey-basic",
@@ -145,6 +166,20 @@
     "expectedOfficial": "environment_limited",
     "expectedEditableGate": "supported_family",
     "source": "journey\ntitle Checkout\nsection Happy\n  Search: User"
+  },
+  {
+    "name": "journey-colon-rich-step",
+    "family": "journey",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "journey\ntitle Incident Response\nsection Alerts\n  HTTP: 500 Error: 1: SRE: On-call\n  Recover service: 4: API: Team"
+  },
+  {
+    "name": "journey-support-escalation",
+    "family": "journey",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "journey\ntitle Support Escalation\nsection Intake\n  Customer reports issue: 2: Support\n  Triage severity: 3: Support\nsection Escalation\n  Hand off to engineering: 4: Support, Engineering\n  Confirm resolution: 5: Support"
   },
   {
     "name": "state-notes-and-control",
@@ -196,11 +231,32 @@
     "source": "flowchart TD\napi.gateway@{ shape: rect, label: \"API Gateway\" } --> db.primary@{ shape: cyl, label: \"Primary DB\" }"
   },
   {
+    "name": "flowchart-style-dotted-id",
+    "family": "flowchart",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "flowchart TD\napi.gateway[Gateway]\nstyle api.gateway fill:#dff,stroke:#08c,color:#024"
+  },
+  {
+    "name": "flowchart-nested-subgraphs",
+    "family": "flowchart",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "flowchart TD\nsubgraph platform[Platform]\n  subgraph api[API]\n    gateway[Gateway] --> service[Service]\n  end\nend"
+  },
+  {
     "name": "flowchart-unexpected-end",
     "family": "flowchart",
     "expectedOfficial": "invalid",
     "expectedEditableGate": "supported_family",
     "source": "flowchart TD\nA --> B\nend"
+  },
+  {
+    "name": "flowchart-auth-decision",
+    "family": "flowchart",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "flowchart TD\nuser[User] --> gateway[API Gateway]\ngateway --> auth{Authenticated?}\nauth -->|Yes| app[Dashboard]\nauth -->|No| login[Login]"
   },
   {
     "name": "state-composite-alias",
@@ -217,6 +273,13 @@
     "source": "stateDiagram-v2\ndirection LR\n[*] --> Idle\nIdle --> Running\nRunning --> [*]"
   },
   {
+    "name": "state-composite-standalone-declarations",
+    "family": "stateDiagram",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "stateDiagram-v2\nstate Working {\n  state Busy\n  state Idle\n  Busy --> Idle\n}\nIdle --> [*]"
+  },
+  {
     "name": "sequence-par-and",
     "family": "sequence",
     "expectedOfficial": "valid",
@@ -231,11 +294,32 @@
     "source": "sequenceDiagram\nparticipant A\nparticipant B\nalt success\n  note over A, B: Shared context\n  A->>B: Request\nelse failure\n  B-->>A: Error\nend"
   },
   {
+    "name": "sequence-critical-option",
+    "family": "sequence",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "sequenceDiagram\nparticipant A\nparticipant B\ncritical primary path\n  A->>B: Request\noption fallback path\n  B-->>A: Error\nend"
+  },
+  {
     "name": "architecture-rich-node-kinds",
+    "family": "architecture",
+    "expectedOfficial": "invalid",
+    "expectedEditableGate": "supported_family",
+    "source": "architecture-beta\nperson user[User]\ncontainer app(server)[App]\ndatabase_container data(database)[Data Store]\nuser:R --> L:app : HTTPS\napp:R --> L:data : TCP:5432"
+  },
+  {
+    "name": "architecture-nested-groups",
     "family": "architecture",
     "expectedOfficial": "valid",
     "expectedEditableGate": "supported_family",
-    "source": "architecture-beta\nperson user[User]\ncontainer app(server)[App]\ndatabase_container data(database)[Data Store]\nuser:R --> L:app : HTTPS\napp:R --> L:data : TCP:5432"
+    "source": "architecture-beta\ngroup global[Global]\ngroup prod(cloud)[Prod] in global\nservice api(server)[API] in prod"
+  },
+  {
+    "name": "architecture-edge-tier",
+    "family": "architecture",
+    "expectedOfficial": "valid",
+    "expectedEditableGate": "supported_family",
+    "source": "architecture-beta\ngroup edge[Edge]\nservice web(server)[Web] in edge\nservice api(server)[API]\nservice db(database)[Database]\nweb:R --> L:api : HTTPS:443\napi:R --> L:db : TCP:5432"
   },
   {
     "name": "unsupported-gitgraph",
@@ -243,5 +327,12 @@
     "expectedOfficial": "valid",
     "expectedEditableGate": "unsupported_family",
     "source": "gitGraph\ncommit id: \"A\""
+  },
+  {
+    "name": "missing-header-flow-only",
+    "family": "flowchart",
+    "expectedOfficial": "invalid",
+    "expectedEditableGate": "invalid_source",
+    "source": "A --> B"
   }
 ]

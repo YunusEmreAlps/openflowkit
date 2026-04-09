@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useFlowStore } from '@/store';
-import type { ParseDiagnostic } from '@/lib/openFlowDSLParser';
+
 import type { FlowEdge, FlowNode } from '@/lib/types';
 import type { MermaidDiagnosticsSnapshot } from '@/store/types';
 import {
@@ -28,12 +28,41 @@ import { enrichNodesWithIcons } from '@/lib/nodeEnricher';
 import { normalizeNodeIconData } from '@/lib/nodeIconState';
 import { assignSmartHandles } from '@/services/smartEdgeRouting';
 import type { LayoutOptions } from '@/services/elk-layout/types';
+import { attachImportLayoutMetadata } from '@/services/importLayoutMetadata';
 
-function combineMermaidDiagnostics(
-  officialDiagnostics: ParseDiagnostic[],
-  parserDiagnostics: ParseDiagnostic[]
-): ParseDiagnostic[] {
-  return [...officialDiagnostics, ...parserDiagnostics];
+const IMPORT_LABEL_COMPACT_THRESHOLD = 10;
+const IMPORT_LABEL_VERBOSE_THRESHOLD = 20;
+const IMPORT_LARGE_DIAGRAM_THRESHOLD = 36;
+
+function getAverageLabelLength(nodes: FlowNode[]): number {
+  if (nodes.length === 0) return 0;
+  const total = nodes.reduce((sum, node) => sum + String(node.data?.label ?? '').trim().length, 0);
+  return total / nodes.length;
+}
+
+function resolveImportLayoutOptions(
+  nodes: FlowNode[],
+  diagramType?: string
+): { spacing: NonNullable<LayoutOptions['spacing']>; contentDensity: NonNullable<LayoutOptions['contentDensity']> } {
+  const avg = getAverageLabelLength(nodes);
+
+  let spacing: NonNullable<LayoutOptions['spacing']>;
+  if (diagramType === 'architecture') {
+    spacing = nodes.length >= 24 ? 'normal' : 'compact';
+  } else if (avg <= IMPORT_LABEL_COMPACT_THRESHOLD) {
+    spacing = 'compact';
+  } else if (avg <= IMPORT_LABEL_VERBOSE_THRESHOLD) {
+    spacing = nodes.length >= IMPORT_LARGE_DIAGRAM_THRESHOLD ? 'loose' : 'normal';
+  } else {
+    spacing = 'loose';
+  }
+
+  const contentDensity: NonNullable<LayoutOptions['contentDensity']> =
+    avg <= IMPORT_LABEL_COMPACT_THRESHOLD ? 'compact'
+    : avg <= IMPORT_LABEL_VERBOSE_THRESHOLD ? 'balanced'
+    : 'verbose';
+
+  return { spacing, contentDensity };
 }
 
 type SetFlowNodes = (payload: FlowNode[] | ((nodes: FlowNode[]) => FlowNode[])) => void;
@@ -79,11 +108,6 @@ export function useFlowCanvasPaste({
   getLastInteractionFlowPosition,
   getCanvasCenterFlowPosition,
 }: UseFlowCanvasPasteParams) {
-  const getImportSpacing = (nodeCount: number): LayoutOptions['spacing'] => {
-    if (nodeCount <= 10) return 'loose';
-    if (nodeCount <= 25) return 'normal';
-    return 'compact';
-  };
 
   const safelyEnrichImportedNodes = useCallback(
     (nodes: FlowNode[], diagramType: MermaidDiagnosticsSnapshot['diagramType']): FlowNode[] => {
@@ -153,7 +177,7 @@ export function useFlowCanvasPaste({
 
         const result = parseMermaidByType(pastedText, { architectureStrictMode });
         const parserDiagnostics = normalizeParseDiagnostics(result.diagnostics);
-        const diagnostics = combineMermaidDiagnostics(officialDiagnostics, parserDiagnostics);
+        const diagnostics = [...officialDiagnostics, ...parserDiagnostics];
 
         if (!result.error) {
           if (diagnostics.length > 0) {
@@ -187,17 +211,29 @@ export function useFlowCanvasPaste({
               const { clearLayoutCache } = await import('@/services/elkLayout');
               clearLayoutCache();
               const layoutDirection = resolveLayoutDirection(result);
+              const { spacing, contentDensity } = resolveImportLayoutOptions(enrichedNodes, result.diagramType);
               const { nodes: layoutedNodes, edges: layoutedEdges } = await composeDiagramForDisplay(
                 enrichedNodes,
                 result.edges,
                 {
                   direction: layoutDirection,
-                  spacing: getImportSpacing(enrichedNodes.length),
+                  spacing,
+                  contentDensity,
                   diagramType: result.diagramType,
+                  source: 'import',
                 }
               );
               const smartEdges = assignSmartHandles(layoutedNodes, layoutedEdges);
-              setNodes(layoutedNodes);
+              const importSignature = `mermaid-import-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+              setNodes(
+                attachImportLayoutMetadata(layoutedNodes, {
+                  signature: importSignature,
+                  direction: layoutDirection,
+                  spacing,
+                  contentDensity,
+                  diagramType: result.diagramType,
+                })
+              );
               setEdges(smartEdges);
             } catch {
               setNodes(enrichedNodes);

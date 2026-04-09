@@ -17,6 +17,8 @@ interface StateControlRecord {
   kind: 'fork' | 'join';
 }
 
+const STATE_DIAGRAM_NOTE_RE = /^note\s+(left of|right of|over)\s+("?)([^":]+)\2\s*:\s*(.+)$/i;
+
 function normalizeStateTransitionLabels(input: string): string {
   const lines = input.replace(/\r\n/g, '\n').split('\n');
   const normalized = lines.map((rawLine) => {
@@ -34,6 +36,48 @@ function normalizeStateTransitionLabels(input: string): string {
   });
 
   return normalized.join('\n');
+}
+
+function extractDeclaredStateId(line: string): string | null {
+  const aliasCompositeMatch = line.match(
+    /^state\s+"([^"]+)"\s+as\s+([A-Za-z_][\w.-]*)(?:\s+<<(fork|join)>>)?\s*\{$/i
+  );
+  if (aliasCompositeMatch) {
+    return aliasCompositeMatch[2].trim();
+  }
+
+  const aliasMatch = line.match(
+    /^state\s+"([^"]+)"\s+as\s+([A-Za-z_][\w.-]*)(?:\s+<<(fork|join)>>)?\s*$/i
+  );
+  if (aliasMatch) {
+    return aliasMatch[2].trim();
+  }
+
+  const compositeMatch = line.match(/^state\s+("?)([^"{]+)\1\s*\{$/i);
+  if (compositeMatch) {
+    return compositeMatch[2].trim();
+  }
+
+  const simpleMatch = line.match(/^state\s+([A-Za-z_][\w.-]*)(?:\s+<<(fork|join)>>)?\s*$/i);
+  if (simpleMatch) {
+    return simpleMatch[1].trim();
+  }
+
+  const descriptionMatch = line.match(/^([A-Za-z_][\w.-]*)\s*:\s*(.+)$/);
+  if (descriptionMatch) {
+    return descriptionMatch[1].trim();
+  }
+
+  return null;
+}
+
+function extractTransitionStateIds(line: string): string[] {
+  const transitionMatch = line.match(/^(.+?)\s+(<-->|<--|-->|==>|-.->)\s+(.+?)(?:\s*:\s*(.+))?$/);
+  if (!transitionMatch) {
+    return [];
+  }
+
+  return [transitionMatch[1].trim(), transitionMatch[3].trim()].filter((value) => value !== '[*]');
 }
 
 function collectStateDiagramDiagnostics(input: string): { diagnostics: string[]; direction?: 'TB' | 'LR' } {
@@ -65,7 +109,7 @@ function collectStateDiagramDiagnostics(input: string): { diagnostics: string[];
     }
 
     if (/^note\b/i.test(line)) {
-      const noteMatch = line.match(/^note\s+(left of|right of|over)\s+\S+\s*:\s*.+$/i);
+      const noteMatch = line.match(STATE_DIAGRAM_NOTE_RE);
       if (!noteMatch) {
         diagnostics.push(`Invalid stateDiagram note syntax at line ${lineNumber}: "${line}"`);
       }
@@ -188,16 +232,14 @@ function applyCompositeStateParenting(nodes: FlowNode[], input: string): FlowNod
       continue;
     }
 
-    const transitionMatch = line.match(/^(.+?)\s+(<-->|<--|-->|==>|-.->)\s+(.+?)(?:\s*:\s*(.+))?$/);
-    if (!transitionMatch) {
-      continue;
+    const declaredStateIds = new Set<string>();
+    const declaredStateId = extractDeclaredStateId(line);
+    if (declaredStateId) {
+      declaredStateIds.add(declaredStateId);
     }
+    extractTransitionStateIds(line).forEach((stateId) => declaredStateIds.add(stateId));
 
-    const stateIds = [transitionMatch[1].trim(), transitionMatch[3].trim()].filter(
-      (value) => value !== '[*]'
-    );
-
-    for (const stateId of stateIds) {
+    for (const stateId of declaredStateIds) {
       const nodeIndex = nodeIndexById.get(stateId);
       if (typeof nodeIndex !== 'number') {
         continue;
@@ -218,7 +260,7 @@ function parseStateDiagramNotes(input: string, nodes: FlowNode[]): StateNoteReco
     .split('\n')
     .forEach((rawLine, index) => {
       const line = rawLine.trim();
-      const match = line.match(/^note\s+(left of|right of|over)\s+("?)([^":]+)\2\s*:\s*(.+)$/i);
+      const match = line.match(STATE_DIAGRAM_NOTE_RE);
       if (!match || !knownNodeIds.has(match[3])) {
         return;
       }

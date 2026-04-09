@@ -25,7 +25,7 @@ function sortSequenceActivations(
 type SequenceFragmentState = {
   type: string;
   condition: string;
-  branchKind?: 'start' | 'else' | 'and';
+  branchKind?: 'start' | 'else' | 'and' | 'option';
 };
 
 function syncFragmentState(
@@ -45,6 +45,10 @@ function syncFragmentState(
     }
     if (nextFrag.type === 'par' && nextFrag.branchKind === 'and') {
       lines.push(`    and ${nextFrag.condition}`);
+      return nextFrag;
+    }
+    if (nextFrag.type === 'critical' && nextFrag.branchKind === 'option') {
+      lines.push(`    option ${nextFrag.condition}`);
       return nextFrag;
     }
     lines.push('    end');

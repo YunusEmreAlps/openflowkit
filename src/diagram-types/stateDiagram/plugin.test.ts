@@ -51,6 +51,23 @@ describe('STATE_DIAGRAM_PLUGIN', () => {
     expect(busyNode?.parentId).toBe('Working');
   });
 
+  it('keeps standalone state declarations parented inside composite blocks', () => {
+    const input = `
+      stateDiagram-v2
+      state Working {
+        state Busy
+        state Idle
+        Busy --> Idle
+      }
+      Idle --> [*]
+    `;
+
+    const result = STATE_DIAGRAM_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.id === 'Busy')?.parentId).toBe('Working');
+    expect(result.nodes.find((node) => node.id === 'Idle')?.parentId).toBe('Working');
+  });
+
   it('renders state notes as annotation nodes instead of rejecting them', () => {
     const input = `
       stateDiagram-v2
@@ -63,6 +80,21 @@ describe('STATE_DIAGRAM_PLUGIN', () => {
     expect(result.error).toBeUndefined();
     expect(result.nodes.some((node) => node.type === 'annotation')).toBe(true);
     expect(result.edges.some((edge) => edge.source.startsWith('state-note-') && edge.target === 'Idle')).toBe(true);
+    expect(result.diagnostics?.some((message) => message.includes('note syntax'))).not.toBe(true);
+  });
+
+  it('accepts quoted note targets for aliased composite states', () => {
+    const input = `
+      stateDiagram-v2
+      state "Working Set" as WorkingSet {
+        [*] --> Busy
+      }
+      note left of "WorkingSet": Parent note
+    `;
+
+    const result = STATE_DIAGRAM_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.some((node) => node.data.stateNoteTarget === 'WorkingSet')).toBe(true);
     expect(result.diagnostics?.some((message) => message.includes('note syntax'))).not.toBe(true);
   });
 

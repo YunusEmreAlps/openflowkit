@@ -25,9 +25,10 @@ export const SKIP_PATTERNS = [
 ];
 
 const LINK_STYLE_RE = /^linkStyle\s+([\d,\s]+)\s+(.+)$/i;
-const CLASS_DEF_RE = /^classDef\s+(\w+)\s+(.+)$/i;
-const STYLE_RE = /^style\s+(\w+)\s+(.+)$/i;
-const MERMAID_NODE_ID_RE = /^[a-zA-Z0-9_][\w.-]*$/;
+const MERMAID_NODE_ID_RE_SOURCE = '[a-zA-Z0-9_][\\w.-]*';
+const CLASS_DEF_RE = /^classDef\s+([\w-]+)\s+(.+)$/i;
+const STYLE_RE = new RegExp(`^style\\s+(${MERMAID_NODE_ID_RE_SOURCE})\\s+(.+)$`, 'i');
+const MERMAID_NODE_ID_RE = new RegExp(`^${MERMAID_NODE_ID_RE_SOURCE}$`);
 
 export { CLASS_DEF_RE, STYLE_RE };
 

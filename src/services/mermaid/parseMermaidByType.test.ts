@@ -84,6 +84,23 @@ describe('parseMermaidByType', () => {
     expect(result.nodes.length).toBeGreaterThan(0);
   });
 
+  it('keeps standalone composite state declarations parented through the dispatcher', () => {
+    const result = parseMermaidByType(`
+      stateDiagram-v2
+      state Working {
+        state Busy
+        state Idle
+        Busy --> Idle
+      }
+      Idle --> [*]
+    `);
+
+    expect(result.error).toBeUndefined();
+    expect(result.diagramType).toBe('stateDiagram');
+    expect(result.nodes.find((node) => node.id === 'Busy')?.parentId).toBe('Working');
+    expect(result.nodes.find((node) => node.id === 'Idle')?.parentId).toBe('Working');
+  });
+
   it('parses classDiagram through plugin dispatcher', () => {
     const result = parseMermaidByType(`
       classDiagram
@@ -181,6 +198,26 @@ describe('parseMermaidByType', () => {
     expect(result.nodes.length).toBeGreaterThan(0);
     expect(result.edges.length).toBeGreaterThan(0);
     expect(result.nodes.every((node) => node.type === 'mindmap')).toBe(true);
+  });
+
+  it('keeps dotted wrapped mindmap aliases in editable_full when no diagnostics are present', () => {
+    const result = parseMermaidByType(`
+      mindmap
+        platform.root((Root))
+          platform.api[[Child A]]
+          platform.branch(Child B)
+    `);
+
+    expect(result.diagramType).toBe('mindmap');
+    expect(result.error).toBeUndefined();
+    expect(result.structuredDiagnostics).toEqual([]);
+    expect(result.importState).toBe('editable_full');
+    expect(result.nodes.find((node) => node.data.label === 'Root')?.data.mindmapAlias).toBe(
+      'platform.root'
+    );
+    expect(
+      result.nodes.find((node) => node.data.label === 'Child A')?.data.mindmapAlias
+    ).toBe('platform.api');
   });
 
   it('parses journey through plugin dispatcher', () => {
@@ -311,6 +348,8 @@ describe('parseMermaidByType', () => {
 
     expect(result.error).toContain('Missing chart type declaration');
     expect(result.importState).toBe('invalid_source');
+    expect(result.structuredDiagnostics?.length).toBeGreaterThan(0);
+    expect(result.structuredDiagnostics?.[0]?.severity).toBe('error');
   });
 
   it('parses semicolon-terminated node declarations correctly', () => {

@@ -34,12 +34,18 @@ const SUPPORTED_MERMAID_FAMILIES: DiagramType[] = [
   'sequence',
 ];
 
+const SUPPORTED_MERMAID_FAMILY_LIST = SUPPORTED_MERMAID_FAMILIES.join(', ');
+
+function getUnsupportedEditableModeError(typeLabel: string): string {
+  return `Mermaid "${typeLabel}" is not supported yet in editable mode. Supported families: ${SUPPORTED_MERMAID_FAMILY_LIST}.`;
+}
+
 function getUnsupportedTypeError(diagramType: DiagramType): string {
-  return `Mermaid "${diagramType}" is not supported yet in editable mode. Supported families: flowchart, stateDiagram, classDiagram, erDiagram, mindmap, journey, architecture, sequence.`;
+  return getUnsupportedEditableModeError(diagramType);
 }
 
 function getUnsupportedHeaderError(rawType: string): string {
-  return `Mermaid "${rawType}" is not supported yet in editable mode. Supported families: flowchart, stateDiagram, classDiagram, erDiagram, mindmap, journey, architecture, sequence.`;
+  return getUnsupportedEditableModeError(rawType);
 }
 
 function finalizeResult(
@@ -52,8 +58,12 @@ function finalizeResult(
     officialMermaidAccepted?: boolean;
   }
 ): MermaidDispatchParseResult {
+  const diagnosticInput =
+    result.structuredDiagnostics
+    ?? result.diagnostics
+    ?? (result.error ? [result.error] : []);
   const structuredDiagnostics = normalizeMermaidImportDiagnostics({
-    diagnostics: result.structuredDiagnostics ?? result.diagnostics,
+    diagnostics: diagnosticInput,
     family: params.family,
     parseBlocked: Boolean(result.error),
     officialMermaidAccepted: params.officialMermaidAccepted,
@@ -124,14 +134,21 @@ export function parseMermaidByType(
       );
     }
 
-    return {
-      nodes: [],
-      edges: [],
-      error:
-        'Missing chart type declaration. Start with "flowchart TD", "stateDiagram-v2", or another Mermaid diagram type header.',
-      importState: 'invalid_source',
-      originalSource: input,
-    };
+    return finalizeResult(
+      input,
+      {
+        nodes: [],
+        edges: [],
+        error:
+          'Missing chart type declaration. Start with "flowchart TD", "stateDiagram-v2", or another Mermaid diagram type header.',
+        importState: 'invalid_source',
+      },
+      {
+        hasHeader: false,
+        isSupportedFamily: false,
+        officialMermaidAccepted: oracleValidation.isValid,
+      }
+    );
   }
 
   if (!SUPPORTED_MERMAID_FAMILIES.includes(detectedType)) {

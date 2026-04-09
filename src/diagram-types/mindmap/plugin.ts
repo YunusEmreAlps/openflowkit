@@ -17,8 +17,17 @@ interface StructuredNode extends ParsedMindmapNode {
 const X_GAP = 260;
 const Y_GAP = 110;
 const ROOT_GAP = 80;
+const MINDMAP_ALIAS_PATTERN = '[A-Za-z_][\\w.-]*';
+
+function createWrappedMindmapPattern(open: string, close: string): RegExp {
+  return new RegExp(`^(${MINDMAP_ALIAS_PATTERN})?\\s*${open}(.+)${close}$`);
+}
 
 function getIndentDepth(rawLine: string): number {
+  return Math.floor(getLeadingIndentUnits(rawLine) / 2);
+}
+
+function getLeadingIndentUnits(rawLine: string): number {
   let indentUnits = 0;
   for (const char of rawLine) {
     if (char === ' ') {
@@ -31,7 +40,7 @@ function getIndentDepth(rawLine: string): number {
     }
     break;
   }
-  return Math.floor(indentUnits / 2);
+  return indentUnits;
 }
 
 function extractMindmapLabel(
@@ -53,13 +62,13 @@ function extractMindmapLabel(
     wrapper: NonNullable<FlowNode['data']['mindmapWrapper']>;
     pattern: RegExp;
   }> = [
-    { wrapper: 'double-circle', pattern: /^([A-Za-z_][\w-]*)?\s*\(\((.+)\)\)$/ },
-    { wrapper: 'double-square', pattern: /^([A-Za-z_][\w-]*)?\s*\[\[(.+)\]\]$/ },
-    { wrapper: 'stadium', pattern: /^([A-Za-z_][\w-]*)?\s*\(\[(.+)\]\)$/ },
-    { wrapper: 'subroutine', pattern: /^([A-Za-z_][\w-]*)?\s*\[\((.+)\)\]$/ },
-    { wrapper: 'square', pattern: /^([A-Za-z_][\w-]*)?\s*\[(.+)\]$/ },
-    { wrapper: 'rounded', pattern: /^([A-Za-z_][\w-]*)?\s*\((.+)\)$/ },
-    { wrapper: 'hexagon', pattern: /^([A-Za-z_][\w-]*)?\s*\{\{(.+)\}\}$/ },
+    { wrapper: 'double-circle', pattern: createWrappedMindmapPattern('\\(\\(', '\\)\\)') },
+    { wrapper: 'double-square', pattern: createWrappedMindmapPattern('\\[\\[', '\\]\\]') },
+    { wrapper: 'stadium', pattern: createWrappedMindmapPattern('\\(\\[', '\\]\\)') },
+    { wrapper: 'subroutine', pattern: createWrappedMindmapPattern('\\[\\(', '\\)\\]') },
+    { wrapper: 'square', pattern: createWrappedMindmapPattern('\\[', '\\]') },
+    { wrapper: 'rounded', pattern: createWrappedMindmapPattern('\\(', '\\)') },
+    { wrapper: 'hexagon', pattern: createWrappedMindmapPattern('\\{\\{', '\\}\\}') },
   ];
 
   for (const definition of wrapperDefinitions) {
@@ -76,7 +85,7 @@ function extractMindmapLabel(
 
 function hasMalformedWrappedLabel(rawContent: string): boolean {
   const trimmed = rawContent.trim();
-  const compact = trimmed.replace(/^[A-Za-z_][\w-]*\s*/, '');
+  const compact = trimmed.replace(new RegExp(`^${MINDMAP_ALIAS_PATTERN}\\s*`), '');
   const wrappers: Array<{ open: string; close: string }> = [
     { open: '((', close: '))' },
     { open: '[[', close: ']]' },
@@ -118,13 +127,7 @@ function parseMindmap(input: string): { nodes: FlowNode[]; edges: FlowEdge[]; er
     const parsedLabel = extractMindmapLabel(rawLine);
     if (!parsedLabel) continue;
 
-    const indentUnits = rawLine
-      .split('')
-      .reduce((sum, char) => {
-        if (char === ' ') return sum + 1;
-        if (char === '\t') return sum + 2;
-        return sum;
-      }, 0);
+    const indentUnits = getLeadingIndentUnits(rawLine);
     if (indentUnits % 2 !== 0) {
       diagnostics.push(`Odd indentation width at line ${lineNumber}; mindmap expects 2-space indentation steps.`);
     }

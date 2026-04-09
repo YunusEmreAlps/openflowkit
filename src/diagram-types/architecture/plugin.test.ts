@@ -53,6 +53,22 @@ describe('ARCHITECTURE_PLUGIN', () => {
     expect(result.edges[0].targetHandle).toBe('left');
   });
 
+  it('preserves nested architecture groups and parented group metadata', () => {
+    const input = `
+      architecture-beta
+      group global[Global]
+      group prod(cloud)[Prod] in global
+      service api(server)[API] in prod
+    `;
+
+    const result = ARCHITECTURE_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.id === 'prod')?.parentId).toBe('global');
+    expect(result.nodes.find((node) => node.id === 'prod')?.data.archBoundaryId).toBe('global');
+    expect(result.nodes.find((node) => node.id === 'prod')?.data.archProvider).toBe('cloud');
+    expect(result.nodes.find((node) => node.id === 'api')?.parentId).toBe('prod');
+  });
+
   it('extracts protocol and port metadata when label follows protocol:port format', () => {
     const input = `
       architecture-beta

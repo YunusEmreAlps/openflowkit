@@ -1,9 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { parseMermaidByType } from './parseMermaidByType';
+import type { MermaidImportStatus } from './importContracts';
+import { MERMAID_COMPAT_FIXTURES } from '../../../scripts/mermaid-compat-fixtures.mjs';
 
 describe('mermaid compat report harness', () => {
   it('emits corpus-driven family summary output', () => {
@@ -13,7 +12,7 @@ describe('mermaid compat report harness', () => {
     });
     const report = JSON.parse(output);
 
-    expect(report.summary.totalFixtures).toBeGreaterThanOrEqual(35);
+    expect(report.summary.totalFixtures).toBeGreaterThanOrEqual(36);
     expect(report.summary.supportedFamilies).toBeGreaterThan(0);
     expect(report.summary.officialExpectationMatches).toBeGreaterThan(0);
     expect(Array.isArray(report.familySummary)).toBe(true);
@@ -31,12 +30,10 @@ describe('mermaid compat report harness', () => {
   });
 
   it('measures actual OpenFlowKit import outcomes for the fixture corpus', () => {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const fixturesPath = path.resolve(__dirname, '../../../scripts/mermaid-compat-fixtures.json');
-    const fixtures = JSON.parse(fs.readFileSync(fixturesPath, 'utf8')) as Array<{
+    const fixtures = MERMAID_COMPAT_FIXTURES as Array<{
       name: string;
       family: string;
+      expectedImportState: MermaidImportStatus;
       expectedOfficial: 'valid' | 'invalid' | 'environment_limited';
       expectedEditableGate: 'supported_family' | 'unsupported_family' | 'invalid_source';
       source: string;
@@ -56,21 +53,31 @@ describe('mermaid compat report harness', () => {
 
       expect(result.originalSource?.trim(), fixture.name).toBe(fixture.source.trim());
       expect(Array.isArray(result.structuredDiagnostics), fixture.name).toBe(true);
+      expect(result.importState, fixture.name).toBe(fixture.expectedImportState);
 
       if (fixture.expectedEditableGate === 'unsupported_family') {
         expect(result.importState, fixture.name).toBe('unsupported_family');
         continue;
       }
 
+      if (fixture.expectedEditableGate === 'invalid_source') {
+        expect(result.importState, fixture.name).toBe('invalid_source');
+        continue;
+      }
+
       expect(result.importState, fixture.name).not.toBe('unsupported_family');
-      expect(result.importState, fixture.name).not.toBe('invalid_source');
 
       if (fixture.expectedOfficial === 'valid') {
         expect(result.diagramType, fixture.name).toBeDefined();
       }
     }
 
-    expect(outcomeCounts.editable_full + outcomeCounts.editable_partial).toBeGreaterThan(0);
+    expect(
+      outcomeCounts.editable_full
+      + outcomeCounts.editable_partial
+      + outcomeCounts.unsupported_construct
+    ).toBeGreaterThan(0);
     expect(outcomeCounts.unsupported_family).toBeGreaterThan(0);
+    expect(outcomeCounts.invalid_source).toBeGreaterThan(0);
   });
 });

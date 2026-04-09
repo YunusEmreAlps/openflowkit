@@ -82,4 +82,32 @@ describe('architecture round-trip', () => {
     expect(second.nodes.find((node) => node.id === 'app')?.data.archResourceType).toBe('container');
     expect(second.nodes.find((node) => node.id === 'data')?.data.archResourceType).toBe('database_container');
   });
+
+  it('preserves nested architecture groups through import/export/import', () => {
+    const source = `
+      architecture-beta
+      group global[Global]
+      group prod(cloud)[Prod] in global
+      service api(server)[API] in prod
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('architecture');
+    expect(first.nodes.find((node) => node.id === 'prod')?.parentId).toBe('global');
+    expect(first.nodes.find((node) => node.id === 'prod')?.data.archBoundaryId).toBe('global');
+    expect(first.nodes.find((node) => node.id === 'api')?.parentId).toBe('prod');
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported).toContain('group global[Global]');
+    expect(exported).toContain('group prod(cloud)[Prod] in global');
+    expect(exported).toContain('service api(server)[API] in prod');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('architecture');
+    expect(second.nodes.find((node) => node.id === 'prod')?.parentId).toBe('global');
+    expect(second.nodes.find((node) => node.id === 'prod')?.data.archBoundaryId).toBe('global');
+    expect(second.nodes.find((node) => node.id === 'api')?.parentId).toBe('prod');
+  });
 });

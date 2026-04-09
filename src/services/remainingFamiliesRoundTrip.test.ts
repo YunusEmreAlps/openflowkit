@@ -37,6 +37,33 @@ describe('remaining Mermaid family round-trip', () => {
     expect(second.nodes.find((node) => node.data.label === 'Child B')?.data.mindmapWrapper).toBe('rounded');
   });
 
+  it('preserves dotted mindmap aliases through parse/export/parse', () => {
+    const source = `
+      mindmap
+        platform.root((Root))
+          platform.api[[Child A]]
+          platform.branch(Child B)
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('mindmap');
+    expect(first.nodes.find((node) => node.data.label === 'Root')?.data.mindmapAlias).toBe('platform.root');
+    expect(first.nodes.find((node) => node.data.label === 'Child A')?.data.mindmapAlias).toBe('platform.api');
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported).toContain('platform.root((Root))');
+    expect(exported).toContain('platform.api[[Child A]]');
+    expect(exported).toContain('platform.branch(Child B)');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('mindmap');
+    expect(second.nodes.find((node) => node.data.label === 'Root')?.data.mindmapAlias).toBe('platform.root');
+    expect(second.nodes.find((node) => node.data.label === 'Child A')?.data.mindmapAlias).toBe('platform.api');
+    expect(second.nodes.find((node) => node.data.label === 'Child B')?.data.mindmapAlias).toBe('platform.branch');
+  });
+
   it('preserves journey family through parse/export/parse', () => {
     const source = `
       journey
@@ -63,6 +90,34 @@ describe('remaining Mermaid family round-trip', () => {
     expect(second.nodes).toHaveLength(first.nodes.length);
     expect(second.edges).toHaveLength(first.edges.length);
     expect(second.nodes[0].data.journeyTitle).toBe('Checkout');
+  });
+
+  it('preserves journey steps with colon-rich task and actor text through parse/export/parse', () => {
+    const source = `
+      journey
+      title Incident Response
+      section Alerts
+      HTTP: 500 Error: 1: SRE: On-call
+      Recover service: 4: API: Team
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('journey');
+    expect(first.nodes[0].data.journeyTask).toBe('HTTP: 500 Error');
+    expect(first.nodes[0].data.journeyActor).toBe('SRE: On-call');
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported.startsWith('journey')).toBe(true);
+    expect(exported).toContain('HTTP: 500 Error: 1: SRE: On-call');
+    expect(exported).toContain('Recover service: 4: API: Team');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('journey');
+    expect(second.nodes[0].data.journeyTask).toBe('HTTP: 500 Error');
+    expect(second.nodes[0].data.journeyActor).toBe('SRE: On-call');
+    expect(second.nodes[1].data.journeyActor).toBe('API: Team');
   });
 
   it('preserves classDiagram family relation semantics through parse/export/parse', () => {
@@ -122,6 +177,30 @@ describe('remaining Mermaid family round-trip', () => {
     expect(second.nodes.find((node) => node.id === 'Repository<T>')).toBeDefined();
     expect(second.edges[0].data?.classRelationSourceCardinality).toBe('1');
     expect(second.edges[0].data?.classRelationTargetCardinality).toBe('*');
+  });
+
+  it('preserves classDiagram multi-parameter generic identifiers through parse/export/parse', () => {
+    const source = `
+      classDiagram
+      class Map~K, V~
+      class Entry
+      Map~K, V~ --> Entry : stores
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('classDiagram');
+    expect(first.nodes.find((node) => node.id === 'Map<K, V>')).toBeDefined();
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported).toContain('class Map~K, V~');
+    expect(exported).toContain('Map~K, V~ --> Entry : stores');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('classDiagram');
+    expect(second.nodes.find((node) => node.id === 'Map<K, V>')).toBeDefined();
+    expect(second.edges[0].data?.classRelationLabel).toBe('stores');
   });
 
   it('preserves erDiagram family relation semantics through parse/export/parse', () => {
@@ -203,6 +282,37 @@ describe('remaining Mermaid family round-trip', () => {
           name: 'created_at',
           dataType: 'timestamp',
           isNotNull: true,
+        }),
+      ])
+    );
+  });
+
+  it('preserves dotted erDiagram REFERENCES targets through parse/export/parse', () => {
+    const source = `
+      erDiagram
+      ORDER {
+        uuid customer_id FK REFERENCES billing.Customer.id
+      }
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('erDiagram');
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported).toContain('uuid customer_id FK REFERENCES billing.Customer.id');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('erDiagram');
+    const fields = second.nodes[0].data.erFields ?? [];
+    expect(fields).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'customer_id',
+          isForeignKey: true,
+          referencesTable: 'billing.Customer',
+          referencesField: 'id',
         }),
       ])
     );
@@ -372,6 +482,41 @@ describe('remaining Mermaid family round-trip', () => {
       type: 'alt',
       condition: 'success',
       branchKind: 'start',
+    });
+  });
+
+  it('preserves sequence critical/option branches through parse/export/parse', () => {
+    const source = `
+      sequenceDiagram
+      participant A
+      participant B
+      critical primary path
+        A->>B: Request
+      option fallback path
+        B-->>A: Error
+      end
+    `;
+
+    const first = parseMermaidByType(source);
+    expect(first.error).toBeUndefined();
+    expect(first.diagramType).toBe('sequence');
+
+    const exported = toMermaid(first.nodes, first.edges);
+    expect(exported).toContain('critical primary path');
+    expect(exported).toContain('option fallback path');
+
+    const second = parseMermaidByType(exported);
+    expect(second.error).toBeUndefined();
+    expect(second.diagramType).toBe('sequence');
+    expect(second.edges[0].data?.seqFragment).toMatchObject({
+      type: 'critical',
+      condition: 'primary path',
+      branchKind: 'start',
+    });
+    expect(second.edges[1].data?.seqFragment).toMatchObject({
+      type: 'critical',
+      condition: 'fallback path',
+      branchKind: 'option',
     });
   });
 });

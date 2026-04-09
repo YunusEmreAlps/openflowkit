@@ -1,7 +1,5 @@
 import mermaid from 'mermaid';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { MERMAID_COMPAT_FIXTURES as fixtures } from './mermaid-compat-fixtures.mjs';
 
 mermaid.initialize({
   startOnLoad: false,
@@ -25,11 +23,6 @@ const SUPPORTED_EDITABLE_FAMILIES = new Set([
   'sequence',
   'sequenceDiagram',
 ]);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const fixturesPath = path.join(__dirname, 'mermaid-compat-fixtures.json');
-const fixtures = JSON.parse(fs.readFileSync(fixturesPath, 'utf8'));
 
 function classifyOfficialResult(official) {
   if (official.isValid) return 'valid';

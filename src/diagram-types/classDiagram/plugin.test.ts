@@ -63,6 +63,24 @@ describe('CLASS_DIAGRAM_PLUGIN', () => {
     expect(result.edges[0].data.classRelationTargetCardinality).toBe('*');
   });
 
+  it('parses multi-parameter generic identifiers with Mermaid ~...~ syntax', () => {
+    const input = `
+      classDiagram
+      class Map~K, V~
+      class Entry
+      Map~K, V~ --> Entry : stores
+    `;
+
+    const result = CLASS_DIAGRAM_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.id === 'Map<K, V>')?.data.label).toBe('Map<K, V>');
+    expect(result.edges[0]).toMatchObject({
+      source: 'Map<K, V>',
+      target: 'Entry',
+    });
+    expect(result.edges[0].data.classRelationLabel).toBe('stores');
+  });
+
   it('emits diagnostics for malformed class lines and relation syntax', () => {
     const input = `
       classDiagram

@@ -67,6 +67,23 @@ describe('JOURNEY_PLUGIN', () => {
     expect(result.nodes[1].data.color).toBe('red');
   });
 
+  it('preserves journey tasks and actors that contain colons', () => {
+    const input = `
+      journey
+      section Incident Flow
+        HTTP: 500 Error: 1: SRE: On-call
+        Recover service: 4: API: Team
+    `;
+
+    const result = JOURNEY_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes).toHaveLength(2);
+    expect(result.nodes[0].data.journeyTask).toBe('HTTP: 500 Error');
+    expect(result.nodes[0].data.journeyScore).toBe(1);
+    expect(result.nodes[0].data.journeyActor).toBe('SRE: On-call');
+    expect(result.nodes[1].data.journeyActor).toBe('API: Team');
+  });
+
   it('returns diagnostics for malformed section and malformed score-like steps while preserving valid steps', () => {
     const input = `
       journey

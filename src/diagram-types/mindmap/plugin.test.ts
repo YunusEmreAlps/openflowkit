@@ -144,4 +144,19 @@ describe('MINDMAP_PLUGIN', () => {
     expect(result.nodes.find((node) => node.data.label === 'Topic')?.data.mindmapAlias).toBe('feature');
     expect(result.nodes.find((node) => node.data.label === 'Child')?.data.mindmapAlias).toBe('branch');
   });
+
+  it('preserves dotted Mermaid alias prefixes for wrapped nodes', () => {
+    const input = `
+      mindmap
+        platform.root((Root))
+          platform.api[[Topic]]
+          platform.branch(Child)
+    `;
+
+    const result = MINDMAP_PLUGIN.parseMermaid(input);
+    expect(result.error).toBeUndefined();
+    expect(result.nodes.find((node) => node.data.label === 'Root')?.data.mindmapAlias).toBe('platform.root');
+    expect(result.nodes.find((node) => node.data.label === 'Topic')?.data.mindmapAlias).toBe('platform.api');
+    expect(result.nodes.find((node) => node.data.label === 'Child')?.data.mindmapAlias).toBe('platform.branch');
+  });
 });

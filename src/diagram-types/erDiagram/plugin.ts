@@ -23,6 +23,26 @@ interface RelationRecord {
 
 const ENTITY_ID_PATTERN = '[A-Za-z_][\\w.]*';
 
+function parseReferenceTarget(reference: string): {
+  referencesTable?: string;
+  referencesField?: string;
+} {
+  const trimmed = reference.trim();
+  if (!trimmed) {
+    return {};
+  }
+
+  const lastDotIndex = trimmed.lastIndexOf('.');
+  if (lastDotIndex <= 0 || lastDotIndex === trimmed.length - 1) {
+    return { referencesTable: trimmed };
+  }
+
+  return {
+    referencesTable: trimmed.slice(0, lastDotIndex),
+    referencesField: trimmed.slice(lastDotIndex + 1),
+  };
+}
+
 function createEmptyEntity(id: string): EntityRecord {
   return {
     id,
@@ -71,10 +91,9 @@ function parseMermaidErField(line: string): ErField {
       continue;
     }
     if (token === 'REFERENCES' && rawConstraints[index + 1]) {
-      const reference = rawConstraints[index + 1];
-      const [referencesTable, referencesField] = reference.split('.');
-      field.referencesTable = referencesTable;
-      field.referencesField = referencesField;
+      const reference = parseReferenceTarget(rawConstraints[index + 1]);
+      field.referencesTable = reference.referencesTable;
+      field.referencesField = reference.referencesField;
       index += 1;
     }
   }

@@ -2,9 +2,9 @@ import type { FlowNode } from '@/lib/types';
 import { getNodeParentId } from '@/lib/nodeParent';
 import { resolveNodeSize } from '@/components/nodeHelpers';
 
-export const SECTION_MIN_WIDTH = 500;
-export const SECTION_MIN_HEIGHT = 400;
-export const SECTION_PADDING_X = 32;
+export const SECTION_MIN_WIDTH = 200;
+export const SECTION_MIN_HEIGHT = 160;
+export const SECTION_PADDING_X = 20;
 export const SECTION_PADDING_BOTTOM = 32;
 // Title now floats ABOVE the section border — no internal header space needed
 export const SECTION_HEADER_HEIGHT = 16;

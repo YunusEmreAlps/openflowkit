@@ -183,4 +183,29 @@ describe('SEQUENCE_PLUGIN', () => {
       branchKind: 'start',
     });
   });
+
+  it('preserves critical and option branch metadata on sequence messages', () => {
+    const input = `sequenceDiagram
+    participant A
+    participant B
+    critical primary path
+      A->>B: Request
+    option fallback path
+      B-->>A: Error
+    end`;
+
+    const result = SEQUENCE_PLUGIN.parseMermaid(input);
+
+    expect(result.error).toBeUndefined();
+    expect(result.edges[0].data?.seqFragment).toMatchObject({
+      type: 'critical',
+      condition: 'primary path',
+      branchKind: 'start',
+    });
+    expect(result.edges[1].data?.seqFragment).toMatchObject({
+      type: 'critical',
+      condition: 'fallback path',
+      branchKind: 'option',
+    });
+  });
 });

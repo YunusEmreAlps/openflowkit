@@ -31,13 +31,20 @@ describe('composeDiagramForDisplay', () => {
     const nodes = [createNode('a'), createNode('b')];
     const edges = [createEdge('e1', 'a', 'b')];
 
-    await composeDiagramForDisplay(nodes, edges, { direction: 'LR', algorithm: 'layered', spacing: 'compact' });
+    await composeDiagramForDisplay(nodes, edges, {
+      direction: 'LR',
+      algorithm: 'layered',
+      spacing: 'compact',
+      contentDensity: 'compact',
+    });
 
     expect(getElkLayout).toHaveBeenCalledWith(nodes, edges, {
       direction: 'LR',
       algorithm: 'layered',
       spacing: 'compact',
+      contentDensity: 'compact',
       diagramType: undefined,
+      source: undefined,
     });
   });
 

@@ -4,6 +4,7 @@ import type { ViewSettings } from '@/store/types';
 import { getNodeParentId } from '@/lib/nodeParent';
 import { getNodeHandleIdForSide, type HandleSide } from '@/lib/nodeHandles';
 import { resolveNodeSize } from '@/components/nodeHelpers';
+import { estimateWrappedTextBox, DEFAULT_MAX_WIDTH } from './elk-layout/textSizing';
 
 // Walks the parent hierarchy to get the canvas-absolute position of a node.
 // Uses node.position (relative) rather than positionAbsolute, which can be
@@ -38,12 +39,14 @@ function getNodeDimensions(node: FlowNode): { width: number; height: number } {
         return resolved;
     }
 
-    // Match ELK's label-based estimation so handle assignment uses the same
+    // Match ELK's text-based estimation so handle assignment uses the same
     // assumed size that ELK used when computing node positions.
-    const label = node.data?.label ?? '';
-    const estimatedWidth = Math.max(NODE_WIDTH, label.length * 8 + 40);
-    const estimatedHeight = Math.max(NODE_HEIGHT, Math.ceil(label.length / 40) * 20 + 60);
-    return { width: estimatedWidth, height: estimatedHeight };
+    const estimate = estimateWrappedTextBox(String(node.data?.label ?? ''), {
+      minWidth: NODE_WIDTH,
+      minHeight: NODE_HEIGHT,
+      maxWidth: DEFAULT_MAX_WIDTH,
+    });
+    return { width: estimate.width, height: estimate.height };
 }
 
 type RoutingContext = {

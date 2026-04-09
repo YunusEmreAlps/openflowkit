@@ -23,7 +23,9 @@ interface RelationRecord {
   targetCardinality?: string;
 }
 
-const CLASS_ID_PATTERN = '[A-Za-z_][\\w.<>~,]*';
+const CLASS_ID_START_PATTERN = '[A-Za-z_]';
+const CLASS_ID_SEGMENT_PATTERN = '(?:[\\w.]|<[^>]+>|~[^~]+~|,)';
+const CLASS_ID_PATTERN = `${CLASS_ID_START_PATTERN}${CLASS_ID_SEGMENT_PATTERN}*`;
 
 function normalizeClassIdentifier(value: string): string {
   return value.trim().replace(/~([^~]+)~/g, '<$1>');

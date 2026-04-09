@@ -36,39 +36,57 @@ interface ParsedJourneyStep {
   scoreMalformed: boolean;
 }
 
+function buildJourneyStep(
+  task: string,
+  scoreMalformed: boolean,
+  score?: number,
+  actor?: string
+): ParsedJourneyStep | null {
+  const normalizedTask = task.trim();
+  if (!normalizedTask) {
+    return null;
+  }
+  const normalizedActor = actor?.trim() || undefined;
+
+  return {
+    task: normalizedTask,
+    actor: normalizedActor,
+    score,
+    scoreMalformed,
+  };
+}
+
+function joinJourneySegments(parts: string[]): string {
+  return parts.join(': ');
+}
+
 function parseJourneyStep(line: string): ParsedJourneyStep | null {
   const parts = line.split(':').map((item) => item.trim());
   if (parts.length === 0) return null;
 
-  const task = parts[0];
-  if (!task) return null;
-
   if (parts.length === 1) {
-    return { task, scoreMalformed: false };
+    return buildJourneyStep(parts[0], false);
   }
 
-  if (parts.length === 2) {
-    const score = normalizeScore(parts[1]);
+  for (let scoreIndex = parts.length - 1; scoreIndex >= 1; scoreIndex -= 1) {
+    const score = normalizeScore(parts[scoreIndex]);
     if (score === null) {
-      return { task, scoreMalformed: true };
+      continue;
     }
-    return { task, score, scoreMalformed: false };
+    return buildJourneyStep(
+      joinJourneySegments(parts.slice(0, scoreIndex)),
+      false,
+      score,
+      joinJourneySegments(parts.slice(scoreIndex + 1))
+    );
   }
 
-  const score = normalizeScore(parts[1]);
-  if (score === null) {
-    return {
-      task,
-      actor: parts.slice(2).join(':').trim() || undefined,
-      scoreMalformed: true,
-    };
-  }
-  return {
-    task,
-    score,
-    actor: parts.slice(2).join(':').trim() || undefined,
-    scoreMalformed: false,
-  };
+  return buildJourneyStep(
+    parts[0],
+    true,
+    undefined,
+    parts.length > 2 ? joinJourneySegments(parts.slice(2)) : undefined
+  );
 }
 
 function parseJourney(input: string): { nodes: FlowNode[]; edges: FlowEdge[]; error?: string; diagnostics?: string[] } {

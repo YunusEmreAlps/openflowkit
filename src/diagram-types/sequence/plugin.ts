@@ -19,7 +19,7 @@ interface ParsedFragment {
   id: string;
   type: 'alt' | 'loop' | 'opt' | 'par' | 'break' | 'critical';
   condition: string;
-  branchKind: 'start' | 'else' | 'and';
+  branchKind: 'start' | 'else' | 'and' | 'option';
   startOrder: number;
   endOrder: number;
 }
@@ -92,6 +92,50 @@ function parseSequence(input: string): {
     startOrder: number;
   }> = [];
 
+  function pushCompletedFragmentBranch(
+    fragment: {
+      id: string;
+      type: ParsedFragment['type'];
+      condition: string;
+      branchKind: ParsedFragment['branchKind'];
+      startOrder: number;
+    }
+  ): void {
+    fragments.push({
+      id: `${fragment.id}-branch-${fragments.length + 1}`,
+      type: fragment.type,
+      condition: fragment.condition,
+      branchKind: fragment.branchKind,
+      startOrder: fragment.startOrder,
+      endOrder: messageOrder,
+    });
+  }
+
+  function switchFragmentBranch(
+    line: string,
+    params: {
+      keyword: 'else' | 'and' | 'option';
+      allowedType: 'alt' | 'par' | 'critical';
+      branchKind: 'else' | 'and' | 'option';
+    }
+  ): boolean {
+    const match = line.match(new RegExp(`^${params.keyword}\\s+(.+)$`, 'i'));
+    if (!match || fragmentStack.length === 0) {
+      return false;
+    }
+
+    const top = fragmentStack[fragmentStack.length - 1];
+    if (top.type !== params.allowedType) {
+      return true;
+    }
+
+    pushCompletedFragmentBranch(top);
+    top.condition = match[1].trim();
+    top.branchKind = params.branchKind;
+    top.startOrder = messageOrder;
+    return true;
+  }
+
   function ensureParticipant(name: string): void {
     if (knownIds.has(name)) return;
     participants.push({ id: name, label: name, kind: 'participant' });
@@ -145,55 +189,40 @@ function parseSequence(input: string): {
       continue;
     }
 
-    const elseMatch = line.match(/^else\s+(.+)$/i);
-    if (elseMatch && fragmentStack.length > 0) {
-      const top = fragmentStack[fragmentStack.length - 1];
-      if (top.type === 'alt') {
-        fragments.push({
-          id: `${top.id}-branch-${fragments.length + 1}`,
-          type: top.type,
-          condition: top.condition,
-          branchKind: top.branchKind,
-          startOrder: top.startOrder,
-          endOrder: messageOrder,
-        });
-        top.condition = elseMatch[1].trim();
-        top.branchKind = 'else';
-        top.startOrder = messageOrder;
-      }
+    if (
+      switchFragmentBranch(line, {
+        keyword: 'else',
+        allowedType: 'alt',
+        branchKind: 'else',
+      })
+    ) {
       continue;
     }
 
-    const andMatch = line.match(/^and\s+(.+)$/i);
-    if (andMatch && fragmentStack.length > 0) {
-      const top = fragmentStack[fragmentStack.length - 1];
-      if (top.type === 'par') {
-        fragments.push({
-          id: `${top.id}-branch-${fragments.length + 1}`,
-          type: top.type,
-          condition: top.condition,
-          branchKind: top.branchKind,
-          startOrder: top.startOrder,
-          endOrder: messageOrder,
-        });
-        top.condition = andMatch[1].trim();
-        top.branchKind = 'and';
-        top.startOrder = messageOrder;
-      }
+    if (
+      switchFragmentBranch(line, {
+        keyword: 'and',
+        allowedType: 'par',
+        branchKind: 'and',
+      })
+    ) {
+      continue;
+    }
+
+    if (
+      switchFragmentBranch(line, {
+        keyword: 'option',
+        allowedType: 'critical',
+        branchKind: 'option',
+      })
+    ) {
       continue;
     }
 
     if (/^end\b/i.test(line)) {
       if (fragmentStack.length > 0) {
         const top = fragmentStack.pop()!;
-        fragments.push({
-          id: `${top.id}-branch-${fragments.length + 1}`,
-          type: top.type,
-          condition: top.condition,
-          branchKind: top.branchKind,
-          startOrder: top.startOrder,
-          endOrder: messageOrder,
-        });
+        pushCompletedFragmentBranch(top);
       }
       continue;
     }

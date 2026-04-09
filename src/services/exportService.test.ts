@@ -41,6 +41,34 @@ describe('toMermaid', () => {
     expect(output).toContain('api:R <--> L:db : HTTPS:443');
   });
 
+  it('preserves nested architecture groups during export', () => {
+    const nodes: FlowNode[] = [
+      {
+        id: 'global',
+        type: 'architecture',
+        position: { x: 0, y: 0 },
+        data: { label: 'Global', archResourceType: 'group' },
+      },
+      {
+        id: 'prod',
+        type: 'architecture',
+        position: { x: 240, y: 0 },
+        data: { label: 'Prod', archResourceType: 'group', archProvider: 'cloud', archBoundaryId: 'global' },
+      },
+      {
+        id: 'api',
+        type: 'architecture',
+        position: { x: 480, y: 0 },
+        data: { label: 'API', archResourceType: 'service', archBoundaryId: 'prod' },
+      },
+    ];
+
+    const output = toMermaid(nodes, []);
+    expect(output).toContain('group global[Global]');
+    expect(output).toContain('group prod(cloud)[Prod] in global');
+    expect(output).toContain('service api[API] in prod');
+  });
+
   it('keeps flowchart export path for mixed or non-architecture nodes', () => {
     const nodes: FlowNode[] = [
       { id: 'a', type: 'process', position: { x: 0, y: 0 }, data: { label: 'A' } },

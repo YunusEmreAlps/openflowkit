@@ -3,6 +3,8 @@ import { NODE_HEIGHT, NODE_WIDTH } from '@/constants';
 import { getIconAssetNodeMinSize, resolveNodeSize } from '@/components/nodeHelpers';
 import {
   SECTION_CONTENT_PADDING_TOP,
+  SECTION_MIN_HEIGHT,
+  SECTION_MIN_WIDTH,
   SECTION_PADDING_BOTTOM,
   SECTION_PADDING_X,
 } from '@/hooks/node-operations/sectionBounds';
@@ -18,6 +20,7 @@ import {
   resolveLayoutPresetOptions,
 } from './elk-layout/options';
 import type { FlowNodeWithMeasuredDimensions, LayoutOptions } from './elk-layout/types';
+import { estimateWrappedTextBox, DEFAULT_MAX_WIDTH } from './elk-layout/textSizing';
 import { getNodeHandleIdForSide } from '@/lib/nodeHandles';
 
 interface ElkLayoutEngine {
@@ -95,7 +98,51 @@ async function getElkInstance(): Promise<ElkLayoutEngine> {
   return elkInstancePromise;
 }
 
-function buildElkNode(node: FlowNode, childrenByParent: Map<string, FlowNode[]>): ElkNode {
+const IMPORT_NODE_MIN_WIDTH = 160;
+const IMPORT_NODE_MIN_HEIGHT = 52;
+const IMPORT_NODE_MAX_WIDTH = 240;
+
+function estimateNodeSize(
+  node: FlowNode,
+  nodeMinWidth: number,
+  nodeMinHeight: number
+): { width: number; height: number } {
+  const isImportSized = nodeMinWidth < NODE_WIDTH;
+  const estimate = estimateWrappedTextBox(String(node.data?.label ?? ''), {
+    minWidth: nodeMinWidth,
+    minHeight: nodeMinHeight,
+    maxWidth: isImportSized ? IMPORT_NODE_MAX_WIDTH : DEFAULT_MAX_WIDTH,
+  });
+
+  // Only apply resolvedSize as a floor when it represents an explicit user-set
+  // dimension, not the canvas default. For import-sized nodes, resolveNodeSize()
+  // returns 250px which would silently defeat import compaction.
+  if (isImportSized) {
+    return estimate;
+  }
+
+  const resolvedSize = resolveNodeSize(node);
+  return {
+    width: Math.max(resolvedSize.width, estimate.width),
+    height: Math.max(resolvedSize.height, estimate.height),
+  };
+}
+
+function hasInternalEdges(
+  childIds: Set<string>,
+  edges: FlowEdge[]
+): boolean {
+  return edges.some((e) => childIds.has(e.source) && childIds.has(e.target));
+}
+
+function buildElkNode(
+  node: FlowNode,
+  childrenByParent: Map<string, FlowNode[]>,
+  allEdges: FlowEdge[],
+  nodeMinWidth = NODE_WIDTH,
+  nodeMinHeight = NODE_HEIGHT,
+  rootElkDirection = 'DOWN'
+): ElkNode {
   const children = childrenByParent.get(node.id) || [];
 
   const nodeWithMeasuredDimensions = node as FlowNodeWithMeasuredDimensions;
@@ -108,29 +155,40 @@ function buildElkNode(node: FlowNode, childrenByParent: Map<string, FlowNode[]>)
       width = width ?? minSize.minWidth;
       height = height ?? minSize.minHeight;
     } else {
-      const resolvedSize = resolveNodeSize(node);
-      const label = node.data?.label || '';
-      const estimatedWidth = Math.max(resolvedSize.width, NODE_WIDTH, label.length * 8 + 40);
-      const estimatedHeight = Math.max(
-        resolvedSize.height,
-        NODE_HEIGHT,
-        Math.ceil(label.length / 40) * 20 + 60
-      );
-
-      width = width ?? estimatedWidth;
-      height = height ?? estimatedHeight;
+      const estimatedSize = estimateNodeSize(node, nodeMinWidth, nodeMinHeight);
+      width = width ?? estimatedSize.width;
+      height = height ?? estimatedSize.height;
     }
   }
 
   const hasChildren = children.length > 0;
+
+  // Subgraphs with no internal edges (pure parallel siblings) lay out
+  // horizontally regardless of root direction — matching Mermaid's Dagre
+  // which places same-rank disconnected nodes side by side.
+  const childIds = hasChildren ? new Set(children.map((c) => c.id)) : null;
+  const parallelChildren = childIds !== null && !hasInternalEdges(childIds, allEdges);
+
+  // Compound nodes must explicitly inherit the root elk.direction — ELK does
+  // not cascade it automatically, so without this subgraphs always use ELK's
+  // built-in default (DOWN) regardless of the root graph setting.
+  const compoundLayoutOptions = hasChildren
+    ? {
+        ...ELK_COMPOUND_LAYOUT_OPTIONS,
+        'elk.direction': parallelChildren ? 'RIGHT' : rootElkDirection,
+      }
+    : {};
+
   return {
     id: node.id,
     width: hasChildren ? undefined : width,
     height: hasChildren ? undefined : height,
-    children: children.map((child) => buildElkNode(child, childrenByParent)),
+    children: children.map((child) =>
+      buildElkNode(child, childrenByParent, allEdges, nodeMinWidth, nodeMinHeight, rootElkDirection)
+    ),
     layoutOptions: {
       'elk.padding': ELK_SECTION_PADDING,
-      ...(hasChildren ? ELK_COMPOUND_LAYOUT_OPTIONS : {}),
+      ...compoundLayoutOptions,
     },
   };
 }
@@ -278,15 +336,11 @@ function getNodeBoundsFromPositionMap(
   const pos = positionMap.get(node.id);
   const x = pos?.x ?? node.position.x;
   const y = pos?.y ?? node.position.y;
-  const label = node.data?.label ?? '';
-  const width =
-    pos?.width ??
-    (node as FlowNodeWithMeasuredDimensions).measured?.width ??
-    Math.max(NODE_WIDTH, label.length * 8 + 40);
-  const height =
-    pos?.height ??
-    (node as FlowNodeWithMeasuredDimensions).measured?.height ??
-    Math.max(NODE_HEIGHT, Math.ceil(label.length / 40) * 20 + 60);
+  const measured = (node as FlowNodeWithMeasuredDimensions).measured;
+  const needsEstimate = !pos?.width || !pos?.height;
+  const estimate = needsEstimate ? estimateNodeSize(node, NODE_WIDTH, NODE_HEIGHT) : null;
+  const width = pos?.width ?? measured?.width ?? estimate!.width;
+  const height = pos?.height ?? measured?.height ?? estimate!.height;
   return {
     left: x,
     right: x + width,
@@ -295,6 +349,118 @@ function getNodeBoundsFromPositionMap(
     centerX: x + width / 2,
     centerY: y + height / 2,
   };
+}
+
+function getFallbackNodeSize(
+  node: FlowNode,
+  nodeMinWidth: number,
+  nodeMinHeight: number
+): { width: number; height: number } {
+  const measured = node as FlowNodeWithMeasuredDimensions;
+  if (measured.measured?.width && measured.measured?.height) {
+    return {
+      width: measured.measured.width,
+      height: measured.measured.height,
+    };
+  }
+
+  if (node.data?.assetPresentation === 'icon') {
+    const minSize = getIconAssetNodeMinSize(Boolean(node.data?.label?.trim()));
+    return { width: minSize.minWidth, height: minSize.minHeight };
+  }
+
+  return estimateNodeSize(node, nodeMinWidth, nodeMinHeight);
+}
+
+function getFallbackSpacing(options: LayoutOptions): { primary: number; secondary: number } {
+  const isImport = options.source === 'import';
+  const primaryBase = isImport ? 36 : 56;
+  const secondaryBase = isImport ? 52 : 84;
+
+  switch (options.contentDensity) {
+    case 'compact':
+      return { primary: primaryBase - 8, secondary: secondaryBase - 10 };
+    case 'verbose':
+      return { primary: primaryBase + 10, secondary: secondaryBase + 14 };
+    default:
+      return { primary: primaryBase, secondary: secondaryBase };
+  }
+}
+
+function applyRecursiveFallbackLayout(
+  nodes: FlowNode[],
+  options: LayoutOptions,
+  nodeMinWidth: number,
+  nodeMinHeight: number
+): FlowNode[] {
+  const { topLevelNodes, childrenByParent } = normalizeLayoutInputsForDeterminism(nodes, []);
+  const positionedNodes = new Map<string, FlowNode>();
+  const isHorizontal = options.direction === 'LR' || options.direction === 'RL';
+  const spacing = getFallbackSpacing(options);
+
+  function layoutNode(
+    node: FlowNode,
+    origin: { x: number; y: number }
+  ): { width: number; height: number } {
+    const directChildren = childrenByParent.get(node.id) ?? [];
+    const hasChildren = directChildren.length > 0;
+    const nextNode: FlowNode = {
+      ...node,
+      position: origin,
+    };
+
+    if (!hasChildren) {
+      positionedNodes.set(node.id, nextNode);
+      return getFallbackNodeSize(node, nodeMinWidth, nodeMinHeight);
+    }
+
+    let cursorX = SECTION_PADDING_X;
+    let cursorY = SECTION_CONTENT_PADDING_TOP;
+    let maxChildRight = cursorX;
+    let maxChildBottom = cursorY;
+
+    for (const child of directChildren) {
+      const childBounds = layoutNode(child, { x: cursorX, y: cursorY });
+      maxChildRight = Math.max(maxChildRight, cursorX + childBounds.width);
+      maxChildBottom = Math.max(maxChildBottom, cursorY + childBounds.height);
+
+      if (isHorizontal) {
+        cursorX += childBounds.width + spacing.primary;
+      } else {
+        cursorY += childBounds.height + spacing.primary;
+      }
+    }
+
+    const width = Math.max(maxChildRight + SECTION_PADDING_X, SECTION_MIN_WIDTH);
+    const height = Math.max(maxChildBottom + SECTION_PADDING_BOTTOM, SECTION_MIN_HEIGHT);
+
+    positionedNodes.set(node.id, {
+      ...nextNode,
+      style:
+        node.type === 'group' || node.type === 'section' || node.type === 'container'
+          ? {
+              ...node.style,
+              width,
+              height,
+            }
+          : node.style,
+    });
+
+    return { width, height };
+  }
+
+  let cursorX = 0;
+  let cursorY = 0;
+  for (const node of topLevelNodes) {
+    const laidOutSize = layoutNode(node, { x: cursorX, y: cursorY });
+    if (isHorizontal) {
+      cursorX += laidOutSize.width + spacing.secondary;
+    } else {
+      cursorY += laidOutSize.height + spacing.secondary;
+    }
+  }
+
+  return nodes.map((node) => positionedNodes.get(node.id) ?? node);
 }
 
 function inferHandleSideFromPoint(
@@ -507,7 +673,7 @@ export function shouldUseLightweightLayoutPostProcessing(
     return false;
   }
 
-  return nodeCount >= 24 || edgeCount >= 36;
+  return nodeCount >= 40 || edgeCount >= 60;
 }
 
 export async function getElkLayout(
@@ -563,10 +729,16 @@ export async function getElkLayout(
       ? sortTopLevelNodesForArchitecture(topLevelNodes, buildDynamicLayerOrder(nodes))
       : topLevelNodes;
 
+  const isImport = options.source === 'import';
+  const nodeMinWidth = isImport ? IMPORT_NODE_MIN_WIDTH : NODE_WIDTH;
+  const nodeMinHeight = isImport ? IMPORT_NODE_MIN_HEIGHT : NODE_HEIGHT;
+
   const elkGraph: ElkNode = {
     id: 'root',
     layoutOptions,
-    children: orderedTopLevelNodes.map((node) => buildElkNode(node, childrenByParent)),
+    children: orderedTopLevelNodes.map((node) =>
+      buildElkNode(node, childrenByParent, sortedEdges, nodeMinWidth, nodeMinHeight, layoutOptions['elk.direction'] ?? 'DOWN')
+    ),
     edges: sortedEdges.map((edge) => ({
       id: edge.id,
       sources: [edge.source],
@@ -640,7 +812,11 @@ export async function getElkLayout(
     return { nodes: laidOutNodes, edges: laidOutEdges };
   } catch (err) {
     logger.error('ELK layout error.', { error: err });
-    return { nodes, edges };
+    const fallbackNodes = applyRecursiveFallbackLayout(nodes, options, nodeMinWidth, nodeMinHeight);
+    return {
+      nodes: fallbackNodes,
+      edges: resolveLayoutedEdgeHandles(fallbackNodes, edges),
+    };
   }
 }
 

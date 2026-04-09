@@ -29,6 +29,6 @@ describe('entityFields', () => {
       referencesField: 'id',
     });
 
-    expect(result).toBe('uuid customer_id FK UK NN REFERENCES CUSTOMER');
+    expect(result).toBe('uuid customer_id FK UK NN REFERENCES CUSTOMER.id');
   });
 });

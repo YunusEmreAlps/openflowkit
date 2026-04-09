@@ -10,7 +10,6 @@ import type {
   ResolvedLayoutConfiguration,
 } from './types';
 
-// Map user-friendly direction codes to ELK direction values
 const DIRECTION_MAP: Record<string, LayoutDirection> = {
   TB: 'DOWN',
   LR: 'RIGHT',
@@ -20,32 +19,68 @@ const DIRECTION_MAP: Record<string, LayoutDirection> = {
 
 function getSpacingDimensions(
   spacing: LayoutOptions['spacing'] = 'normal',
-  isHorizontal: boolean
+  isHorizontal: boolean,
+  options: LayoutOptions
 ): {
   nodeNode: string;
   nodeLayer: string;
   component: string;
 } {
-  let nodeNode = 80;
-  let nodeLayer = 150;
+  let nodeNode = 56;
+  let nodeLayer = 84;
 
   switch (spacing) {
     case 'compact':
-      nodeNode = 60;
-      nodeLayer = 120;
+      nodeNode = 40;
+      nodeLayer = 60;
       break;
     case 'loose':
-      nodeNode = 150;
-      nodeLayer = 250;
+      nodeNode = 76;
+      nodeLayer = 116;
       break;
     case 'normal':
     default:
-      nodeNode = 80;
-      nodeLayer = 150;
+      nodeNode = 56;
+      nodeLayer = 84;
+  }
+
+  if (options.source === 'import') {
+    nodeNode -= 6;
+    nodeLayer -= 8;
+  }
+
+  switch (options.contentDensity) {
+    case 'compact':
+      nodeNode -= 8;
+      nodeLayer -= 10;
+      break;
+    case 'verbose':
+      nodeNode += 10;
+      nodeLayer += 14;
+      break;
+    default:
+      break;
+  }
+
+  switch (options.diagramType) {
+    case 'architecture':
+    case 'infrastructure':
+      nodeNode = Math.max(nodeNode, 56);
+      nodeLayer = Math.max(nodeLayer, 88);
+      break;
+    case 'flowchart':
+    case 'stateDiagram':
+    case 'classDiagram':
+    case 'erDiagram':
+      nodeNode = Math.min(nodeNode, spacing === 'loose' ? 72 : 52);
+      nodeLayer = Math.min(nodeLayer, spacing === 'loose' ? 108 : 76);
+      break;
+    default:
+      break;
   }
 
   if (isHorizontal) {
-    nodeLayer *= 1.2;
+    nodeLayer = Math.round(nodeLayer * 1.12);
   }
 
   return {
@@ -57,25 +92,6 @@ function getSpacingDimensions(
 
 function isArchitectureLikeDiagram(diagramType: string | undefined): boolean {
   return diagramType === 'architecture' || diagramType === 'infrastructure';
-}
-
-function applyDiagramTypeSpacingHeuristics(
-  dims: { nodeNode: string; nodeLayer: string; component: string },
-  options: LayoutOptions
-): { nodeNode: string; nodeLayer: string; component: string } {
-  if (!isArchitectureLikeDiagram(options.diagramType)) {
-    return dims;
-  }
-
-  const nodeNode = Math.round(Number(dims.nodeNode) * 1.35);
-  const nodeLayer = Math.round(Number(dims.nodeLayer) * 1.3);
-  const component = Math.round(Number(dims.component) * 1.25);
-
-  return {
-    nodeNode: String(nodeNode),
-    nodeLayer: String(nodeLayer),
-    component: String(component),
-  };
 }
 
 function getAlgorithmOptions(
@@ -135,7 +151,9 @@ function getAlgorithmOptions(
   } else if (algorithm === 'mrtree') {
     Object.assign(algorithmOptions, {
       'elk.separateConnectedComponents': 'true',
-      'elk.portConstraints': 'FIXED_SIDE', // Lock to centers to force centralized trunk grouping
+      // FIXED_SIDE constrains ports to a node face, preventing mrtree from
+      // routing edges through the center and producing cleaner trunk grouping.
+      'elk.portConstraints': 'FIXED_SIDE',
       'elk.spacing.edgeEdge': '12',
     });
   } else if (algorithm === 'force') {
@@ -195,10 +213,7 @@ export function buildResolvedLayoutConfiguration(
   const elkDirection = DIRECTION_MAP[direction] || 'DOWN';
   const isHorizontal = direction === 'LR' || direction === 'RL';
 
-  const dims = applyDiagramTypeSpacingHeuristics(
-    getSpacingDimensions(spacing, isHorizontal),
-    options
-  );
+  const dims = getSpacingDimensions(spacing, isHorizontal, options);
   const algoOptions = getAlgorithmOptions(algorithm, parseFloat(dims.nodeLayer), options);
   const deterministicSeedOptions = getDeterministicSeedOptions(algorithm);
   const layoutOptions = {

@@ -7,15 +7,14 @@ import { InlineTextEditSurface } from '@/components/InlineTextEditSurface';
 import { NodeChrome } from '@/components/NodeChrome';
 import { getTransformDiagnosticsAttrs } from '@/components/transformDiagnostics';
 import { resolveContainerVisualStyle } from '@/theme';
-
-// These constants are used by SequenceMessageEdge to position arrows correctly.
-export const SEQ_BOX_H = 48;
-export const SEQ_ACTOR_EXTRA_H = 40;
-export const SEQ_LIFELINE_H = 500;
-export const SEQ_MSG_OFFSET = 20; // gap between box bottom and first message
-export const SEQ_MSG_SPACING = 52;
-
-const SEQ_NODE_W = 140;
+import {
+  SEQ_ACTOR_EXTRA_H,
+  SEQ_BOX_H,
+  SEQ_LIFELINE_H,
+  SEQ_NODE_W,
+  SEQ_MSG_OFFSET,
+  SEQ_MSG_SPACING,
+} from '@/services/sequence/layoutConstants';
 
 // Single invisible handle at top-center — used by SequenceMessageEdge
 const TOP_HANDLE_ONLY = [{ id: 'top', position: Position.Top, side: 'top' as const }];
